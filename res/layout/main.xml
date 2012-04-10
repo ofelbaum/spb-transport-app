@@ -9,9 +9,8 @@
             android:layout_height="fill_parent"
             android:enabled="true"
             android:clickable="true"
-            android:apiKey="0mYNikb5z6ZE__ckWY3HwQpCDdyP5XoDgxSluiw"
+            android:apiKey="0mYNikb5z6ZF45BvsObwE7zpQ0bZh5ji_Ur-I0Q"
             />
-
 
     <LinearLayout android:id="@+id/zoom"
                   android:layout_width="wrap_content"
@@ -21,20 +20,3 @@
             />
 
 </RelativeLayout>
-
-        <!--<?xml version="1.0" encoding="utf-8"?>-->
-        <!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="fill_parent">-->
-
-        <!--<com.google.android.maps.MapView-->
-        <!--android:id="@+id/mapView"-->
-        <!--android:layout_width="fill_parent"-->
-        <!--android:layout_height="fill_parent"-->
-        <!--android:enabled="true"-->
-        <!--android:clickable="true"-->
-        <!--android:apiKey="0mYNikb5z6ZF45BvsObwE7zpQ0bZh5ji_Ur-I0Q"-->
-        <!--/>-->
-
-        <!--</RelativeLayout>-->
-

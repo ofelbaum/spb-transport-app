@@ -1,4 +1,4 @@
-package your.company;
+package com.emal.android;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
-import java.util.concurrent.ExecutionException;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -74,15 +73,6 @@ public class MapOverlayItemMarkerAsyncTask extends AsyncTask<String, Void, Bitma
             //result.recycle();
 		}
         System.out.println("STOP " + Thread.currentThread().getName());
-
-        final MapOverlayItemMarkerAsyncTask task = new MapOverlayItemMarkerAsyncTask(overlayitem, mapView);
-//        AsyncTask<String, Void, Bitmap> asyncTask = task.execute("http://transport.orgp.spb.ru/cgi-bin/mapserv?TRANSPARENT=TRUE&FORMAT=image%2Fpng&LAYERS=vehicle_bus&MAP=vehicle_typed.map&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&SRS=EPSG%3A900913&_OLSALT=0.1508798657450825&BBOX=3321583.9050831,8354817.803403,3433590.4458589,8415634.772084&WIDTH=480&HEIGHT=800");
-        AsyncTask<String, Void, Bitmap> asyncTask = task.execute("http://transport.orgp.spb.ru/cgi-bin/mapserv?TRANSPARENT=TRUE&FORMAT=image%2Fpng&LAYERS=vehicle_bus&MAP=vehicle_typed.map&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&SRS=EPSG%3A900913&_OLSALT=0.5802055234089494&BBOX=3365039.2729075,8377526.3272622,3393040.9081015,8392730.5694324&WIDTH=1431&HEIGHT=777");
-        //result.recycle();
-
     }
-
-
-
 }
 
