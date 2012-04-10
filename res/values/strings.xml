@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Всем привет!</string>
+    <string name="app_name">Awesome application</string>
+    <integer name="width">100</integer>
+    <integer name="heigth">100</integer>
+</resources>
