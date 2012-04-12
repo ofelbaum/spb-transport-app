@@ -11,11 +11,9 @@
         </activity>
         <uses-library android:name="com.google.android.maps"/>
     </application>
-    <!--<uses-sdk android:minsdkversion="15">-->
-    <!--</uses-sdk>-->
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="15"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-
     <!--<uses-permission android:name="android.permission.SEND_SMS"></uses-permission>-->
 </manifest>
 

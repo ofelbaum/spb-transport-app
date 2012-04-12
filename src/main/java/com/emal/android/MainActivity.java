@@ -1,22 +1,19 @@
 package com.emal.android;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import com.google.android.maps.*;
 
-import java.util.List;
-
 public class MainActivity extends MapActivity {
+    private static final String TAG = "MapActivity";
     private static final String URL_TEMPLATE = "http://transport.orgp.spb.ru/cgi-bin/mapserv?TRANSPARENT=TRUE&FORMAT=image%2Fpng&MAP=vehicle_typed.map&SERVICE=WMS&VERSION=1.1.1&REQUEST=GetMap&STYLES=&SRS=EPSG%3A900913&_OLSALT=0.1508798657450825";
     private static final String URL_PARAMS = "&LAYERS=%s&BBOX=%s&WIDTH=%d&HEIGHT=%d";
     private MapView mapView;
@@ -40,16 +37,13 @@ public class MainActivity extends MapActivity {
         moveToCurrentLocation();
 
         mapView.setOnGenericMotionListener(new View.OnGenericMotionListener() {
-            private MapOverlayItem newMapOverlayItem;
-            private MapOverlayItem oldMapOverlayItem;
-
             public boolean onGenericMotion(View v, MotionEvent event) {
+                Log.d(TAG, "Get event onGenericMotion " + event);
                 if (MotionEvent.ACTION_HOVER_MOVE == event.getAction()) {
                     MapView mapView = (MapView) v;
 
                     int screenWidth = mapView.getWidth();
                     int screenHeight = mapView.getHeight();
-
 
                     String url = null;
                     String bbox = calculateBBox(mapView);
@@ -57,10 +51,9 @@ public class MainActivity extends MapActivity {
                     url = URL_TEMPLATE + String.format(URL_PARAMS, params);
 
                     OverlayItem overlayItem = new OverlayItem(mapView.getMapCenter(), null, null);
-                    newMapOverlayItem = createMapOverlayItem(overlayItem);
-                    oldMapOverlayItem = updateMapOverlay(newMapOverlayItem, oldMapOverlayItem);
+                    MapOverlayUpdater updater = new MapOverlayUpdater(overlayItem, Vehicle.BUS);
 
-                    final MapOverlayItemMarkerAsyncTask task = new MapOverlayItemMarkerAsyncTask(overlayItem, mapView);
+                    final MapOverlayItemMarkerAsyncTask task = new MapOverlayItemMarkerAsyncTask(overlayItem, mapView, updater);
                     AsyncTask<String, Void, Bitmap> asyncTask = task.execute(url);
 
                     return true;
@@ -69,7 +62,6 @@ public class MainActivity extends MapActivity {
                 return false;
             }
         });
-
     }
 
     private String calculateBBox(MapView mapView) {
@@ -96,22 +88,6 @@ public class MainActivity extends MapActivity {
         Location location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         GeoPoint currentPoint = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
         mapView.getController().animateTo(currentPoint);
-    }
-
-    private MapOverlayItem updateMapOverlay(MapOverlayItem mapOverlayItem, MapOverlayItem oldItem) {
-        List<Overlay> mapOverlays = mapView.getOverlays();
-        if (oldItem != null) {
-            mapOverlays.remove(oldItem);
-        }
-        mapOverlays.add(mapOverlayItem);
-        return mapOverlayItem;
-    }
-
-    private MapOverlayItem createMapOverlayItem(OverlayItem overlayItem) {
-        Drawable drawable = new BitmapDrawable(Resources.getSystem());
-        MapOverlayItem mapOverlayItem = new MapOverlayItem(drawable);
-        mapOverlayItem.addOverlay(overlayItem);
-        return mapOverlayItem;
     }
 
     @Override
