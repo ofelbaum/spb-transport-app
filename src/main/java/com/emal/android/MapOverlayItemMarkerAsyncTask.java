@@ -82,10 +82,10 @@ public class MapOverlayItemMarkerAsyncTask extends AsyncTask<String, Void, Bitma
 
 	@Override
 	protected void onPostExecute(Bitmap result) {
-        Log.d(TAG, "Start overlay picture: " + Thread.currentThread().getName());
         super.onPostExecute(result);
-		if (result != null) {
-			Drawable drawable = new BitmapDrawable(Resources.getSystem(), result);
+        if (result != null) {
+            Log.d(TAG, "Start overlay picture: " + Thread.currentThread().getName() + " " + result.getRowBytes() + " bytes");
+            Drawable drawable = new BitmapDrawable(Resources.getSystem(), result);
             int zl = 2;
 			drawable.setBounds(-drawable.getIntrinsicWidth() / zl, -drawable.getIntrinsicHeight() / zl, drawable.getIntrinsicWidth() / zl, drawable.getIntrinsicHeight() / zl);
 			overlayitem.setMarker(drawable);
