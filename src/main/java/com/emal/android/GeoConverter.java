@@ -1,6 +1,7 @@
 package com.emal.android;
 
 import android.util.Pair;
+import com.google.android.maps.MapView;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -19,5 +20,28 @@ public class GeoConverter {
 
         my = my * originShift / 180.0;
         return new Pair<Double, Double>(mx, my);
+    }
+
+    /**
+     * Get bbox parameter from map view
+     * @param mapView
+     * @return
+     */
+    public static String calculateBBox(MapView mapView) {
+        int latitudeSpan = mapView.getLatitudeSpan();
+        int longitudeSpan = mapView.getLongitudeSpan();
+        int latitudeE6 = mapView.getMapCenter().getLatitudeE6();
+        int longitudeE6 = mapView.getMapCenter().getLongitudeE6();
+
+        int x1 = latitudeE6 - latitudeSpan / 2;
+        int y1 = longitudeE6 - longitudeSpan / 2;
+        int x2 = latitudeE6 + latitudeSpan / 2;
+        int y2 = longitudeE6 + longitudeSpan / 2;
+
+
+        Pair<Double, Double> p1 = GeoConverter.fromLatLonToMeters(x1 / 1E6, y1 / 1E6);
+        Pair<Double, Double> p2 = GeoConverter.fromLatLonToMeters(x2 / 1E6, y2 / 1E6);
+
+        return p1.first.toString() + "," + p1.second.toString() + "," + p2.first.toString() + "," + p2.second.toString();
     }
 }
