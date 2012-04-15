@@ -16,14 +16,17 @@
     <CheckBox android:id="@+id/vehicle_bus"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:onClick="onVehicleBusChanged"
               android:text="@string/vehicle_bus"/>
     <CheckBox android:id="@+id/vehicle_trolley"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:onClick="onVehicleTrolleyChanged"
               android:text="@string/vehicle_trolley"/>
     <CheckBox android:id="@+id/vehicle_tram"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:onClick="onVehicleTramChanged"
               android:text="@string/vehicle_tram"/>
     <TextView
             style="?android:attr/listSeparatorTextViewStyle"
@@ -39,10 +42,12 @@
         <RadioButton android:id="@+id/street_view"
                      android:layout_width="match_parent"
                      android:layout_height="match_parent"
+                     android:onClick="onMapViewChanged"
                      android:text="@string/street_view"/>
         <RadioButton android:id="@+id/satellite_view"
                      android:layout_width="match_parent"
                      android:layout_height="match_parent"
+                     android:onClick="onMapViewChanged"
                      android:text="@string/satellite_view"/>
     </RadioGroup>
 
@@ -51,37 +56,34 @@
             android:id="@+id/separator"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:text="@string/refresh_period"
             android:textColor="@android:color/white"/>
+    <Spinner
+            android:id="@+id/sync_period"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:prompt="@string/sync_picker"/>
 
     <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/refresh_period"/>
-
-    <Spinner android:id="@+id/spinner1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:drawSelectorOnTop="true"
-        android:prompt="@string/choose_period"/>
-
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center">
-        <Button android:id="@+id/save"
-            android:layout_width="wrap_content"
+            style="?android:attr/listSeparatorTextViewStyle"
+            android:id="@+id/separator"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/save"
-            android:minHeight="52dp"
-            android:textSize="14dp"
-            android:onClick="onSaveButtonClick"/>
-        <Button android:id="@+id/cancel"
-            android:layout_width="wrap_content"
+            android:text="@string/info"
+            android:textColor="@android:color/white"/>
+    <TextView
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="@string/cancel"
-            android:layout_toRightOf="@+id/save"
-            android:minHeight="52dp"
-            android:textSize="14dp"
-            android:onClick="onCancelButtonClick"/>
-    </RelativeLayout>
+            android:paddingLeft="7dp"
+            android:text="@string/copyright"/>
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="7dp"
+            android:text="@string/version"/>
+    <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="7dp"
+            android:text="@string/email"/>
 </LinearLayout>

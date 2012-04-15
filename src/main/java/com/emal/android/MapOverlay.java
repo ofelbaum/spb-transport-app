@@ -54,8 +54,8 @@ public class MapOverlay extends ItemizedOverlay<OverlayItem> {
     public boolean onTouchEvent(MotionEvent motionEvent, MapView mapView) {
         boolean result = super.onTouchEvent(motionEvent, mapView);
 
-        Log.d(TAG, "onTouchEvent " + motionEvent + " from " + vehicle);
         if (MotionEvent.ACTION_UP == motionEvent.getAction()) {
+            Log.d(TAG, "onTouchEvent " + motionEvent + " from " + vehicle);
             UpdateOverlayItemAsyncTask task = new UpdateOverlayItemAsyncTask(mapView, vehicle);
             AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
         }

@@ -27,6 +27,7 @@ public class MainActivity extends MapActivity {
     private boolean showTrolley = false;
     private boolean showTram = false;
     private boolean satView = true;
+    private int syncTime = Constants.DEFAULT_SYNC_MS;
     private int zoomSize;
     private GeoPoint homeLocation;
     private Set<Vehicle> vehicles;
@@ -56,18 +57,17 @@ public class MainActivity extends MapActivity {
 
     private void initParams() {
         sharedPreferences = getSharedPreferences(Constants.APP_SHARED_SOURCE, 0);
-        if (sharedPreferences != null) {
             showBus = sharedPreferences.getBoolean(Constants.SHOW_BUS_FLAG, true);
             showTrolley = sharedPreferences.getBoolean(Constants.SHOW_TROLLEY_FLAG, true);
             showTram = sharedPreferences.getBoolean(Constants.SHOW_TRAM_FLAG, true);
+            syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
             Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
             Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
             homeLocation = new GeoPoint((int)(homeLat * 1E6), (int)(homeLong * 1E6));
 
             satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, true);
-            zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, 15);
-        }
+            zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
         if (showBus) {
             trackVehicle(Vehicle.BUS);
         } else {
@@ -90,18 +90,6 @@ public class MainActivity extends MapActivity {
     protected void onResume() {
         initParams();
         super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        SharedPreferences.Editor ed = sharedPreferences.edit();
-        ed.putBoolean(Constants.SHOW_BUS_FLAG, showBus);
-        ed.putBoolean(Constants.SHOW_TROLLEY_FLAG, showTrolley);
-        ed.putBoolean(Constants.SHOW_TRAM_FLAG, showTram);
-        ed.putBoolean(Constants.SAT_VIEW_FLAG, mapView.isSatellite());
-        ed.commit();
     }
 
     private void moveToCurrentLocation() {

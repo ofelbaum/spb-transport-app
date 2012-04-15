@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Городской транспорт</string>
+    <string name="app_name">Транспорт</string>
     <string name="satellite_view">Спутник</string>
     <string name="street_view">Улица</string>
     <string name="vehicle_bus">Автобус</string>
     <string name="vehicle_trolley">Троллейбус</string>
     <string name="vehicle_tram">Трамвай</string>
-    <string name="cur_location">Текущее место</string>
-    <string name="home_location">Дом</string>
+    <string name="cur_location">Где я?</string>
+    <string name="home_location">Домой</string>
     <string name="settings">Настройки</string>
     <string name="vehicle_type">Слои</string>
     <string name="map_type">Тип карты</string>
@@ -17,4 +17,20 @@
     <string name="choose_period">Выбор</string>
     <integer name="width">100</integer>
     <integer name="heigth">100</integer>
+    <string name="sync_picker">Выберите частоту (сек)</string>
+    <string name="info">Информация</string>
+    <string name="version">версия 0.5-dev</string>
+    <string name="copyright">&#169; 2012 Алексей Емельяненко</string>
+    <string name="email">alexey.emelyanenko@gmail.com</string>
+    <string-array name="sync_string_array">
+        <item>1 сек</item>
+        <item>2 сек</item>
+        <item>3 сек</item>
+        <item>4 сек</item>
+        <item>5 сек</item>
+        <item>10 сек</item>
+        <item>20 сек</item>
+        <item>30 сек</item>
+        <item>60 сек</item>
+    </string-array>
 </resources>
