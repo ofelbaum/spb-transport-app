@@ -3,19 +3,19 @@ package com.emal.android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import com.google.android.maps.*;
 
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -33,12 +33,29 @@ public class MainActivity extends MapActivity {
     private Set<Vehicle> vehicles;
     private ExtendedMapView mapView;
     private SharedPreferences sharedPreferences;
+    private Handler mHandler = new Handler();
+    private TimerTask timerTask = new MapUpdateTimerTask();
+
+    public class MapUpdateTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            Log.d(TAG, "Run task with time " + syncTime);
+            for (Vehicle vehicle : vehicles) {
+                UpdateOverlayItemAsyncTask task = new UpdateOverlayItemAsyncTask(mapView, vehicle);
+                AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
+            }
+
+            mHandler.postDelayed(this, syncTime);
+        }
+    }
 
     /**
      * Called when the activity is first created.
      */
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         mapView = (ExtendedMapView) findViewById(R.id.mapView);
@@ -57,17 +74,20 @@ public class MainActivity extends MapActivity {
 
     private void initParams() {
         sharedPreferences = getSharedPreferences(Constants.APP_SHARED_SOURCE, 0);
-            showBus = sharedPreferences.getBoolean(Constants.SHOW_BUS_FLAG, true);
-            showTrolley = sharedPreferences.getBoolean(Constants.SHOW_TROLLEY_FLAG, true);
-            showTram = sharedPreferences.getBoolean(Constants.SHOW_TRAM_FLAG, true);
-            syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
+        showBus = sharedPreferences.getBoolean(Constants.SHOW_BUS_FLAG, true);
+        showTrolley = sharedPreferences.getBoolean(Constants.SHOW_TROLLEY_FLAG, true);
+        showTram = sharedPreferences.getBoolean(Constants.SHOW_TRAM_FLAG, true);
+        syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
-            Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
-            Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
-            homeLocation = new GeoPoint((int)(homeLat * 1E6), (int)(homeLong * 1E6));
+        Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
+        Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
+        homeLocation = new GeoPoint((int) (homeLat * 1E6), (int) (homeLong * 1E6));
 
-            satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, true);
-            zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
+        satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, true);
+        zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
+    }
+
+    private void updateApplicationState() {
         if (showBus) {
             trackVehicle(Vehicle.BUS);
         } else {
@@ -84,12 +104,28 @@ public class MainActivity extends MapActivity {
             untrackVehicle(Vehicle.TRAM);
         }
         mapView.setSatellite(satView);
+
+        mHandler.postDelayed(timerTask, syncTime);
     }
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume");
         initParams();
+        updateApplicationState();
         super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mHandler.removeCallbacks(timerTask);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mHandler.removeCallbacks(timerTask);
+        super.onDestroy();
     }
 
     private void moveToCurrentLocation() {
