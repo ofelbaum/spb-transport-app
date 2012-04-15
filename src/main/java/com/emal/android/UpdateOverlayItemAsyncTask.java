@@ -57,7 +57,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
 
 
         long start = System.currentTimeMillis();
-        Log.d(TAG, Thread.currentThread().getName() + " download start for vehicle " + vehicle);
+        Log.d(TAG, "Download " + vehicle + " START for " + Thread.currentThread().getName());
 
         Bitmap bitmap = null;
         InputStream in = null;
@@ -67,10 +67,11 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             in.close();
             return bitmap;
         } catch (IOException e1) {
+            Log.d(TAG, "Download " + vehicle + " CANCELLED for " + Thread.currentThread().getName());
             return null;
         } finally {
             double duration = (System.currentTimeMillis() - start) / 1000d;
-            Log.d(TAG, Thread.currentThread().getName() + " download start for vehicle " + vehicle + " in " + duration + " sec");
+            Log.d(TAG, "Download " + vehicle + " FINISHED takes " + duration + " ms for " + Thread.currentThread().getName());
         }
     }
 
@@ -113,7 +114,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
     protected void onPostExecute(Bitmap result) {
         super.onPostExecute(result);
         if (result != null) {
-            Log.d(TAG, "Start overlay picture: " + Thread.currentThread().getName() + " " + result.getRowBytes() + " bytes");
+            Log.d(TAG, "Overlay " + vehicle + " START size " + result.getRowBytes() + " bytes for " + Thread.currentThread().getName());
             Drawable drawable = new BitmapDrawable(Resources.getSystem(), result);
             int zl = 2;
             drawable.setBounds(-drawable.getIntrinsicWidth() / zl, -drawable.getIntrinsicHeight() / zl, drawable.getIntrinsicWidth() / zl, drawable.getIntrinsicHeight() / zl);
@@ -121,33 +122,34 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
 
             updateOverlayItem(mapView, overlayItem, vehicle);
 
-            Log.d(TAG, "Finish overlay picture: " + Thread.currentThread().getName());
+            Log.d(TAG, "Overlay " + vehicle + " FINISHED for "+ Thread.currentThread().getName());
         } else {
+            Log.d(TAG, "Overlay " + vehicle + " CANCELLED for "+ Thread.currentThread().getName());
             this.cancel(true);
         }
     }
 
     private void updateOverlayItem(final MapView mapView, OverlayItem overlayItem, Vehicle vehicle) {
-            List<Overlay> mapOverlays = mapView.getOverlays();
-            Iterator<Overlay> iterator = mapOverlays.iterator();
-            while (iterator.hasNext()) {
-                Overlay overlay = iterator.next();
-                if (overlay instanceof MyLocationOverlay) {
-                    continue;
-                }
-                if (overlay instanceof MapOverlay) {
-                    Vehicle vehicle1 = ((MapOverlay) overlay).getVehicle();
-                    if (vehicle1.equals(vehicle)) {
-                        iterator.remove();
-                        mapView.invalidate();
-                        break;
-                    }
+        List<Overlay> mapOverlays = mapView.getOverlays();
+        Iterator<Overlay> iterator = mapOverlays.iterator();
+        while (iterator.hasNext()) {
+            Overlay overlay = iterator.next();
+            if (overlay instanceof MyLocationOverlay) {
+                continue;
+            }
+            if (overlay instanceof MapOverlay) {
+                Vehicle vehicle1 = ((MapOverlay) overlay).getVehicle();
+                if (vehicle1.equals(vehicle)) {
+                    iterator.remove();
+                    mapView.invalidate();
+                    break;
                 }
             }
-            MapOverlay mapOverlay = new MapOverlay(vehicle);
-            mapOverlay.addItem(overlayItem);
-            mapOverlays.add(mapOverlay);
-            mapView.invalidate();
+        }
+        MapOverlay mapOverlay = new MapOverlay(vehicle);
+        mapOverlay.addItem(overlayItem);
+        mapOverlays.add(mapOverlay);
+        mapView.invalidate();
     }
 }
 

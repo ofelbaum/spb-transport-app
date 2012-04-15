@@ -1,7 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Всем привет!</string>
-    <string name="app_name">Где автобус?</string>
+    <string name="app_name">Городской транспорт</string>
+    <string name="satellite_view">Спутник</string>
+    <string name="street_view">Улица</string>
+    <string name="vehicle_bus">Автобус</string>
+    <string name="vehicle_trolley">Троллейбус</string>
+    <string name="vehicle_tram">Трамвай</string>
+    <string name="cur_location">Текущее место</string>
+    <string name="home_location">Дом</string>
+    <string name="settings">Настройки</string>
+    <string name="vehicle_type">Слои</string>
+    <string name="map_type">Тип карты</string>
+    <string name="refresh_period">Частота обновления</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="choose_period">Выбор</string>
     <integer name="width">100</integer>
     <integer name="heigth">100</integer>
 </resources>

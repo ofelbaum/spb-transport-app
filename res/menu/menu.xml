@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <!--<item android:id="@+id/bus"-->
+              <!--android:checkable="true"-->
+              <!--android:title="@string/vehicle_bus"/>-->
+        <!--<item android:id="@+id/trolley"-->
+              <!--android:checkable="true"-->
+              <!--android:title="@string/vehicle_trolley"/>-->
+        <!--<item android:id="@+id/tram"-->
+              <!--android:checkable="true"-->
+              <!--android:title="@string/vehicle_tram"/>-->
+        <!--<item android:id="@+id/street_view"-->
+              <!--android:title="@string/street_view"/>-->
+        <!--<item android:id="@+id/satellite_view"-->
+              <!--android:title="@string/satellite_view"/>-->
+        <item android:id="@+id/cur_location"
+              android:checkable="false"
+              android:title="@string/cur_location"/>
+        <item android:id="@+id/home_location"
+              android:checkable="false"
+              android:title="@string/home_location"/>
+        <item android:id="@+id/settings"
+              android:icon="@drawable/autobus"
+              android:checkable="false"
+              android:title="@string/settings"/>
+    </group>
+</menu>

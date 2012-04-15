@@ -52,13 +52,14 @@ public class MapOverlay extends ItemizedOverlay<OverlayItem> {
 
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent, MapView mapView) {
-        if (MotionEvent.ACTION_UP == motionEvent.getAction()) {
-            Log.d(TAG, "onTouchEvent " + motionEvent + " from " + vehicle);
+        boolean result = super.onTouchEvent(motionEvent, mapView);
 
-                UpdateOverlayItemAsyncTask task = new UpdateOverlayItemAsyncTask(mapView, vehicle);
-                AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
+        Log.d(TAG, "onTouchEvent " + motionEvent + " from " + vehicle);
+        if (MotionEvent.ACTION_UP == motionEvent.getAction()) {
+            UpdateOverlayItemAsyncTask task = new UpdateOverlayItemAsyncTask(mapView, vehicle);
+            AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
         }
-        return super.onTouchEvent(motionEvent, mapView);
+        return result;
     }
 
     public Vehicle getVehicle() {

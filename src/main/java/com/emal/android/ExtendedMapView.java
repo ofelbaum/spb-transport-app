@@ -33,7 +33,6 @@ public class ExtendedMapView extends MapView {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
-        super.dispatchDraw(canvas);
         if (getZoomLevel() != oldZoomLevel) {
             Log.d(TAG, "ZOOM event");
             oldZoomLevel = getZoomLevel();
@@ -43,6 +42,7 @@ public class ExtendedMapView extends MapView {
                 AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
             }
         }
+        super.dispatchDraw(canvas);
     }
 
     public void setVehicles(Set<Vehicle> vehicles) {
