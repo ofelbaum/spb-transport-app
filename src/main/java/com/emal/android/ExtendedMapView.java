@@ -1,14 +1,10 @@
 package com.emal.android;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.os.AsyncTask;
 import android.util.AttributeSet;
 import android.util.Log;
 import com.google.android.maps.MapView;
-
-import java.util.Set;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -17,7 +13,7 @@ import java.util.Set;
 public class ExtendedMapView extends MapView {
     private static final String TAG = ExtendedMapView.class.getName();
     private int oldZoomLevel = -1;
-    private Set<Vehicle> vehicles;
+    private VehicleTracker vehicleTracker;
 
     public ExtendedMapView(Context context, String s) {
         super(context, s);
@@ -31,21 +27,17 @@ public class ExtendedMapView extends MapView {
         super(context, attributeSet, i);
     }
 
+    public void setVehicleTracker(VehicleTracker vehicleTracker) {
+        this.vehicleTracker = vehicleTracker;
+    }
+
     @Override
     public void dispatchDraw(Canvas canvas) {
         if (getZoomLevel() != oldZoomLevel) {
             Log.d(TAG, "ZOOM event");
             oldZoomLevel = getZoomLevel();
-
-            for (Vehicle vehicle : vehicles) {
-                UpdateOverlayItemAsyncTask task = new UpdateOverlayItemAsyncTask(this, vehicle);
-                AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
-            }
+            vehicleTracker.syncAll();
         }
         super.dispatchDraw(canvas);
-    }
-
-    public void setVehicles(Set<Vehicle> vehicles) {
-        this.vehicles = vehicles;
     }
 }

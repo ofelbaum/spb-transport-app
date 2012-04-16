@@ -38,11 +38,13 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
     private MapView mapView;
     private Vehicle vehicle;
     private OverlayItem overlayItem;
+    private VehicleTracker vehicleTracker;
 
 
-    public UpdateOverlayItemAsyncTask(MapView mapView, Vehicle vehicle) {
+    public UpdateOverlayItemAsyncTask(MapView mapView, Vehicle vehicle, VehicleTracker vehicleTracker) {
         this.mapView = mapView;
         this.vehicle = vehicle;
+        this.vehicleTracker = vehicleTracker;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             return null;
         } finally {
             double duration = (System.currentTimeMillis() - start) / 1000d;
-            Log.d(TAG, "Download " + vehicle + " FINISHED takes " + duration + " ms for " + Thread.currentThread().getName());
+            Log.d(TAG, "Download " + vehicle + " FINISHED takes " + duration + " sec for " + Thread.currentThread().getName());
         }
     }
 
@@ -146,7 +148,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
                 }
             }
         }
-        MapOverlay mapOverlay = new MapOverlay(vehicle);
+        MapOverlay mapOverlay = new MapOverlay(vehicle, vehicleTracker);
         mapOverlay.addItem(overlayItem);
         mapOverlays.add(mapOverlay);
         mapView.invalidate();

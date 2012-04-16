@@ -3,10 +3,8 @@ package com.emal.android;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.location.LocationManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -30,21 +28,17 @@ public class MainActivity extends MapActivity {
     private int syncTime = Constants.DEFAULT_SYNC_MS;
     private int zoomSize;
     private GeoPoint homeLocation;
-    private Set<Vehicle> vehicles;
     private ExtendedMapView mapView;
     private SharedPreferences sharedPreferences;
     private Handler mHandler = new Handler();
     private TimerTask timerTask = new MapUpdateTimerTask();
+    private VehicleTracker vehicleTracker;
 
     public class MapUpdateTimerTask extends TimerTask {
         @Override
         public void run() {
-            Log.d(TAG, "Run task with time " + syncTime);
-            for (Vehicle vehicle : vehicles) {
-                UpdateOverlayItemAsyncTask task = new UpdateOverlayItemAsyncTask(mapView, vehicle);
-                AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
-            }
-
+            Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
+            vehicleTracker.syncAll();
             mHandler.postDelayed(this, syncTime);
         }
     }
@@ -66,10 +60,10 @@ public class MainActivity extends MapActivity {
         mylocationOverlay.enableMyLocation();
         mapView.getOverlays().add(mylocationOverlay);
 
-        vehicles = new LinkedHashSet<Vehicle>();
-        mapView.setVehicles(vehicles);
         initParams();
         moveToCurrentLocation();
+        vehicleTracker = new VehicleTracker(mapView);
+        mapView.setVehicleTracker(vehicleTracker);
     }
 
     private void initParams() {
@@ -105,7 +99,7 @@ public class MainActivity extends MapActivity {
         }
         mapView.setSatellite(satView);
 
-        mHandler.postDelayed(timerTask, syncTime);
+        mHandler.postDelayed(timerTask, 0);
     }
 
     @Override
@@ -149,9 +143,9 @@ public class MainActivity extends MapActivity {
     }
 
     public void trackVehicle(Vehicle vehicle) {
-        Log.d(TAG, "track " + vehicle);
-        vehicles.add(vehicle);
-        MapOverlay mapOverlay = new MapOverlay(vehicle);
+        Log.d(TAG, "Track " + vehicle);
+        vehicleTracker.track(vehicle);
+        MapOverlay mapOverlay = new MapOverlay(vehicle, vehicleTracker);
         List<Overlay> overlays = mapView.getOverlays();
         for (Overlay overlay : overlays) {
             if (overlay instanceof MapOverlay) {
@@ -167,8 +161,8 @@ public class MainActivity extends MapActivity {
     }
 
     public void untrackVehicle(Vehicle vehicle) {
-        Log.d(TAG, "untrack " + vehicle);
-        vehicles.remove(vehicle);
+        Log.d(TAG, "Untrack " + vehicle);
+        vehicleTracker.untrack(vehicle);
 
         List<Overlay> mapOverlays = mapView.getOverlays();
         Iterator<Overlay> iterator = mapOverlays.iterator();

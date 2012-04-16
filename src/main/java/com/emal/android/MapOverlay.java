@@ -1,12 +1,9 @@
 package com.emal.android;
 
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.MotionEvent;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -22,11 +19,13 @@ public class MapOverlay extends ItemizedOverlay<OverlayItem> {
     private static final Drawable drawable = new BitmapDrawable(Resources.getSystem());
     private OverlayItem item;
     private Vehicle vehicle;
+    private VehicleTracker vehicleTracker;
 
-    public MapOverlay(Vehicle vehicle) {
+    public MapOverlay(Vehicle vehicle, VehicleTracker vehicleTracker) {
         super(drawable);
         this.vehicle = vehicle;
         this.item = defaultOverlayItem();
+        this.vehicleTracker = vehicleTracker;
         populate();
     }
 
@@ -55,9 +54,7 @@ public class MapOverlay extends ItemizedOverlay<OverlayItem> {
         boolean result = super.onTouchEvent(motionEvent, mapView);
 
         if (MotionEvent.ACTION_UP == motionEvent.getAction()) {
-            Log.d(TAG, "onTouchEvent " + motionEvent + " from " + vehicle);
-            UpdateOverlayItemAsyncTask task = new UpdateOverlayItemAsyncTask(mapView, vehicle);
-            AsyncTask<String, Void, Bitmap> asyncTask = task.execute();
+            vehicleTracker.track(vehicle);
         }
         return result;
     }
