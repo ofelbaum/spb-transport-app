@@ -78,7 +78,7 @@ public class MainActivity extends MapActivity {
         Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
         homeLocation = new GeoPoint((int) (homeLat * 1E6), (int) (homeLong * 1E6));
 
-        satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, true);
+        satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, false);
         zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
     }
 

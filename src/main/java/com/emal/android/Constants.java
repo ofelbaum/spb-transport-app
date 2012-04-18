@@ -18,5 +18,5 @@ public final class Constants {
     public static final String APP_SHARED_SOURCE = "SPB_TRANSPORT_APP";
     public static final int DEFAULT_ZOOM_LEVEL = 15;
     public static final int MS_IN_SEC = 1000;
-    public static final int DEFAULT_SYNC_MS = 1000;
+    public static final int DEFAULT_SYNC_MS = 5000;
 }
