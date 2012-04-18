@@ -13,11 +13,10 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -68,7 +67,9 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             bitmap = BitmapFactory.decodeStream(in, null, null);
             in.close();
             return bitmap;
-        } catch (IOException e1) {
+        } catch (IOException e) {
+            String message = e.getMessage();
+            Log.e(TAG, message != null ? message : e.getClass().getName());
             Log.d(TAG, "Download " + vehicle + " CANCELLED for " + Thread.currentThread().getName());
             return null;
         } finally {
@@ -83,37 +84,30 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         HttpParams httpParameters = new BasicHttpParams();
         // Set the timeout in milliseconds until a connection is established.
         // The default value is zero, that means the timeout is not used.
-        int timeoutConnection = 10000;
+        int timeoutConnection = 5000;
         HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
         // Set the default socket timeout (SO_TIMEOUT)
         // in milliseconds which is the timeout for waiting for data.
-        int timeoutSocket = 10000;
+        int timeoutSocket = 5000;
         HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 
-        HttpClient httpclient = null;
+        DefaultHttpClient httpclient = null;
         HttpResponse response = null;
 
-        try {
-            httpclient = new DefaultHttpClient(httpParameters);
-            response = httpclient.execute(httpRequest);
-            HttpEntity entity = response.getEntity();
-            BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
-            return bufHttpEntity.getContent();
-
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-            this.cancel(true);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            this.cancel(true);
-        }
-        return null;
-
+        httpclient = new DefaultHttpClient(httpParameters);
+        httpclient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
+        response = httpclient.execute(httpRequest);
+        HttpEntity entity = response.getEntity();
+        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+        return bufHttpEntity.getContent();
     }
 
     @Override
     protected void onPostExecute(Bitmap result) {
+        if (isCancelled()) {
+            Log.d(TAG, "onPostExecute skipped");
+            return;
+        }
         super.onPostExecute(result);
         if (result != null) {
             Log.d(TAG, "Overlay " + vehicle + " START size " + result.getRowBytes() + " bytes for " + Thread.currentThread().getName());
@@ -124,9 +118,9 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
 
             updateOverlayItem(mapView, overlayItem, vehicle);
 
-            Log.d(TAG, "Overlay " + vehicle + " FINISHED for "+ Thread.currentThread().getName());
+            Log.d(TAG, "Overlay " + vehicle + " FINISHED for " + Thread.currentThread().getName());
         } else {
-            Log.d(TAG, "Overlay " + vehicle + " CANCELLED for "+ Thread.currentThread().getName());
+            Log.d(TAG, "Overlay " + vehicle + " CANCELLED for " + Thread.currentThread().getName());
             this.cancel(true);
         }
     }

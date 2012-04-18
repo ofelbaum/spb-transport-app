@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AndroidDevelopers" parent="android:style/Theme.Holo">
+        <item name="android:actionBarTabStyle">@style/MyActionBarTabStyle</item>
+    </style>
+    <style name="MyActionBarTabStyle" parent="android:Widget.Holo.ActionBar.TabView">
+        <item name="android:background">#29000000</item>
+        <item name="android:selectableItemBackground">@android:color/transparent</item>
+        <!--<item name="android:actionBarItemBackground">#29000000</item>-->
+        <item name="android:paddingLeft">32dp</item>
+        <item name="android:paddingRight">32dp</item>
+    </style>
+</resources>
