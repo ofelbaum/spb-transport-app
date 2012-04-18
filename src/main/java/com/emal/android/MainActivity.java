@@ -1,6 +1,5 @@
 package com.emal.android;
 
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,6 +33,8 @@ public class MainActivity extends MapActivity {
     private Handler mHandler = new Handler();
     private TimerTask timerTask = new MapUpdateTimerTask();
     private VehicleTracker vehicleTracker;
+    private MyLocationOverlay mylocationOverlay;
+    private LocationManager locationManager;
 
     public class MapUpdateTimerTask extends TimerTask {
         @Override
@@ -57,7 +58,8 @@ public class MainActivity extends MapActivity {
         mapView.setBuiltInZoomControls(true);
         mapView.displayZoomControls(true);
 
-        MyLocationOverlay mylocationOverlay = new MyLocationOverlay(mapView.getContext(), mapView);
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        mylocationOverlay = new MyLocationOverlay(mapView.getContext(), mapView);
         mylocationOverlay.enableMyLocation();
         mapView.getOverlays().add(mylocationOverlay);
 
@@ -65,6 +67,7 @@ public class MainActivity extends MapActivity {
         moveToCurrentLocation();
         vehicleTracker = new VehicleTracker(mapView);
         mapView.setVehicleTracker(vehicleTracker);
+        mapView.getController().setZoom(zoomSize);
     }
 
     private void initParams() {
@@ -82,7 +85,7 @@ public class MainActivity extends MapActivity {
         zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
     }
 
-    private void updateApplicationState() {
+    private void restoreApplicationState() {
         if (showBus) {
             trackVehicle(Vehicle.BUS);
         } else {
@@ -99,15 +102,15 @@ public class MainActivity extends MapActivity {
             untrackVehicle(Vehicle.TRAM);
         }
         mapView.setSatellite(satView);
-
         mHandler.postDelayed(timerTask, 0);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 3, mylocationOverlay);
     }
 
     @Override
     protected void onResume() {
         Log.d(TAG, "onResume");
         initParams();
-        updateApplicationState();
+        restoreApplicationState();
         super.onResume();
     }
 
@@ -118,18 +121,17 @@ public class MainActivity extends MapActivity {
     }
 
     @Override
-    protected void onDestroy() {
+    protected void onStop() {
         mHandler.removeCallbacks(timerTask);
-        super.onDestroy();
+        locationManager.removeUpdates(mylocationOverlay);
+        super.onStop();
     }
 
     private void moveToCurrentLocation() {
-        LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Location location = lm.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         GeoPoint currentPoint = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
         MapController controller = mapView.getController();
         controller.animateTo(currentPoint);
-        controller.setZoom(zoomSize);
     }
 
     private void moveToHomeLocation() {

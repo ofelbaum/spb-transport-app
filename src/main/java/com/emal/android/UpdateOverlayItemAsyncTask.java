@@ -13,13 +13,9 @@ import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,24 +75,9 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
     }
 
     private InputStream fetch(String address) throws IOException {
+        HttpClient httpclient = vehicleTracker.getHttpClient();
         HttpGet httpRequest = new HttpGet(URI.create(address));
-
-        HttpParams httpParameters = new BasicHttpParams();
-        // Set the timeout in milliseconds until a connection is established.
-        // The default value is zero, that means the timeout is not used.
-        int timeoutConnection = 5000;
-        HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-        // Set the default socket timeout (SO_TIMEOUT)
-        // in milliseconds which is the timeout for waiting for data.
-        int timeoutSocket = 5000;
-        HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
-
-        DefaultHttpClient httpclient = null;
-        HttpResponse response = null;
-
-        httpclient = new DefaultHttpClient(httpParameters);
-        httpclient.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
-        response = httpclient.execute(httpRequest);
+        HttpResponse response = httpclient.execute(httpRequest);
         HttpEntity entity = response.getEntity();
         BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
         return bufHttpEntity.getContent();
