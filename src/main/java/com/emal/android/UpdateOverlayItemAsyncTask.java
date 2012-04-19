@@ -30,16 +30,26 @@ import java.util.List;
 public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> {
     private static final String TAG = "UpdateOverlayItemAsyncTask";
 
+    private boolean clearBeforeUpdate;
     private MapView mapView;
     private Vehicle vehicle;
     private OverlayItem overlayItem;
     private VehicleTracker vehicleTracker;
 
 
-    public UpdateOverlayItemAsyncTask(MapView mapView, Vehicle vehicle, VehicleTracker vehicleTracker) {
-        this.mapView = mapView;
+    public UpdateOverlayItemAsyncTask(Vehicle vehicle, VehicleTracker vehicleTracker, boolean clearBeforeUpdate) {
+        this.mapView = vehicleTracker.getMapView();
         this.vehicle = vehicle;
         this.vehicleTracker = vehicleTracker;
+        this.clearBeforeUpdate = clearBeforeUpdate;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+        if (clearBeforeUpdate) {
+            dropOverlayItem();
+        }
     }
 
     @Override
@@ -97,7 +107,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             drawable.setBounds(-drawable.getIntrinsicWidth() / zl, -drawable.getIntrinsicHeight() / zl, drawable.getIntrinsicWidth() / zl, drawable.getIntrinsicHeight() / zl);
             overlayItem.setMarker(drawable);
 
-            updateOverlayItem(mapView, overlayItem, vehicle);
+            updateOverlayItem();
 
             Log.d(TAG, "Overlay " + vehicle + " FINISHED for " + Thread.currentThread().getName());
         } else {
@@ -106,7 +116,18 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         }
     }
 
-    private void updateOverlayItem(final MapView mapView, OverlayItem overlayItem, Vehicle vehicle) {
+    private void updateOverlayItem() {
+        if (!clearBeforeUpdate) {
+            dropOverlayItem();
+        }
+        List<Overlay> mapOverlays = mapView.getOverlays();
+        MapOverlay mapOverlay = new MapOverlay(vehicle, vehicleTracker);
+        mapOverlay.addItem(overlayItem);
+        mapOverlays.add(mapOverlay);
+        mapView.invalidate();
+    }
+
+    private void dropOverlayItem() {
         List<Overlay> mapOverlays = mapView.getOverlays();
         Iterator<Overlay> iterator = mapOverlays.iterator();
         while (iterator.hasNext()) {
@@ -123,9 +144,6 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
                 }
             }
         }
-        MapOverlay mapOverlay = new MapOverlay(vehicle, vehicleTracker);
-        mapOverlay.addItem(overlayItem);
-        mapOverlays.add(mapOverlay);
         mapView.invalidate();
     }
 }

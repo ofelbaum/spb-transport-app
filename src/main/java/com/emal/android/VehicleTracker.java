@@ -32,7 +32,15 @@ public class VehicleTracker {
         this.mapView = mapView;
     }
 
+    public MapView getMapView() {
+        return mapView;
+    }
+
     public void track(Vehicle vehicle) {
+        track(vehicle, false);
+    }
+
+    public void track(Vehicle vehicle, boolean clearBeforeUpdate) {
         UpdateOverlayItemAsyncTask task = taskMap.get(vehicle);
         if (task != null) {
             if (!AsyncTask.Status.FINISHED.equals(task.getStatus())) {
@@ -40,7 +48,7 @@ public class VehicleTracker {
                 task.cancel(true);
             }
         }
-        task = new UpdateOverlayItemAsyncTask(mapView, vehicle, this);
+        task = new UpdateOverlayItemAsyncTask(vehicle, this, clearBeforeUpdate);
         taskMap.put(vehicle, task);
         task.execute();
     }
@@ -54,8 +62,12 @@ public class VehicleTracker {
     }
 
     public void syncAll() {
+        syncAll(false);
+    }
+
+    public void syncAll(boolean clearBeforeUpdate) {
         for (Vehicle vehicle : taskMap.keySet()) {
-            track(vehicle);
+            track(vehicle, clearBeforeUpdate);
         }
     }
 
