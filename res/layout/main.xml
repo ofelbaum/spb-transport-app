@@ -3,7 +3,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
 
-    <com.emal.android.ExtendedMapView
+    <com.emal.android.transport.map.ExtendedMapView
             android:id="@+id/mapView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"

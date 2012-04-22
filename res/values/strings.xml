@@ -22,6 +22,9 @@
     <string name="version">версия 0.5-dev</string>
     <string name="copyright">&#169; 2012 Алексей Емельяненко</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
+    <string name="addmyplace">Добавить избранный адрес %1$s?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
     <string-array name="sync_string_array">
         <item>1 сек</item>
         <item>2 сек</item>

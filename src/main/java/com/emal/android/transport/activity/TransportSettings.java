@@ -1,4 +1,4 @@
-package com.emal.android;
+package com.emal.android.transport.activity;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
+import com.emal.android.transport.utils.Constants;
+import com.emal.android.R;
 
 /**
  * User: alexey.emelyanenko@gmail.com

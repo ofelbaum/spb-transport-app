@@ -1,18 +1,27 @@
-package com.emal.android;
+package com.emal.android.transport.activity;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
+import android.view.*;
+import com.emal.android.*;
+import com.emal.android.transport.map.ExtendedMapView;
+import com.emal.android.transport.map.MapOverlay;
+import com.emal.android.transport.utils.Constants;
+import com.emal.android.transport.utils.GeoConverter;
+import com.emal.android.transport.map.MapUtils;
 import com.google.android.maps.*;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -28,6 +37,7 @@ public class MainActivity extends MapActivity {
     private int syncTime = Constants.DEFAULT_SYNC_MS;
     private int zoomSize;
     private GeoPoint homeLocation;
+    private GeoPoint longPressedLocation;
     private ExtendedMapView mapView;
     private SharedPreferences sharedPreferences;
     private Handler mHandler = new Handler();
@@ -35,6 +45,8 @@ public class MainActivity extends MapActivity {
     private VehicleTracker vehicleTracker;
     private MyLocationOverlay mylocationOverlay;
     private LocationManager locationManager;
+    private AlertDialog alert;
+    private Address myPlace;
 
     public class MapUpdateTimerTask extends TimerTask {
         @Override
@@ -64,10 +76,65 @@ public class MainActivity extends MapActivity {
         mapView.getOverlays().add(mylocationOverlay);
 
         initParams();
+        alert = MapUtils.createMyPlaceDialog(mapView,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        homeLocation = longPressedLocation;
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        float latitude = (float) (homeLocation.getLatitudeE6() / 1E6);
+                        float longtitude = (float) (homeLocation.getLongitudeE6() / 1E6);
+                        editor.putFloat(Constants.HOME_LOC_LAT_FLAG, latitude);
+                        editor.putFloat(Constants.HOME_LOC_LONG_FLAG, longtitude);
+                        editor.commit();
+                        MapUtils.showMyPlace(mapView, homeLocation);
+                        dialog.cancel();
+
+                    }
+                },
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                }
+        );
         moveToCurrentLocation();
         vehicleTracker = new VehicleTracker(mapView);
         mapView.setVehicleTracker(vehicleTracker);
         mapView.getController().setZoom(zoomSize);
+        mapView.setOnLongpressListener(createLongPressListener());
+        MapUtils.showMyPlace(mapView, homeLocation);
+    }
+
+    private ExtendedMapView.OnLongpressListener createLongPressListener() {
+        return new ExtendedMapView.OnLongpressListener() {
+            public void onLongpress(final MapView view, final GeoPoint geoPoint) {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        Log.d(TAG, "Long press");
+                        longPressedLocation = geoPoint;
+                        float latitude = (float) (longPressedLocation.getLatitudeE6() / 1E6);
+                        float longtitude = (float) (longPressedLocation.getLongitudeE6() / 1E6);
+
+                        Geocoder geo = new Geocoder(view.getContext());
+                        try {
+                            List<Address> myAddrs = geo.getFromLocation(latitude, longtitude, 1);
+                            if (myAddrs.size() > 0) {
+                                myPlace = myAddrs.get(0);
+                                Log.d(TAG, "My Place selected: " + GeoConverter.convert(myPlace));
+
+                                String msg = getResources().getString(R.string.addmyplace, GeoConverter.convert(myPlace));
+                                alert.setMessage(msg);
+                                alert.show();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        };
     }
 
     private void initParams() {

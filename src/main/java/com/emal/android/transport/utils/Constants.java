@@ -1,4 +1,4 @@
-package com.emal.android;
+package com.emal.android.transport.utils;
 
 /**
  * User: alexey.emelyanenko@gmail.com

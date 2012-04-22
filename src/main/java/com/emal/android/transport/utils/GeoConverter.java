@@ -1,6 +1,12 @@
-package com.emal.android;
+package com.emal.android.transport.utils;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.location.Address;
 import android.util.Pair;
+import com.emal.android.R;
 import com.google.android.maps.MapView;
 
 /**
@@ -43,5 +49,17 @@ public class GeoConverter {
         Pair<Double, Double> p2 = GeoConverter.fromLatLonToMeters(x2 / 1E6, y2 / 1E6);
 
         return p1.first.toString() + "," + p1.second.toString() + "," + p2.first.toString() + "," + p2.second.toString();
+    }
+
+    public static String convert(Address address) {
+        StringBuffer buffer = new StringBuffer();
+        int maxAddressLineIndex = address.getMaxAddressLineIndex();
+        for (int i = 0; i <= maxAddressLineIndex; i++) {
+            buffer.append(address.getAddressLine(i).trim());
+            if (i < maxAddressLineIndex) {
+                buffer.append(", ");
+            }
+        }
+        return buffer.toString();
     }
 }
