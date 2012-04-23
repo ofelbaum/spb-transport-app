@@ -87,7 +87,7 @@ public class MainActivity extends MapActivity {
                         editor.putFloat(Constants.HOME_LOC_LAT_FLAG, latitude);
                         editor.putFloat(Constants.HOME_LOC_LONG_FLAG, longtitude);
                         editor.commit();
-                        MapUtils.showMyPlace(mapView, homeLocation);
+                        MapUtils.redrawMyPlace(mapView, homeLocation);
                         dialog.cancel();
 
                     }
@@ -104,7 +104,7 @@ public class MainActivity extends MapActivity {
         mapView.setVehicleTracker(vehicleTracker);
         mapView.getController().setZoom(zoomSize);
         mapView.setOnLongpressListener(createLongPressListener());
-        MapUtils.showMyPlace(mapView, homeLocation);
+        MapUtils.addMyPlace(mapView, homeLocation);
     }
 
     private ExtendedMapView.OnLongpressListener createLongPressListener() {
@@ -112,7 +112,7 @@ public class MainActivity extends MapActivity {
             public void onLongpress(final MapView view, final GeoPoint geoPoint) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Log.d(TAG, "Long press");
+                        Log.d(TAG, "Long press. Point " + geoPoint);
                         longPressedLocation = geoPoint;
                         float latitude = (float) (longPressedLocation.getLatitudeE6() / 1E6);
                         float longtitude = (float) (longPressedLocation.getLongitudeE6() / 1E6);

@@ -3,8 +3,8 @@ package com.emal.android.transport.map;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
+import android.graphics.drawable.Drawable;
 import com.emal.android.R;
-import com.emal.android.transport.map.MyPlaceOverlay;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -29,7 +29,7 @@ public class MapUtils {
         return builder.create();
     }
 
-    public static void showMyPlace(MapView mapView, GeoPoint homeLocation) {
+    public static void addMyPlace(MapView mapView, GeoPoint homeLocation) {
         List<Overlay> overlays = mapView.getOverlays();
         for (Iterator<Overlay> iterator = overlays.iterator(); iterator.hasNext(); ) {
             Overlay overlay = iterator.next();
@@ -38,7 +38,22 @@ public class MapUtils {
                 break;
             }
         }
-        overlays.add(new MyPlaceOverlay(homeLocation, mapView.getResources()));
+
+        Drawable drawable = mapView.getResources().getDrawable(R.drawable.btn_star_big_on);
+        MyPlaceOverlay placeOverlay = new MyPlaceOverlay(drawable, homeLocation);
+        overlays.add(placeOverlay);
         mapView.invalidate();
+    }
+
+    public static void redrawMyPlace(MapView mapView, GeoPoint homeLocation) {
+        List<Overlay> overlays = mapView.getOverlays();
+        for (Iterator<Overlay> iterator = overlays.iterator(); iterator.hasNext(); ) {
+            Overlay overlay = iterator.next();
+            if (overlay instanceof MyPlaceOverlay) {
+                ((MyPlaceOverlay) overlay).setPlace(homeLocation);
+                mapView.invalidate();
+                break;
+            }
+        }
     }
 }

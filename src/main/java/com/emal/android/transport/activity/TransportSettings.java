@@ -2,12 +2,18 @@ package com.emal.android.transport.activity;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import com.emal.android.transport.utils.Constants;
 import com.emal.android.R;
+import com.emal.android.transport.utils.GeoConverter;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -57,8 +63,31 @@ public class TransportSettings extends Activity {
             streetView.setChecked(true);
         }
 
+        TextView textView = (TextView)findViewById(R.id.my_place);
+        textView.setText(getMyPlace());
+
         initSplitter();
     }
+
+    private String getMyPlace() {
+        String myPlaceString = "";
+        Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
+        Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
+        Geocoder geo = new Geocoder(getApplicationContext());
+        try {
+            List<Address> myAddrs = geo.getFromLocation(homeLat, homeLong, 1);
+            if (myAddrs.size() > 0) {
+                Address myPlace = myAddrs.get(0);
+                Log.d(TAG, "My Place selected: " + GeoConverter.convert(myPlace));
+                myPlaceString = GeoConverter.convert(myPlace);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            return myPlaceString;
+        }
+    }
+
 
     private void initSplitter() {
         spinner = (Spinner) findViewById(R.id.sync_period);
