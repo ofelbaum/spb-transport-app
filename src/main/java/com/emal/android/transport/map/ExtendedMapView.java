@@ -132,11 +132,11 @@ public class ExtendedMapView extends MapView {
 
     @Override
     public void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
         if (getZoomLevel() != oldZoomLevel) {
             Log.d(TAG, "ZOOM event");
             oldZoomLevel = getZoomLevel();
             vehicleTracker.syncAll(true);
         }
-        super.dispatchDraw(canvas);
     }
 }
