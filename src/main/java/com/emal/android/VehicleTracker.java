@@ -1,8 +1,10 @@
 package com.emal.android;
 
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.google.android.maps.MapView;
+import com.google.android.maps.Overlay;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.params.ConnManagerPNames;
@@ -27,6 +29,7 @@ public class VehicleTracker {
     private MapView mapView;
     private static DefaultHttpClient CLIENT;
     private Map<Vehicle, UpdateOverlayItemAsyncTask> taskMap = new HashMap<Vehicle, UpdateOverlayItemAsyncTask>();
+    private Map<Overlay, Bitmap> overlayBitmapMap = new HashMap<Overlay, Bitmap>();
 
     public VehicleTracker(MapView mapView) {
         this.mapView = mapView;
@@ -72,30 +75,44 @@ public class VehicleTracker {
     }
 
     public HttpClient getHttpClient() {
-            if (CLIENT == null) {
-                synchronized (VehicleTracker.class) {
-                    if (CLIENT == null) {
-                        SchemeRegistry schemeRegistry = new SchemeRegistry();
-                        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        if (CLIENT == null) {
+            synchronized (VehicleTracker.class) {
+                if (CLIENT == null) {
+                    SchemeRegistry schemeRegistry = new SchemeRegistry();
+                    schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
 
-                        HttpParams params = new BasicHttpParams();
-                        params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 6);
-                        params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new ConnPerRouteBean(3));
-                        params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
-                        params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
-                        int timeoutConnection = 5000;
-                        HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
-                        int timeoutSocket = 5000;
-                        HttpConnectionParams.setSoTimeout(params, timeoutSocket);
+                    HttpParams params = new BasicHttpParams();
+                    params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 6);
+                    params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new ConnPerRouteBean(3));
+                    params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
+                    params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
+                    int timeoutConnection = 5000;
+                    HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
+                    int timeoutSocket = 5000;
+                    HttpConnectionParams.setSoTimeout(params, timeoutSocket);
 
-                        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+                    HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
 
-                        ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
-                        CLIENT = new DefaultHttpClient(cm, params);
-                        CLIENT.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
-                    }
+                    ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+                    CLIENT = new DefaultHttpClient(cm, params);
+                    CLIENT.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
                 }
             }
-            return CLIENT;
         }
+        return CLIENT;
+    }
+
+    public void addBitmap(Overlay overlay, Bitmap bitmap) {
+        overlayBitmapMap.put(overlay, bitmap);
+        Log.d(TAG, "Add bitmap " + overlay);
+    }
+
+    public void removeBitmap(Overlay overlay) {
+        String oId = overlay.toString();
+        Bitmap bitmap = overlayBitmapMap.remove(overlay);
+        if (bitmap != null) {
+            bitmap.recycle();
+            Log.d(TAG, "Recycle bitmap " + oId);
+        }
+    }
 }

@@ -20,8 +20,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.BufferedHttpEntity;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -73,7 +72,9 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         InputStream in = null;
         try {
             in = fetch(url);
-            bitmap = BitmapFactory.decodeStream(in, null, null);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 1;
+            bitmap = BitmapFactory.decodeStream(in, null, options);
             in.close();
             return bitmap;
         } catch (IOException e) {
@@ -110,7 +111,8 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             drawable.setBounds(-drawable.getIntrinsicWidth() / zl, -drawable.getIntrinsicHeight() / zl, drawable.getIntrinsicWidth() / zl, drawable.getIntrinsicHeight() / zl);
             overlayItem.setMarker(drawable);
 
-            updateOverlayItem();
+            Overlay mapOverlay = updateOverlayItem();
+            vehicleTracker.addBitmap(mapOverlay, result);
 
             Log.d(TAG, "Overlay " + vehicle + " FINISHED for " + Thread.currentThread().getName());
         } else {
@@ -119,7 +121,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         }
     }
 
-    private void updateOverlayItem() {
+    private Overlay updateOverlayItem() {
         if (!clearBeforeUpdate) {
             dropOverlayItem();
         }
@@ -128,6 +130,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         mapOverlay.addItem(overlayItem);
         mapOverlays.add(mapOverlay);
         mapView.invalidate();
+        return mapOverlay;
     }
 
     private void dropOverlayItem() {
@@ -141,6 +144,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             if (overlay instanceof MapOverlay) {
                 Vehicle vehicle1 = ((MapOverlay) overlay).getVehicle();
                 if (vehicle1.equals(vehicle)) {
+                    vehicleTracker.removeBitmap(overlay);
                     iterator.remove();
                     mapView.invalidate();
                     break;

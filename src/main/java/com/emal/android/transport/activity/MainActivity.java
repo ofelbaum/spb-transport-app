@@ -99,11 +99,11 @@ public class MainActivity extends MapActivity {
                     }
                 }
         );
-        moveToCurrentLocation();
         vehicleTracker = new VehicleTracker(mapView);
         mapView.setVehicleTracker(vehicleTracker);
         mapView.getController().setZoom(zoomSize);
         mapView.setOnLongpressListener(createLongPressListener());
+        moveToCurrentLocation();
         MapUtils.addMyPlace(mapView, homeLocation);
     }
 
@@ -198,12 +198,22 @@ public class MainActivity extends MapActivity {
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         GeoPoint currentPoint = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
         MapController controller = mapView.getController();
-        controller.animateTo(currentPoint);
+        controller.animateTo(currentPoint, new Runnable() {
+            @Override
+            public void run() {
+                mHandler.postDelayed(timerTask, 0);
+            }
+        });
     }
 
     private void moveToHomeLocation() {
         MapController controller = mapView.getController();
-        controller.animateTo(homeLocation);
+        controller.animateTo(homeLocation, new Runnable() {
+            @Override
+            public void run() {
+                mHandler.postDelayed(timerTask, 0);
+            }
+        });
         controller.setZoom(zoomSize);
     }
 
