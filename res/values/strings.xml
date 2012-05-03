@@ -26,14 +26,14 @@
     <string name="addmyplace">Установить закладку на %1$s?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="wait">Пожалуйста подождите...</string>
+    <string name="notfound">Адрес не определен</string>
     <string-array name="sync_string_array">
-        <item>1 сек</item>
-        <item>2 сек</item>
-        <item>3 сек</item>
-        <item>4 сек</item>
         <item>5 сек</item>
         <item>10 сек</item>
+        <item>15 сек</item>
         <item>20 сек</item>
+        <item>30 сек</item>
         <item>30 сек</item>
         <item>60 сек</item>
     </string-array>

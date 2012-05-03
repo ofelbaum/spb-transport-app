@@ -79,13 +79,28 @@ public class TransportSettings extends Activity {
         }
 
         TextView textView = (TextView)findViewById(R.id.my_place);
+        textView.setText(R.string.wait);
         loadAddressTask.execute(textView);
 
         initSplitter();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (loadAddressTask.isCancelled()) {
+            loadAddressTask.execute();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        loadAddressTask.cancel(true);
+    }
+
     private String getMyPlace() {
-        String myPlaceString = "";
+        String myPlaceString = getResources().getString(R.string.notfound);
         Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
         Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
         Geocoder geo = new Geocoder(getApplicationContext());
