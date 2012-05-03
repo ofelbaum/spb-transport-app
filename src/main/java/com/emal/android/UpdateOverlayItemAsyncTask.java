@@ -91,6 +91,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
     private InputStream fetch(String address) throws IOException {
         HttpClient httpclient = vehicleTracker.getHttpClient();
         HttpGet httpRequest = new HttpGet(URI.create(address));
+        httpRequest.setHeader("User-Agent","Mozilla/5.0 (X11; Linux i686)");
         HttpResponse response = httpclient.execute(httpRequest);
         HttpEntity entity = response.getEntity();
         BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
