@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +36,20 @@ public class TransportSettings extends Activity {
     private boolean showTram = false;
     private boolean satView = true;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
+    private AsyncTask loadAddressTask = new AsyncTask<Object, Void, String>() {
+        private TextView textView;
+
+        @Override
+        protected String doInBackground(Object... params) {
+            textView = (TextView) params[0];
+            return getMyPlace();
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            textView.setText(s);
+        }
+    };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,7 +79,7 @@ public class TransportSettings extends Activity {
         }
 
         TextView textView = (TextView)findViewById(R.id.my_place);
-        textView.setText(getMyPlace());
+        loadAddressTask.execute(textView);
 
         initSplitter();
     }
