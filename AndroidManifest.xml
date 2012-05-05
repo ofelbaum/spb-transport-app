@@ -1,34 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.emal.android" android:versionCode="1" android:versionName="1.0">
+          package="com.emal.android.transport" android:versionCode="2" android:versionName="1.0">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application android:icon="@drawable/autobus" android:label="@string/app_name"
                  >
-        <activity android:name=".transport.activity.MainActivity">
+        <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".transport.activity.TransportSettings">
+        <activity android:name=".activity.TransportSettings">
             <intent-filter>
             </intent-filter>
         </activity>
         <uses-library android:name="com.google.android.maps"/>
-        <receiver android:name=".transport.utils.ConnectivityTypeReceiver" android:enabled="true" android:exported="false">
+        <receiver android:name=".utils.ConnectivityTypeReceiver" android:enabled="true" android:exported="false">
             <intent-filter>
-                <!--<action android:name="android.net.wifi.STATE_CHANGE" />-->
-                <!--<action android:name="android.net.wifi.WIFI_STATE_CHANGED" />-->
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-                <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
         </receiver>
     </application>
