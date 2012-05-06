@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.emal.android.transport" android:versionCode="2" android:versionName="1.0">
+          package="com.emal.android.transport" android:versionCode="4" android:versionName="1.0">
 
     <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="8"/>
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -21,11 +21,11 @@
             </intent-filter>
         </activity>
         <uses-library android:name="com.google.android.maps"/>
-        <receiver android:name=".utils.ConnectivityTypeReceiver" android:enabled="true" android:exported="false">
-            <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-            </intent-filter>
-        </receiver>
+        <!--<receiver android:name=".utils.ConnectivityTypeReceiver" android:enabled="true" android:exported="false">-->
+            <!--<intent-filter>-->
+                <!--<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />-->
+            <!--</intent-filter>-->
+        <!--</receiver>-->
     </application>
 </manifest>
 
