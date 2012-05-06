@@ -24,6 +24,7 @@ import java.io.*;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -34,14 +35,14 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
 
     private boolean clearBeforeUpdate;
     private MapView mapView;
-    private Vehicle vehicle;
+    private Set<Vehicle> vehicles;
     private OverlayItem overlayItem;
     private VehicleTracker vehicleTracker;
 
 
-    public UpdateOverlayItemAsyncTask(Vehicle vehicle, VehicleTracker vehicleTracker, boolean clearBeforeUpdate) {
+    public UpdateOverlayItemAsyncTask(Set<Vehicle> vehicles, VehicleTracker vehicleTracker, boolean clearBeforeUpdate) {
         this.mapView = vehicleTracker.getMapView();
-        this.vehicle = vehicle;
+        this.vehicles = vehicles;
         this.vehicleTracker = vehicleTracker;
         this.clearBeforeUpdate = clearBeforeUpdate;
     }
@@ -61,12 +62,21 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         String bbox = GeoConverter.calculateBBox(mapView);
         int screenWidth = mapView.getWidth();
         int screenHeight = mapView.getHeight();
-        Object[] paramss = new Object[]{vehicle.getCode(), bbox, screenWidth, screenHeight};
+        StringBuffer vs = new StringBuffer();
+        Iterator<Vehicle> iterator = vehicles.iterator();
+        while (iterator.hasNext()) {
+            Vehicle next = iterator.next();
+            vs.append(next.getCode());
+            if (iterator.hasNext()) {
+                vs.append(",");
+            }
+        }
+        Object[] paramss = new Object[]{vs.toString(), bbox, screenWidth, screenHeight};
         String url = Constants.URL_TEMPLATE + String.format(Constants.URL_PARAMS, paramss);
 
 
         long start = System.currentTimeMillis();
-        Log.d(TAG, "Download " + vehicle + " START for " + Thread.currentThread().getName());
+        Log.d(TAG, "Download " + vehicles + " START for " + Thread.currentThread().getName());
 
         Bitmap bitmap = null;
         InputStream in = null;
@@ -80,11 +90,11 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         } catch (IOException e) {
             String message = e.getMessage();
             Log.e(TAG, message != null ? message : e.getClass().getName());
-            Log.d(TAG, "Download " + vehicle + " CANCELLED for " + Thread.currentThread().getName());
+            Log.d(TAG, "Download " + vehicles + " CANCELLED for " + Thread.currentThread().getName());
             return null;
         } finally {
             double duration = (System.currentTimeMillis() - start) / 1000d;
-            Log.d(TAG, "Download " + vehicle + " FINISHED takes " + duration + " sec for " + Thread.currentThread().getName());
+            Log.d(TAG, "Download " + vehicles + " FINISHED takes " + duration + " sec for " + Thread.currentThread().getName());
         }
     }
 
@@ -106,18 +116,18 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         }
         super.onPostExecute(result);
         if (result != null) {
-            Log.d(TAG, "Overlay " + vehicle + " START size " + result.getRowBytes() + " bytes for " + Thread.currentThread().getName());
+            Log.d(TAG, "Overlay " + vehicles + " START size " + result.getRowBytes() + " bytes for " + Thread.currentThread().getName());
             Drawable drawable = new BitmapDrawable(Resources.getSystem(), result);
             int zl = 2;
             drawable.setBounds(-drawable.getIntrinsicWidth() / zl, -drawable.getIntrinsicHeight() / zl, drawable.getIntrinsicWidth() / zl, drawable.getIntrinsicHeight() / zl);
             overlayItem.setMarker(drawable);
 
             Overlay mapOverlay = updateOverlayItem();
-            vehicleTracker.addBitmap(mapOverlay, result);
+            vehicleTracker.addBitmap(result);
 
-            Log.d(TAG, "Overlay " + vehicle + " FINISHED for " + Thread.currentThread().getName());
+            Log.d(TAG, "Overlay " + vehicles + " FINISHED for " + Thread.currentThread().getName());
         } else {
-            Log.d(TAG, "Overlay " + vehicle + " CANCELLED for " + Thread.currentThread().getName());
+            Log.d(TAG, "Overlay " + vehicles + " CANCELLED for " + Thread.currentThread().getName());
             this.cancel(true);
         }
     }
@@ -127,7 +137,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             dropOverlayItem();
         }
         List<Overlay> mapOverlays = mapView.getOverlays();
-        MapOverlay mapOverlay = new MapOverlay(vehicle, vehicleTracker);
+        MapOverlay mapOverlay = new MapOverlay(vehicleTracker);
         mapOverlay.addItem(overlayItem);
         mapOverlays.add(mapOverlay);
         mapView.invalidate();
@@ -143,13 +153,9 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
                 continue;
             }
             if (overlay instanceof MapOverlay) {
-                Vehicle vehicle1 = ((MapOverlay) overlay).getVehicle();
-                if (vehicle1.equals(vehicle)) {
-                    vehicleTracker.removeBitmap(overlay);
+                    vehicleTracker.clearBitmap();
                     iterator.remove();
-                    mapView.invalidate();
                     break;
-                }
             }
         }
         mapView.invalidate();

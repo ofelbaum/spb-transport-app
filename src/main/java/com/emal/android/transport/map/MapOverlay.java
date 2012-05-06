@@ -4,9 +4,7 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.MotionEvent;
-import com.emal.android.Vehicle;
 import com.emal.android.VehicleTracker;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
@@ -21,12 +19,10 @@ public class MapOverlay extends ItemizedOverlay<OverlayItem> {
     private static final String TAG = "MapOverlay";
     private static final Drawable drawable = new BitmapDrawable(Resources.getSystem());
     private OverlayItem item;
-    private Vehicle vehicle;
     private VehicleTracker vehicleTracker;
 
-    public MapOverlay(Vehicle vehicle, VehicleTracker vehicleTracker) {
+    public MapOverlay(VehicleTracker vehicleTracker) {
         super(drawable);
-        this.vehicle = vehicle;
         this.item = defaultOverlayItem();
         this.vehicleTracker = vehicleTracker;
         populate();
@@ -57,13 +53,9 @@ public class MapOverlay extends ItemizedOverlay<OverlayItem> {
         boolean result = super.onTouchEvent(motionEvent, mapView);
 
         if (MotionEvent.ACTION_UP == motionEvent.getAction()) {
-            vehicleTracker.track(vehicle);
+            vehicleTracker.syncVehicles();
         }
         return result;
-    }
-
-    public Vehicle getVehicle() {
-        return vehicle;
     }
 
     private static OverlayItem defaultOverlayItem() {

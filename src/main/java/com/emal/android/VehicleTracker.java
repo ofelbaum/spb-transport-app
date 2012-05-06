@@ -4,7 +4,6 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.google.android.maps.MapView;
-import com.google.android.maps.Overlay;
 import org.apache.http.HttpVersion;
 import org.apache.http.client.HttpClient;
 import org.apache.http.conn.params.ConnManagerPNames;
@@ -17,8 +16,7 @@ import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.*;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -28,50 +26,41 @@ public class VehicleTracker {
     private static final String TAG = "VehicleTracker";
     private MapView mapView;
     private static DefaultHttpClient CLIENT;
-    private Map<Vehicle, UpdateOverlayItemAsyncTask> taskMap = new HashMap<Vehicle, UpdateOverlayItemAsyncTask>();
-    private Map<Overlay, Bitmap> overlayBitmapMap = new HashMap<Overlay, Bitmap>();
+    private UpdateOverlayItemAsyncTask task;
+    private Set<Bitmap> bitmaps;
+    private Set<Vehicle> vehicles;
 
     public VehicleTracker(MapView mapView) {
         this.mapView = mapView;
+        vehicles = new HashSet<Vehicle>();
+        bitmaps = new HashSet<Bitmap>();
     }
 
     public MapView getMapView() {
         return mapView;
     }
 
-    public void track(Vehicle vehicle) {
-        track(vehicle, false);
+    public boolean startTrack(Vehicle vehicle) {
+        return vehicles.add(vehicle);
     }
 
-    public void track(Vehicle vehicle, boolean clearBeforeUpdate) {
-        UpdateOverlayItemAsyncTask task = taskMap.get(vehicle);
+    public boolean stopTrack(Vehicle vehicle) {
+        return vehicles.remove(vehicle);
+    }
+
+    public void syncVehicles() {
+        syncVehicles(false);
+    }
+
+    public void syncVehicles(boolean clearBeforeUpdate) {
         if (task != null) {
             if (!AsyncTask.Status.FINISHED.equals(task.getStatus())) {
-                Log.d(TAG, "Reschedule " + vehicle);
+                Log.d(TAG, "Reschedule vehicles");
                 task.cancel(true);
             }
         }
-        task = new UpdateOverlayItemAsyncTask(vehicle, this, clearBeforeUpdate);
-        taskMap.put(vehicle, task);
+        task = new UpdateOverlayItemAsyncTask(vehicles, this, clearBeforeUpdate);
         task.execute();
-    }
-
-    public void untrack(Vehicle vehicle) {
-        UpdateOverlayItemAsyncTask task = taskMap.get(vehicle);
-        if (task != null) {
-            task.cancel(true);
-            taskMap.remove(vehicle);
-        }
-    }
-
-    public void syncAll() {
-        syncAll(false);
-    }
-
-    public void syncAll(boolean clearBeforeUpdate) {
-        for (Vehicle vehicle : taskMap.keySet()) {
-            track(vehicle, clearBeforeUpdate);
-        }
     }
 
     public HttpClient getHttpClient() {
@@ -102,17 +91,18 @@ public class VehicleTracker {
         return CLIENT;
     }
 
-    public void addBitmap(Overlay overlay, Bitmap bitmap) {
-        overlayBitmapMap.put(overlay, bitmap);
-        Log.d(TAG, "Add bitmap " + overlay);
+    public void addBitmap(Bitmap bitmap) {
+        bitmaps.add(bitmap);
+        Log.d(TAG, "Add bitmap " + bitmap);
     }
 
-    public void removeBitmap(Overlay overlay) {
-        String oId = overlay.toString();
-        Bitmap bitmap = overlayBitmapMap.remove(overlay);
-        if (bitmap != null) {
+    public void clearBitmap() {
+        Log.d(TAG, "Recycle bitmap");
+        Iterator<Bitmap> iterator = bitmaps.iterator();
+        while (iterator.hasNext()) {
+            Bitmap bitmap = iterator.next();
             bitmap.recycle();
-            Log.d(TAG, "Recycle bitmap " + oId);
+            bitmap = null;
         }
     }
 }

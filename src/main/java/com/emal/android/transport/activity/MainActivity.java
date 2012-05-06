@@ -16,7 +16,6 @@ import android.view.*;
 import com.emal.android.*;
 import com.emal.android.transport.R;
 import com.emal.android.transport.map.ExtendedMapView;
-import com.emal.android.transport.map.MapOverlay;
 import com.emal.android.transport.utils.Constants;
 import com.emal.android.transport.utils.GeoConverter;
 import com.emal.android.transport.map.MapUtils;
@@ -53,7 +52,7 @@ public class MainActivity extends MapActivity {
         @Override
         public void run() {
             Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
-            vehicleTracker.syncAll();
+            vehicleTracker.syncVehicles();
             mHandler.postDelayed(this, syncTime);
         }
     }
@@ -155,19 +154,19 @@ public class MainActivity extends MapActivity {
 
     private void restoreApplicationState() {
         if (showBus) {
-            trackVehicle(Vehicle.BUS);
+            vehicleTracker.startTrack(Vehicle.BUS);
         } else {
-            untrackVehicle(Vehicle.BUS);
+            vehicleTracker.stopTrack(Vehicle.BUS);
         }
         if (showTrolley) {
-            trackVehicle(Vehicle.TROLLEY);
+            vehicleTracker.startTrack(Vehicle.TROLLEY);
         } else {
-            untrackVehicle(Vehicle.TROLLEY);
+            vehicleTracker.stopTrack(Vehicle.TROLLEY);
         }
         if (showTram) {
-            trackVehicle(Vehicle.TRAM);
+            vehicleTracker.startTrack(Vehicle.TRAM);
         } else {
-            untrackVehicle(Vehicle.TRAM);
+            vehicleTracker.stopTrack(Vehicle.TRAM);
         }
         mapView.setSatellite(satView);
         mHandler.postDelayed(timerTask, 0);
@@ -221,43 +220,6 @@ public class MainActivity extends MapActivity {
     @Override
     protected boolean isRouteDisplayed() {
         return false;
-    }
-
-    public void trackVehicle(Vehicle vehicle) {
-        Log.d(TAG, "Track " + vehicle);
-        vehicleTracker.track(vehicle);
-        MapOverlay mapOverlay = new MapOverlay(vehicle, vehicleTracker);
-        List<Overlay> overlays = mapView.getOverlays();
-        for (Overlay overlay : overlays) {
-            if (overlay instanceof MapOverlay) {
-                Vehicle v = ((MapOverlay) overlay).getVehicle();
-                if (v.equals(vehicle)) {
-                    Log.d(TAG, "vehicle exist " + vehicle);
-                    return;
-                }
-            }
-        }
-        overlays.add(mapOverlay);
-        mapView.invalidate();
-    }
-
-    public void untrackVehicle(Vehicle vehicle) {
-        Log.d(TAG, "Untrack " + vehicle);
-        vehicleTracker.untrack(vehicle);
-
-        List<Overlay> mapOverlays = mapView.getOverlays();
-        Iterator<Overlay> iterator = mapOverlays.iterator();
-        while (iterator.hasNext()) {
-            Overlay overlay = iterator.next();
-            if (overlay instanceof MapOverlay) {
-                Vehicle vehicle1 = ((MapOverlay) overlay).getVehicle();
-                if (vehicle1.equals(vehicle)) {
-                    iterator.remove();
-                    mapView.invalidate();
-                    //break;
-                }
-            }
-        }
     }
 
     @Override
