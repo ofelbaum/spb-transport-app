@@ -60,7 +60,7 @@ public class TransportSettings extends Activity {
         showBus = sharedPreferences.getBoolean(Constants.SHOW_BUS_FLAG, true);
         showTrolley = sharedPreferences.getBoolean(Constants.SHOW_TROLLEY_FLAG, true);
         showTram = sharedPreferences.getBoolean(Constants.SHOW_TRAM_FLAG, true);
-        satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, true);
+        satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, false);
         syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
         vehicleBus = (CheckBox) findViewById(R.id.vehicle_bus);
