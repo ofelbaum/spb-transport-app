@@ -1,12 +1,7 @@
 package com.emal.android.transport.utils;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.location.Address;
 import android.util.Pair;
-import com.emal.android.R;
 import com.google.android.maps.MapView;
 
 /**

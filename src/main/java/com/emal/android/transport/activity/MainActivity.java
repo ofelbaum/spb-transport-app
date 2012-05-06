@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.*;
 import com.emal.android.*;
+import com.emal.android.transport.R;
 import com.emal.android.transport.map.ExtendedMapView;
 import com.emal.android.transport.map.MapOverlay;
 import com.emal.android.transport.utils.Constants;

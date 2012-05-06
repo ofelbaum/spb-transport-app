@@ -9,8 +9,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
+import com.emal.android.transport.R;
 import com.emal.android.transport.utils.Constants;
-import com.emal.android.R;
 import com.emal.android.transport.utils.GeoConverter;
 
 import java.io.IOException;
