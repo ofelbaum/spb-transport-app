@@ -57,6 +57,17 @@ public class MainActivity extends MapActivity {
         }
     }
 
+    private Runnable immediateUpdate = new Runnable() {
+        @Override
+        public void run() {
+            if (timerTask != null) {
+                timerTask.cancel();
+            }
+            mHandler.removeCallbacks(timerTask);
+            mHandler.postDelayed(timerTask, 0);
+        }
+    };
+
     /**
      * Called when the activity is first created.
      */
@@ -198,22 +209,12 @@ public class MainActivity extends MapActivity {
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         GeoPoint currentPoint = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
         MapController controller = mapView.getController();
-        controller.animateTo(currentPoint, new Runnable() {
-            @Override
-            public void run() {
-                mHandler.postDelayed(timerTask, 0);
-            }
-        });
+        controller.animateTo(currentPoint, immediateUpdate);
     }
 
     private void moveToHomeLocation() {
         MapController controller = mapView.getController();
-        controller.animateTo(homeLocation, new Runnable() {
-            @Override
-            public void run() {
-                mHandler.postDelayed(timerTask, 0);
-            }
-        });
+        controller.animateTo(homeLocation, immediateUpdate);
         controller.setZoom(zoomSize);
     }
 
