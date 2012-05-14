@@ -1,0 +1,11 @@
+   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the Apache Maven distribution.                    ==
+   =========================================================================
+
+This product includes software (Google Maps API) developed by
+Google (http://www.google.com)
+
+This product uses back-end services developed by
+Санкт-Петербургское государственное казенное учреждение «Организатор перевозок» (http://transport.orgp.spb.ru)
