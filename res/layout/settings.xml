@@ -30,6 +30,11 @@
                   android:layout_height="match_parent"
                   android:onClick="onVehicleTramChanged"
                   android:text="@string/vehicle_tram"/>
+        <CheckBox android:id="@+id/vehicle_ship"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:onClick="onVehicleShipChanged"
+                  android:text="@string/vehicle_ship"/>
         <TextView
                 style="?android:attr/listSeparatorTextViewStyle"
                 android:id="@+id/separator"

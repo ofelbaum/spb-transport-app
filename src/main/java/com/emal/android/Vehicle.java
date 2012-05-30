@@ -7,7 +7,9 @@ package com.emal.android;
 public enum Vehicle {
     BUS("vehicle_bus"),
     TROLLEY("vehicle_trolley"),
-    TRAM("vehicle_tram");
+    TRAM("vehicle_tram"),
+    SHIP("vehicle_ship");
+
     private String code;
 
     private Vehicle(String code) {

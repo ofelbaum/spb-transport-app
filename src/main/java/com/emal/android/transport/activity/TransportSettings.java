@@ -27,6 +27,7 @@ public class TransportSettings extends Activity {
     private CheckBox vehicleBus;
     private CheckBox vehicleTrolley;
     private CheckBox vehicleTram;
+    private CheckBox vehicleShip;
     private RadioButton streetView;
     private RadioButton satelliteView;
     private Spinner spinner;
@@ -34,6 +35,7 @@ public class TransportSettings extends Activity {
     private boolean showBus = false;
     private boolean showTrolley = false;
     private boolean showTram = false;
+    private boolean showShip = false;
     private boolean satView = true;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
     private AsyncTask loadAddressTask = new AsyncTask<Object, Void, String>() {
@@ -60,6 +62,7 @@ public class TransportSettings extends Activity {
         showBus = sharedPreferences.getBoolean(Constants.SHOW_BUS_FLAG, true);
         showTrolley = sharedPreferences.getBoolean(Constants.SHOW_TROLLEY_FLAG, true);
         showTram = sharedPreferences.getBoolean(Constants.SHOW_TRAM_FLAG, true);
+        showShip = sharedPreferences.getBoolean(Constants.SHOW_SHIP_FLAG, true);
         satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, false);
         syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
@@ -69,6 +72,8 @@ public class TransportSettings extends Activity {
         vehicleTrolley.setChecked(showTrolley);
         vehicleTram = (CheckBox) findViewById(R.id.vehicle_tram);
         vehicleTram.setChecked(showTram);
+        vehicleShip = (CheckBox) findViewById(R.id.vehicle_ship);
+        vehicleShip.setChecked(showShip);
 
         streetView = (RadioButton) findViewById(R.id.street_view);
         satelliteView = (RadioButton) findViewById(R.id.satellite_view);
@@ -171,6 +176,13 @@ public class TransportSettings extends Activity {
         boolean isChecked = vehicleTram.isChecked();
         SharedPreferences.Editor ed = sharedPreferences.edit();
         ed.putBoolean(Constants.SHOW_TRAM_FLAG, isChecked);
+        ed.commit();
+    }
+
+    public void onVehicleShipChanged(View view) {
+        boolean isChecked = vehicleShip.isChecked();
+        SharedPreferences.Editor ed = sharedPreferences.edit();
+        ed.putBoolean(Constants.SHOW_SHIP_FLAG, isChecked);
         ed.commit();
     }
 

@@ -33,6 +33,7 @@ public class MainActivity extends MapActivity {
     private boolean showBus = false;
     private boolean showTrolley = false;
     private boolean showTram = false;
+    private boolean showShip = false;
     private boolean satView = true;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
     private int zoomSize;
@@ -153,6 +154,7 @@ public class MainActivity extends MapActivity {
         showBus = sharedPreferences.getBoolean(Constants.SHOW_BUS_FLAG, true);
         showTrolley = sharedPreferences.getBoolean(Constants.SHOW_TROLLEY_FLAG, true);
         showTram = sharedPreferences.getBoolean(Constants.SHOW_TRAM_FLAG, true);
+        showShip = sharedPreferences.getBoolean(Constants.SHOW_SHIP_FLAG, true);
         syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
         Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
@@ -178,6 +180,11 @@ public class MainActivity extends MapActivity {
             vehicleTracker.startTrack(Vehicle.TRAM);
         } else {
             vehicleTracker.stopTrack(Vehicle.TRAM);
+        }
+        if (showShip) {
+            vehicleTracker.startTrack(Vehicle.SHIP);
+        } else {
+            vehicleTracker.stopTrack(Vehicle.SHIP);
         }
         mapView.setSatellite(satView);
         mHandler.postDelayed(timerTask, 0);

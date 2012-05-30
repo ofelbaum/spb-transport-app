@@ -6,6 +6,7 @@
     <string name="vehicle_bus">Автобус</string>
     <string name="vehicle_trolley">Троллейбус</string>
     <string name="vehicle_tram">Трамвай</string>
+    <string name="vehicle_ship">Водное такси</string>
     <string name="cur_location">Где я</string>
     <string name="home_location">Закладка</string>
     <string name="settings">Настройки</string>
