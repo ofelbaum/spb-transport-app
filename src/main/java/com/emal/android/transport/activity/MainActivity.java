@@ -214,7 +214,10 @@ public class MainActivity extends MapActivity {
 
     private void moveToCurrentLocation() {
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        GeoPoint currentPoint = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
+        GeoPoint currentPoint = homeLocation;
+        if (location != null) {
+            currentPoint = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
+        }
         MapController controller = mapView.getController();
         controller.animateTo(currentPoint, immediateUpdate);
     }
