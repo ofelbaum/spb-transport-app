@@ -20,7 +20,7 @@ import java.util.TimerTask;
 public class ExtendedMapView extends MapView {
 
     public interface OnLongpressListener {
-        public void onLongpress(MapView view, GeoPoint longpressLocation);
+        public void onLongpress(MapView view, int x, int y);
     }
 
     private static final String TAG = ExtendedMapView.class.getName();
@@ -94,15 +94,7 @@ public class ExtendedMapView extends MapView {
             longpressTimer.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    GeoPoint longpressLocation = getProjection().fromPixels((int) event.getX(),
-                            (int) event.getY());
-
-                    /*
-                     * Fire the listener. We pass the map location
-                     * of the longpress as well, in case it is needed
-                     * by the caller.
-                     */
-                    longpressListener.onLongpress(ExtendedMapView.this, longpressLocation);
+                    longpressListener.onLongpress(ExtendedMapView.this, (int) event.getX(), (int) event.getY());
                 }
 
             }, LONGPRESS_THRESHOLD);

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -121,11 +122,12 @@ public class MainActivity extends MapActivity {
 
     private ExtendedMapView.OnLongpressListener createLongPressListener() {
         return new ExtendedMapView.OnLongpressListener() {
-            public void onLongpress(final MapView view, final GeoPoint geoPoint) {
+            @Override
+            public void onLongpress(final MapView view, final int x, final int y) {
                 runOnUiThread(new Runnable() {
                     public void run() {
-                        Log.d(TAG, "Long press. Point " + geoPoint);
-                        longPressedLocation = geoPoint;
+                        longPressedLocation = view.getProjection().fromPixels(x, y - getTitleBarHeight());
+                        Log.d(TAG, "Long press. Point " + longPressedLocation);
                         float latitude = (float) (longPressedLocation.getLatitudeE6() / 1E6);
                         float longtitude = (float) (longPressedLocation.getLongitudeE6() / 1E6);
 
@@ -145,6 +147,15 @@ public class MainActivity extends MapActivity {
                         }
                     }
                 });
+            }
+
+            private int getTitleBarHeight() {
+                Rect rect = new Rect();
+                Window window = getWindow();
+                window.getDecorView().getWindowVisibleDisplayFrame(rect);
+                int StatusBarHeight = rect.top;
+                int contentViewTop = window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
+                return contentViewTop - StatusBarHeight;
             }
         };
     }
