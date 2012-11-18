@@ -110,7 +110,7 @@
 
     <profiles>
         <profile>
-            <id>release</id>
+            <id>Release</id>
             <properties>
                 <google.maps.key>${maven.prop.google.maps.key.release}</google.maps.key>
             </properties>
@@ -147,7 +147,7 @@
             </build>
         </profile>
         <profile>
-            <id>sdk8</id>
+            <id>Android 2.2 (api level 8)</id>
             <properties>
                 <platform.sdk.version>8</platform.sdk.version>
             </properties>
@@ -156,7 +156,7 @@
             </build>
         </profile>
         <profile>
-            <id>sdk11</id>
+            <id>Android 3.0 (api level 11)</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
