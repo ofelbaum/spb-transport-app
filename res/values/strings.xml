@@ -21,7 +21,7 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Выберите частоту (сек)</string>
     <string name="info">Информация</string>
-    <string name="version">версия 1.0</string>
+    <string name="version">версия 1.2.2</string>
     <string name="copyright">&#169; 2012 Алексей Емельяненко</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Установить закладку на %1$s?</string>
@@ -37,5 +37,7 @@
         <item>30 сек</item>
         <item>30 сек</item>
         <item>60 сек</item>
+        <item>90 сек</item>
+        <item>120 сек</item>
     </string-array>
 </resources>

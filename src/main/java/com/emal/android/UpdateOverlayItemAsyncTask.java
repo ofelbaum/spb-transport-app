@@ -38,7 +38,7 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
     private Set<Vehicle> vehicles;
     private OverlayItem overlayItem;
     private VehicleTracker vehicleTracker;
-
+    private Bitmap bitmap;
 
     public UpdateOverlayItemAsyncTask(Set<Vehicle> vehicles, VehicleTracker vehicleTracker, boolean clearBeforeUpdate) {
         this.mapView = vehicleTracker.getMapView();
@@ -122,8 +122,8 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
             drawable.setBounds(-drawable.getIntrinsicWidth() / zl, -drawable.getIntrinsicHeight() / zl, drawable.getIntrinsicWidth() / zl, drawable.getIntrinsicHeight() / zl);
             overlayItem.setMarker(drawable);
 
-            Overlay mapOverlay = updateOverlayItem();
-            vehicleTracker.addBitmap(result);
+            updateOverlayItem();
+            bitmap = result;
 
             Log.d(TAG, "Overlay " + vehicles + " FINISHED for " + Thread.currentThread().getName());
         } else {
@@ -153,9 +153,11 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
                 continue;
             }
             if (overlay instanceof MapOverlay) {
-                    vehicleTracker.clearBitmap();
-                    iterator.remove();
-                    break;
+                if (bitmap != null) {
+                    bitmap.recycle();
+                }
+                iterator.remove();
+                break;
             }
         }
         mapView.invalidate();

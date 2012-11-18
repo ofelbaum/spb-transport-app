@@ -27,13 +27,11 @@ public class VehicleTracker {
     private MapView mapView;
     private static DefaultHttpClient CLIENT;
     private UpdateOverlayItemAsyncTask task;
-    private Set<Bitmap> bitmaps;
     private Set<Vehicle> vehicles;
 
     public VehicleTracker(MapView mapView) {
         this.mapView = mapView;
         vehicles = new HashSet<Vehicle>();
-        bitmaps = new HashSet<Bitmap>();
     }
 
     public MapView getMapView() {
@@ -89,20 +87,5 @@ public class VehicleTracker {
             }
         }
         return CLIENT;
-    }
-
-    public void addBitmap(Bitmap bitmap) {
-        bitmaps.add(bitmap);
-        Log.d(TAG, "Add bitmap " + bitmap);
-    }
-
-    public void clearBitmap() {
-        Log.d(TAG, "Recycle bitmap");
-        Iterator<Bitmap> iterator = bitmaps.iterator();
-        while (iterator.hasNext()) {
-            Bitmap bitmap = iterator.next();
-            bitmap.recycle();
-            bitmap = null;
-        }
     }
 }
