@@ -1,4 +1,4 @@
-package com.emal.android.transport.activity;
+package com.emal.android.transport.spb.activity;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,12 +14,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.*;
-import com.emal.android.*;
-import com.emal.android.transport.R;
-import com.emal.android.transport.map.ExtendedMapView;
-import com.emal.android.transport.utils.Constants;
-import com.emal.android.transport.utils.GeoConverter;
-import com.emal.android.transport.map.MapUtils;
+import com.emal.android.transport.spb.R;
+import com.emal.android.transport.spb.Vehicle;
+import com.emal.android.transport.spb.VehicleTracker;
+import com.emal.android.transport.spb.map.ExtendedMapView;
+import com.emal.android.transport.spb.utils.Constants;
+import com.emal.android.transport.spb.utils.GeoConverter;
+import com.emal.android.transport.spb.map.MapUtils;
 import com.google.android.maps.*;
 
 import java.io.IOException;

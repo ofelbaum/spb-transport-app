@@ -1,10 +1,10 @@
-package com.emal.android.transport.map;
+package com.emal.android.transport.spb.map;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
-import com.emal.android.transport.R;
+import com.emal.android.transport.spb.R;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;

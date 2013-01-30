@@ -1,6 +1,5 @@
-package com.emal.android;
+package com.emal.android.transport.spb;
 
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.google.android.maps.MapView;

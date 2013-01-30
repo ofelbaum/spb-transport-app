@@ -1,4 +1,4 @@
-package com.emal.android.transport.utils;
+package com.emal.android.transport.spb.utils;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

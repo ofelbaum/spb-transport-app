@@ -1,4 +1,4 @@
-package com.emal.android.transport.map;
+package com.emal.android.transport.spb.map;
 
 import android.content.Context;
 
@@ -6,7 +6,7 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
-import com.emal.android.VehicleTracker;
+import com.emal.android.transport.spb.VehicleTracker;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 

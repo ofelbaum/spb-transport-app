@@ -1,11 +1,11 @@
-package com.emal.android.transport.map;
+package com.emal.android.transport.spb.map;
 
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.MotionEvent;
-import com.emal.android.VehicleTracker;
+import com.emal.android.transport.spb.VehicleTracker;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;

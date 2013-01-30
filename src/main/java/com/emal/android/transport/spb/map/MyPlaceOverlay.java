@@ -1,4 +1,4 @@
-package com.emal.android.transport.map;
+package com.emal.android.transport.spb.map;
 
 import android.graphics.drawable.Drawable;
 import com.google.android.maps.*;

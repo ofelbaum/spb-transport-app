@@ -1,4 +1,4 @@
-package com.emal.android;
+package com.emal.android.transport.spb;
 
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -7,9 +7,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
-import com.emal.android.transport.map.MapOverlay;
-import com.emal.android.transport.utils.Constants;
-import com.emal.android.transport.utils.GeoConverter;
+import com.emal.android.transport.spb.map.MapOverlay;
+import com.emal.android.transport.spb.utils.Constants;
+import com.emal.android.transport.spb.utils.GeoConverter;
 import com.google.android.maps.MapView;
 import com.google.android.maps.MyLocationOverlay;
 import com.google.android.maps.Overlay;
