@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout android:id="@+id/layout" xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent">
 
@@ -18,5 +18,29 @@
                   android:layout_alignParentBottom="true"
                   android:layout_centerHorizontal="true"
             />
+
+    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                 android:indeterminateOnly="true"
+                 android:indeterminateDrawable="@drawable/progress_bar_ring"
+                 android:layout_alignRight="@+id/mapView" android:layout_alignTop="@+id/mapView"
+                 android:layout_margin="10dp" android:indeterminate="false"/>
+
+    <RelativeLayout
+            android:id="@+id/errorSignLayout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignTop="@+id/progressBar"
+            android:visibility="invisible" android:layout_alignRight="@+id/progressBar"
+            android:layout_alignParentTop="false" android:layout_alignParentLeft="false"
+            android:layout_alignParentBottom="false" android:layout_alignParentRight="false"
+            android:layout_alignWithParentIfMissing="false" android:clickable="false">
+        <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/errorSign"
+                android:src="@drawable/indicator_input_error"
+                android:layout_margin="13dp"/>
+
+    </RelativeLayout>
 
 </RelativeLayout>

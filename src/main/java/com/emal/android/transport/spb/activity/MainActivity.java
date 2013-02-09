@@ -14,6 +14,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.*;
+import android.widget.*;
 import com.emal.android.transport.spb.R;
 import com.emal.android.transport.spb.Vehicle;
 import com.emal.android.transport.spb.VehicleTracker;
@@ -119,6 +120,34 @@ public class MainActivity extends MapActivity {
         mapView.setOnLongpressListener(createLongPressListener());
         moveToCurrentLocation();
         MapUtils.addMyPlace(mapView, homeLocation);
+
+        final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+
+        final RelativeLayout errorSign = (RelativeLayout) findViewById(R.id.errorSignLayout);
+        errorSign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(mapView.getContext());
+
+                builder.setTitle(R.string.error_title);
+                builder.setMessage(R.string.server_error);
+                builder.setPositiveButton(R.string.ok, null);
+
+                final AlertDialog dialog = builder.show();
+                TextView messageText = (TextView) dialog.findViewById(android.R.id.message);
+                messageText.setGravity(Gravity.CENTER);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        dialog.cancel();
+                        dialog.dismiss();
+                    }
+                }, 5000);
+
+                errorSign.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     private ExtendedMapView.OnLongpressListener createLongPressListener() {

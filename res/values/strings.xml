@@ -21,7 +21,7 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Выберите частоту (сек)</string>
     <string name="info">Информация</string>
-    <string name="version">версия 1.3</string>
+    <string name="version">версия 1.4</string>
     <string name="copyright">&#169; 2013 Алексей Емельяненко</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Установить закладку на %1$s?</string>
@@ -29,13 +29,16 @@
     <string name="no">Нет</string>
     <string name="wait">Пожалуйста подождите...</string>
     <string name="notfound">Адрес не определен</string>
+    <string name="server_error">Нет связи с сервером</string>
+    <string name="error_title">Ошибка</string>
+    <string name="ok">OK</string>
     <string-array name="sync_string_array">
         <item>5 сек</item>
         <item>10 сек</item>
         <item>15 сек</item>
         <item>20 сек</item>
         <item>30 сек</item>
-        <item>30 сек</item>
+        <item>45 сек</item>
         <item>60 сек</item>
         <item>90 сек</item>
         <item>120 сек</item>

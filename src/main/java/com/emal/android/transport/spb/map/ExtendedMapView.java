@@ -128,7 +128,9 @@ public class ExtendedMapView extends MapView {
         if (getZoomLevel() != oldZoomLevel) {
             Log.d(TAG, "ZOOM event");
             oldZoomLevel = getZoomLevel();
-            vehicleTracker.syncVehicles(true);
+            if (vehicleTracker != null) {
+                vehicleTracker.syncVehicles(true);
+            }
         }
     }
 }

@@ -6,7 +6,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.util.Log;
+import android.view.View;
+import android.widget.*;
+import com.emal.android.transport.spb.activity.MainActivity;
 import com.emal.android.transport.spb.map.MapOverlay;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.utils.GeoConverter;
@@ -39,16 +43,26 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
     private OverlayItem overlayItem;
     private VehicleTracker vehicleTracker;
     private Bitmap bitmap;
+    private ProgressBar progressBar;
+    private RelativeLayout errorSign;
 
     public UpdateOverlayItemAsyncTask(Set<Vehicle> vehicles, VehicleTracker vehicleTracker, boolean clearBeforeUpdate) {
         this.mapView = vehicleTracker.getMapView();
         this.vehicles = vehicles;
         this.vehicleTracker = vehicleTracker;
         this.clearBeforeUpdate = clearBeforeUpdate;
+
+        MainActivity context = (MainActivity) mapView.getContext();
+        this.progressBar = (ProgressBar) context.findViewById(com.emal.android.transport.spb.R.id.progressBar);
+        this.errorSign = (RelativeLayout) context.findViewById(com.emal.android.transport.spb.R.id.errorSignLayout);
     }
 
     @Override
     protected void onPreExecute() {
+        if (errorSign.getVisibility() == View.INVISIBLE) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
         super.onPreExecute();
         if (clearBeforeUpdate) {
             dropOverlayItem();
@@ -110,12 +124,16 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
 
     @Override
     protected void onPostExecute(Bitmap result) {
+        progressBar.setVisibility(View.INVISIBLE);
+
         if (isCancelled()) {
             Log.d(TAG, "onPostExecute skipped");
             return;
         }
         super.onPostExecute(result);
         if (result != null) {
+            errorSign.setVisibility(View.INVISIBLE);
+
             Log.d(TAG, "Overlay " + vehicles + " START size " + result.getRowBytes() + " bytes for " + Thread.currentThread().getName());
             Drawable drawable = new BitmapDrawable(Resources.getSystem(), result);
             int zl = 2;
@@ -129,6 +147,13 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         } else {
             Log.d(TAG, "Overlay " + vehicles + " CANCELLED for " + Thread.currentThread().getName());
             this.cancel(true);
+
+            new Handler().postAtTime(new Runnable() {
+                @Override
+                public void run() {
+                    errorSign.setVisibility(View.VISIBLE);
+                }
+            }, 1000);
         }
     }
 
