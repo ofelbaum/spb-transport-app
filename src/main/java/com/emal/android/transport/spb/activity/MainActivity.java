@@ -6,10 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Rect;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
-import android.location.LocationManager;
+import android.location.*;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -19,6 +16,7 @@ import com.emal.android.transport.spb.R;
 import com.emal.android.transport.spb.Vehicle;
 import com.emal.android.transport.spb.VehicleTracker;
 import com.emal.android.transport.spb.map.ExtendedMapView;
+import com.emal.android.transport.spb.map.TouchOverlay;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.utils.GeoConverter;
 import com.emal.android.transport.spb.map.MapUtils;
@@ -41,6 +39,7 @@ public class MainActivity extends MapActivity {
     private int syncTime = Constants.DEFAULT_SYNC_MS;
     private int zoomSize;
     private GeoPoint homeLocation;
+    private GeoPoint lastLocation;
     private GeoPoint longPressedLocation;
     private ExtendedMapView mapView;
     private SharedPreferences sharedPreferences;
@@ -88,7 +87,9 @@ public class MainActivity extends MapActivity {
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mylocationOverlay = new MyLocationOverlay(mapView.getContext(), mapView);
         mylocationOverlay.enableMyLocation();
-        mapView.getOverlays().add(mylocationOverlay);
+        List<Overlay> overlays = mapView.getOverlays();
+        overlays.add(mylocationOverlay);
+        overlays.add(new TouchOverlay(this));
 
         initParams();
         alert = MapUtils.createMyPlaceDialog(mapView,
@@ -97,10 +98,10 @@ public class MainActivity extends MapActivity {
                     public void onClick(DialogInterface dialog, int which) {
                         homeLocation = longPressedLocation;
                         SharedPreferences.Editor editor = sharedPreferences.edit();
-                        float latitude = (float) (homeLocation.getLatitudeE6() / 1E6);
-                        float longtitude = (float) (homeLocation.getLongitudeE6() / 1E6);
-                        editor.putFloat(Constants.HOME_LOC_LAT_FLAG, latitude);
-                        editor.putFloat(Constants.HOME_LOC_LONG_FLAG, longtitude);
+                        int latitude = homeLocation.getLatitudeE6();
+                        int longtitude = homeLocation.getLongitudeE6();
+                        editor.putInt(Constants.HOME_LOC_LAT_FLAG, latitude);
+                        editor.putInt(Constants.HOME_LOC_LONG_FLAG, longtitude);
                         editor.commit();
                         MapUtils.redrawMyPlace(mapView, homeLocation);
                         dialog.cancel();
@@ -118,7 +119,13 @@ public class MainActivity extends MapActivity {
         mapView.setVehicleTracker(vehicleTracker);
         mapView.getController().setZoom(zoomSize);
         mapView.setOnLongpressListener(createLongPressListener());
-        moveToCurrentLocation();
+        mapView.setOnZoomListener(createOnZoomListener());
+
+        if (lastLocation == null) {
+            moveToCurrentLocation();
+        } else {
+            moveToLocation(lastLocation);
+        }
         MapUtils.addMyPlace(mapView, homeLocation);
 
         final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progressBar);
@@ -148,6 +155,18 @@ public class MainActivity extends MapActivity {
                 errorSign.setVisibility(View.INVISIBLE);
             }
         });
+    }
+
+    private ExtendedMapView.OnZoomListener createOnZoomListener() {
+        return new ExtendedMapView.OnZoomListener() {
+            @Override
+            public void onZoom(int oldZoomValue, int newZoomValue) {
+                SharedPreferences sharedPreferences = getSharedPreferences(Constants.APP_SHARED_SOURCE, 0);
+                SharedPreferences.Editor ed = sharedPreferences.edit();
+                ed.putInt(Constants.ZOOM_FLAG, newZoomValue);
+                ed.commit();
+            }
+        };
     }
 
     private ExtendedMapView.OnLongpressListener createLongPressListener() {
@@ -198,9 +217,13 @@ public class MainActivity extends MapActivity {
         showShip = sharedPreferences.getBoolean(Constants.SHOW_SHIP_FLAG, true);
         syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
-        Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
-        Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
-        homeLocation = new GeoPoint((int) (homeLat * 1E6), (int) (homeLong * 1E6));
+        Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, MapUtils.SPB_CENTER_LAT_DEF_VALUE);
+        Integer homeLong = sharedPreferences.getInt(Constants.HOME_LOC_LONG_FLAG, MapUtils.SPB_CENTER_LONG_DEF_VALUE);
+        homeLocation = new GeoPoint(homeLat, homeLong);
+
+        Integer currLat = sharedPreferences.getInt(Constants.LAST_LOC_LAT_FLAG, MapUtils.SPB_CENTER_LAT_DEF_VALUE);
+        Integer currLong = sharedPreferences.getInt(Constants.LAST_LOC_LONG_FLAG, MapUtils.SPB_CENTER_LONG_DEF_VALUE);
+        lastLocation = new GeoPoint(currLat, currLong);
 
         satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, false);
         zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
@@ -229,7 +252,11 @@ public class MainActivity extends MapActivity {
         }
         mapView.setSatellite(satView);
         mHandler.postDelayed(timerTask, 0);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 3, mylocationOverlay);
+
+        Criteria criteria = new Criteria();
+        String bestProvider = locationManager.getBestProvider(criteria, true);
+        Log.d(TAG, "Best provider = " + bestProvider);
+        locationManager.requestLocationUpdates(bestProvider, 3000, 3, mylocationOverlay);
     }
 
     @Override
@@ -259,14 +286,14 @@ public class MainActivity extends MapActivity {
         if (location != null) {
             currentPoint = new GeoPoint((int) (location.getLatitude() * 1E6), (int) (location.getLongitude() * 1E6));
         }
-        MapController controller = mapView.getController();
-        controller.animateTo(currentPoint, immediateUpdate);
+        moveToLocation(currentPoint);
     }
 
-    private void moveToHomeLocation() {
+    private void moveToLocation(GeoPoint geoPoint) {
         MapController controller = mapView.getController();
-        controller.animateTo(homeLocation, immediateUpdate);
-        controller.setZoom(zoomSize);
+        controller.animateTo(geoPoint, immediateUpdate);
+
+        MapUtils.saveGeoPoint(this, geoPoint);
     }
 
     @Override
@@ -289,7 +316,7 @@ public class MainActivity extends MapActivity {
                 break;
             }
             case R.id.home_location: {
-                moveToHomeLocation();
+                moveToLocation(homeLocation);
                 break;
             }
             case R.id.settings: {

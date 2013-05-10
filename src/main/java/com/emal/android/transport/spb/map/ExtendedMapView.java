@@ -23,6 +23,10 @@ public class ExtendedMapView extends MapView {
         public void onLongpress(MapView view, int x, int y);
     }
 
+    public interface OnZoomListener {
+        public void onZoom(int oldZoomValue, int newZoomValue);
+    }
+
     private static final String TAG = ExtendedMapView.class.getName();
     private int oldZoomLevel = -1;
     private VehicleTracker vehicleTracker;
@@ -39,7 +43,8 @@ public class ExtendedMapView extends MapView {
     private GeoPoint lastMapCenter;
 
     private Timer longpressTimer = new Timer();
-    private ExtendedMapView.OnLongpressListener longpressListener;
+    private OnLongpressListener longpressListener;
+    private OnZoomListener onZoomListener;
 
     public ExtendedMapView(Context context, String apiKey) {
         super(context, apiKey);
@@ -57,8 +62,12 @@ public class ExtendedMapView extends MapView {
         this.vehicleTracker = vehicleTracker;
     }
 
-    public void setOnLongpressListener(ExtendedMapView.OnLongpressListener listener) {
+    public void setOnLongpressListener(OnLongpressListener listener) {
         longpressListener = listener;
+    }
+
+    public void setOnZoomListener(OnZoomListener onZoomListener) {
+        this.onZoomListener = onZoomListener;
     }
 
     /**
@@ -125,12 +134,14 @@ public class ExtendedMapView extends MapView {
     @Override
     public void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        if (getZoomLevel() != oldZoomLevel) {
+        int zoomLevel = getZoomLevel();
+        if (zoomLevel != oldZoomLevel) {
             Log.d(TAG, "ZOOM event");
-            oldZoomLevel = getZoomLevel();
             if (vehicleTracker != null) {
                 vehicleTracker.syncVehicles(true);
             }
+            onZoomListener.onZoom(oldZoomLevel, zoomLevel);
+            oldZoomLevel = zoomLevel;
         }
     }
 }

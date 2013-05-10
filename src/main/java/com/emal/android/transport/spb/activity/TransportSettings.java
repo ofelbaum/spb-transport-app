@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 import com.emal.android.transport.spb.R;
+import com.emal.android.transport.spb.map.MapUtils;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.utils.GeoConverter;
 
@@ -38,7 +39,9 @@ public class TransportSettings extends Activity {
     private boolean showShip = false;
     private boolean satView = true;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
-    private AsyncTask loadAddressTask = new AsyncTask<Object, Void, String>() {
+    private AsyncTask loadAddressTask;
+
+    private class LoadAddressTask extends AsyncTask<Object, Void, String> {
         private TextView textView;
 
         @Override
@@ -85,32 +88,25 @@ public class TransportSettings extends Activity {
 
         TextView textView = (TextView)findViewById(R.id.my_place);
         textView.setText(R.string.wait);
+        loadAddressTask = new LoadAddressTask();
         loadAddressTask.execute(textView);
 
         initSplitter();
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        if (loadAddressTask.isCancelled()) {
-            loadAddressTask.execute();
-        }
-    }
-
-    @Override
     protected void onStop() {
-        super.onStop();
         loadAddressTask.cancel(true);
+        super.onStop();
     }
 
     private String getMyPlace() {
         String myPlaceString = getResources().getString(R.string.notfound);
-        Float homeLat = sharedPreferences.getFloat(Constants.HOME_LOC_LAT_FLAG, 59.95f);
-        Float homeLong = sharedPreferences.getFloat(Constants.HOME_LOC_LONG_FLAG, 30.316667f);
+        Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, MapUtils.SPB_CENTER_LAT_DEF_VALUE);
+        Integer homeLong = sharedPreferences.getInt(Constants.HOME_LOC_LONG_FLAG, MapUtils.SPB_CENTER_LONG_DEF_VALUE);
         Geocoder geo = new Geocoder(getApplicationContext());
         try {
-            List<Address> myAddrs = geo.getFromLocation(homeLat, homeLong, 1);
+            List<Address> myAddrs = geo.getFromLocation(homeLat / 1E6, homeLong / 1E6, 1);
             if (myAddrs.size() > 0) {
                 Address myPlace = myAddrs.get(0);
                 Log.d(TAG, "My Place selected: " + GeoConverter.convert(myPlace));

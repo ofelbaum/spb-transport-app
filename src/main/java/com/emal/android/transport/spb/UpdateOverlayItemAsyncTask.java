@@ -88,20 +88,17 @@ public class UpdateOverlayItemAsyncTask extends AsyncTask<String, Void, Bitmap> 
         Object[] paramss = new Object[]{vs.toString(), bbox, screenWidth, screenHeight};
         String url = Constants.URL_TEMPLATE + String.format(Constants.URL_PARAMS, paramss);
 
-
         long start = System.currentTimeMillis();
         Log.d(TAG, "Download " + vehicles + " START for " + Thread.currentThread().getName());
 
-        Bitmap bitmap = null;
-        InputStream in = null;
         try {
-            in = fetch(url);
+            InputStream in = fetch(url);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 1;
-            bitmap = BitmapFactory.decodeStream(in, null, options);
+            Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
             in.close();
             return bitmap;
-        } catch (IOException e) {
+        } catch (Exception e) {
             String message = e.getMessage();
             Log.e(TAG, message != null ? message : e.getClass().getName());
             Log.d(TAG, "Download " + vehicles + " CANCELLED for " + Thread.currentThread().getName());
