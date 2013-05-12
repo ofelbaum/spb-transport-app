@@ -256,7 +256,9 @@ public class MainActivity extends MapActivity {
         Criteria criteria = new Criteria();
         String bestProvider = locationManager.getBestProvider(criteria, true);
         Log.d(TAG, "Best provider = " + bestProvider);
-        locationManager.requestLocationUpdates(bestProvider, 3000, 3, mylocationOverlay);
+        if (bestProvider != null) {
+            locationManager.requestLocationUpdates(bestProvider, 3000, 3, mylocationOverlay);
+        }
     }
 
     @Override
