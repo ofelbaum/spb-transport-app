@@ -2,6 +2,8 @@ package com.emal.android.transport.spb.utils;
 
 import android.location.Address;
 import android.util.Pair;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.maps.MapView;
 
 /**
@@ -56,5 +58,14 @@ public class GeoConverter {
             }
         }
         return buffer.toString();
+    }
+
+    public static String calculateBBox(LatLngBounds latLngBounds) {
+        LatLng southwest = latLngBounds.southwest;
+        LatLng northeast = latLngBounds.northeast;
+        Pair<Double, Double> p1 = GeoConverter.fromLatLonToMeters(southwest.latitude, southwest.longitude);
+        Pair<Double, Double> p2 = GeoConverter.fromLatLonToMeters(northeast.latitude, northeast.longitude);
+
+        return p1.first.toString() + "," + p1.second.toString() + "," + p2.first.toString() + "," + p2.second.toString();
     }
 }

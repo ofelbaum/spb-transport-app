@@ -12,6 +12,7 @@ public final class Constants {
     public static final String SHOW_TRAM_FLAG = "SHOW_TRAM_FLAG";
     public static final String SHOW_SHIP_FLAG = "SHOW_SHIP_FLAG";
     public static final String SAT_VIEW_FLAG = "SAT_VIEW_FLAG";
+    public static final String MAP_PROVIDER_TYPE_FLAG = "MAP_PROVIDER_TYPE_FLAG";
     public static final String SYNC_TIME_FLAG = "SYNC_TIME_FLAG";
     public static final String ZOOM_FLAG = "ZOOM_FLAG";
     public static final String HOME_LOC_LONG_FLAG = "HOME_LOCATION_LONG_FLAG";

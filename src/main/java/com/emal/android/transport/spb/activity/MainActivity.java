@@ -322,7 +322,7 @@ public class MainActivity extends MapActivity {
                 break;
             }
             case R.id.settings: {
-                startActivity(new Intent(this, TransportSettings.class));
+                startActivity(new Intent(this, PreferencesActivity.class));
                 break;
             }
         }

@@ -32,6 +32,14 @@
     <string name="server_error">Нет связи с сервером</string>
     <string name="error_title">Ошибка</string>
     <string name="ok">OK</string>
+    <string name="vehicles">Транспорт</string>
+    <string name="map_params">Параметры карты</string>
+    <string name="map_sync_time">Частота обновления</string>
+    <string name="map_provider">Провайдер карты</string>
+    <string name="version_title">Версия</string>
+    <string name="copyright_title">Copyright</string>
+    <string name="vehicle_types">Типы транспорта</string>
+    <string name="choose_vehicles">Выберите транспорт</string>
     <string-array name="sync_string_array">
         <item>5 сек</item>
         <item>10 сек</item>
@@ -42,5 +50,50 @@
         <item>60 сек</item>
         <item>90 сек</item>
         <item>120 сек</item>
+    </string-array>
+    <string-array name="sync_string_values">
+        <item>5000</item>
+        <item>10000</item>
+        <item>15000</item>
+        <item>20000</item>
+        <item>30000</item>
+        <item>45000</item>
+        <item>60000</item>
+        <item>90000</item>
+        <item>120000</item>
+    </string-array>
+    <string-array name="map_types_entries">
+        <item>Обычная</item>
+        <item>Спутниковая</item>
+        <!--<item>Топографическая</item>-->
+        <!--<item>Спутниковая с дорогами</item>-->
+    </string-array>
+    <string-array name="map_types_values">
+        <item>1</item>
+        <item>2</item>
+        <!--<item>3</item>-->
+        <!--<item>4</item>-->
+    </string-array>
+    <string-array name="map_provider_entries">
+        <item>Google Maps v.1</item>
+        <item>Google Maps v.2</item>
+        <!--<item>OpenStreet Maps</item>-->
+    </string-array>
+    <string-array name="map_provider_values">
+        <item>GMAPSV1</item>
+        <item>GMAPSV2</item>
+        <item>OSM</item>
+    </string-array>
+    <string-array name="vehicle_types_values">
+        <item>BUS</item>
+        <item>TRAM</item>
+        <item>TROLLEY</item>
+        <item>SHIP</item>
+    </string-array>
+    <string-array name="vehicle_types_entries">
+        <item>Автобус</item>
+        <item>Трамвай</item>
+        <item>Троллейбус</item>
+        <item>Аквабус</item>
     </string-array>
 </resources>

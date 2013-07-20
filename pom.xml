@@ -16,6 +16,7 @@
         <keystore.keypass>${maven.prop.keystore.keypass}</keystore.keypass>
         <keystore.alias>${maven.prop.keystore.alias}</keystore.alias>
         <google.maps.key>${maven.prop.google.maps.key}</google.maps.key>
+        <google.maps.v2.key>${maven.prop.google.maps.v2.key}</google.maps.v2.key>
     </properties>
 
     <dependencies>
@@ -30,6 +31,23 @@
             <artifactId>maps</artifactId>
             <version>${platform.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android.gms</groupId>
+            <artifactId>google-play-services</artifactId>
+            <version>5</version>
+            <type>apklib</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android.gms</groupId>
+            <artifactId>google-play-services-jar</artifactId>
+            <version>5</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>support</artifactId>
+            <version>17</version>
         </dependency>
     </dependencies>
 
@@ -66,7 +84,7 @@
                         </goals>
                         <configuration>
                             <files>
-                                <file>maven.properties</file>
+                                <file>${maven.prop.filepath}</file>
                             </files>
                         </configuration>
                     </execution>
@@ -135,6 +153,7 @@
             <id>Release</id>
             <properties>
                 <google.maps.key>${maven.prop.google.maps.key.release}</google.maps.key>
+                <google.maps.v2.key>${maven.prop.google.maps.v2.key.release}</google.maps.v2.key>
             </properties>
             <build>
                 <plugins>

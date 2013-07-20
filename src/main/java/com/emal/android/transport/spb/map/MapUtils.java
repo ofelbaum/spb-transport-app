@@ -6,8 +6,11 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import com.emal.android.transport.spb.R;
+import com.emal.android.transport.spb.utils.ApplicationParams;
 import com.emal.android.transport.spb.utils.Constants;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 import com.google.android.maps.Overlay;
@@ -68,5 +71,10 @@ public class MapUtils {
         ed.putInt(Constants.LAST_LOC_LAT_FLAG, geoPoint.getLatitudeE6());
         ed.putInt(Constants.LAST_LOC_LONG_FLAG, geoPoint.getLongitudeE6());
         ed.commit();
+    }
+
+    public static void saveGeoPoint(ApplicationParams applicationParams, Location location) {
+        GeoPoint lastLocation = new GeoPoint((int)(location.getLatitude() * 1E6), (int)(location.getLongitude() * 1E6));
+        applicationParams.setLastLocation(lastLocation);
     }
 }
