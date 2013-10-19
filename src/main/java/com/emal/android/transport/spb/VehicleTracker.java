@@ -56,6 +56,10 @@ public class VehicleTracker {
                 task.cancel(true);
             }
         }
+        if (vehicles.isEmpty()) {
+            Log.d(TAG, "No one vehicle requested to show");
+            return;
+        }
         task = new UpdateOverlayItemAsyncTask(vehicles, this, clearBeforeUpdate);
         task.execute();
     }

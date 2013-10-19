@@ -1,9 +1,10 @@
 package com.emal.android.transport.spb.utils;
 
 import android.content.SharedPreferences;
+import android.util.Log;
 import com.emal.android.transport.spb.MapProviderType;
 import com.emal.android.transport.spb.map.MapUtils;
-import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.maps.GeoPoint;
 
 /**
@@ -11,13 +12,13 @@ import com.google.android.maps.GeoPoint;
  * Date: 5/18/13 2:38 AM
  */
 public class ApplicationParams {
+    private static final String TAG = "ApplicationParams";
     private SharedPreferences sharedPreferences;
     private boolean showBus = false;
     private boolean showTrolley = false;
     private boolean showTram = false;
     private boolean showShip = false;
     private boolean satView = true;
-//    private int mapType = GoogleMap.MAP_TYPE_NORMAL;
     private MapProviderType mapProviderType;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
     private int zoomSize;
@@ -81,10 +82,6 @@ public class ApplicationParams {
         return lastLocation;
     }
 
-//    public int getMapType() {
-//        return mapType;
-//    }
-
     public MapProviderType getMapProviderType() {
         return mapProviderType;
     }
@@ -109,10 +106,6 @@ public class ApplicationParams {
         this.satView = satView;
     }
 
-//    public void setMapType(int mapType) {
-//        this.mapType = mapType;
-//    }
-
     public void setMapProviderType(MapProviderType mapProviderType) {
         this.mapProviderType = mapProviderType;
     }
@@ -135,7 +128,6 @@ public class ApplicationParams {
 
     public void saveAll() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putInt(Constants.MAP_TYPE_FLAG, mapType);
         editor.putInt(Constants.SYNC_TIME_FLAG, syncTime);
         editor.putString(Constants.MAP_PROVIDER_TYPE_FLAG, mapProviderType.name());
         editor.putBoolean(Constants.SHOW_BUS_FLAG, Boolean.TRUE.equals(showBus));
@@ -143,9 +135,11 @@ public class ApplicationParams {
         editor.putBoolean(Constants.SHOW_TROLLEY_FLAG, Boolean.TRUE.equals(showTrolley));
         editor.putBoolean(Constants.SHOW_SHIP_FLAG, Boolean.TRUE.equals(showShip));
         editor.putBoolean(Constants.SAT_VIEW_FLAG, Boolean.TRUE.equals(satView));
-
         editor.putInt(Constants.LAST_LOC_LAT_FLAG, lastLocation.getLatitudeE6());
         editor.putInt(Constants.LAST_LOC_LONG_FLAG, lastLocation.getLongitudeE6());
+        editor.putInt(Constants.ZOOM_FLAG, zoomSize);
+
+        Log.d(TAG, "Saving app prefs: " + this);
 
         editor.commit();
 
@@ -156,5 +150,26 @@ public class ApplicationParams {
         showShip = false;
         showTram = false;
         showTrolley = false;
+    }
+
+    public void setLastLocation(LatLng location) {
+        GeoPoint geoPoint = new GeoPoint((int)(location.latitude * 1E6), (int)(location.longitude * 1E6));
+        setLastLocation(geoPoint);
+    }
+
+    @Override
+    public String toString() {
+        return "ApplicationParams{" +
+                "showBus=" + showBus +
+                ", showTrolley=" + showTrolley +
+                ", showTram=" + showTram +
+                ", showShip=" + showShip +
+                ", satView=" + satView +
+                ", mapProviderType=" + mapProviderType +
+                ", syncTime=" + syncTime +
+                ", zoomSize=" + zoomSize +
+                ", homeLocation=" + homeLocation +
+                ", lastLocation=" + lastLocation +
+                '}';
     }
 }

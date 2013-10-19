@@ -14,7 +14,7 @@
               android:title="@string/home_location"/>
         <item android:id="@+id/settings"
               android:checkable="false"
-              android:showAsAction="ifRoom|withText"
+              android:showAsAction="never"
               android:icon="@drawable/ic_menu_preferences"
               android:title="@string/settings"/>
     </group>

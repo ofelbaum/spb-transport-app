@@ -55,7 +55,10 @@ public class SyncVehiclePositionTask extends AsyncTask<String, Void, Bitmap> {
             }
         }
         vehiclesStr = vs.toString();
-        Object[] paramss = new Object[]{vehiclesStr, bbox, vehicleSyncAdapter.getScreenWidth(), vehicleSyncAdapter.getScreenHeight()};
+        Object[] paramss = new Object[]{vehiclesStr,
+                bbox,
+                (int)(vehicleSyncAdapter.getScreenWidth()/1.8),
+                (int)(vehicleSyncAdapter.getScreenHeight()/1.8)};
         String url = Constants.URL_TEMPLATE + String.format(Constants.URL_PARAMS, paramss);
 
         long start = System.currentTimeMillis();

@@ -20,35 +20,69 @@
                 android:layout_height="fill_parent">
 
 
-
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               android:id="@+id/map"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               class="com.google.android.gms.maps.SupportMapFragment"/>
 
-    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                 android:indeterminateOnly="true"
-                 android:indeterminateDrawable="@drawable/progress_bar_ring"
-                 android:layout_alignRight="@+id/mapView" android:layout_alignTop="@+id/mapView"
-                 android:layout_margin="10dp" android:indeterminate="false"/>
-
-    <RelativeLayout
+    <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp" android:layout_alignLeft="@+id/map"
+            android:layout_alignParentTop="false" android:layout_alignParentBottom="true"
+            android:layout_margin="10dp">
+        <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:indeterminateOnly="true"
+                     android:indeterminateDrawable="@drawable/progress_bar_ring"
+                     android:indeterminate="false"
+                     android:layout_alignParentLeft="true"
+                     android:layout_alignParentTop="true" android:layout_gravity="center_horizontal"
+                />
+    </LinearLayout>
+    <LinearLayout
             android:id="@+id/errorSignLayout"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignTop="@+id/progressBar"
-            android:visibility="invisible" android:layout_alignRight="@+id/progressBar"
-            android:layout_alignParentTop="false" android:layout_alignParentLeft="false"
-            android:layout_alignParentBottom="false" android:layout_alignParentRight="false"
-            android:layout_alignWithParentIfMissing="false" android:clickable="false">
-        <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/errorSign"
-                android:src="@drawable/indicator_input_error"
-                android:layout_margin="13dp"/>
+            android:orientation="vertical"
+            android:layout_width="fill_parent"
+            android:layout_height="50dp" android:layout_alignLeft="@+id/map"
+            android:layout_alignParentTop="false" android:layout_alignParentBottom="true"
+            android:layout_margin="10dp" android:visibility="invisible">
+        <ImageView android:layout_width="30dp" android:layout_height="30dp" android:id="@+id/errorSign"
+                   android:src="@drawable/indicator_input_error" android:layout_alignParentLeft="false"
+                   android:layout_alignParentTop="false" android:layout_alignParentBottom="false"
+                   android:layout_alignParentRight="false" android:layout_centerInParent="true"
+                   android:visibility="visible" android:layout_gravity="center"
+                   android:layout_weight="30"/>
 
-    </RelativeLayout>
+    </LinearLayout>
+    <GridLayout
+            android:layout_width="fill_parent"
+            android:layout_height="40dp" android:layout_margin="11dp">
+        <GridLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp" android:layout_centerHorizontal="true"
+                android:layout_alignParentTop="true"
+                android:background="@drawable/layout_border">
+            <ImageView
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:id="@+id/myPlaceButton"
+                    android:src="@drawable/ic_menu_myplaces"
+                    android:layout_gravity="fill" android:layout_margin="2dp"/>
+        </GridLayout>
+        <GridLayout
+                android:layout_width="40dp"
+                android:layout_height="fill_parent" android:layout_gravity="right">
+        </GridLayout>
+    </GridLayout>
+    <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:id="@+id/settingsButton" android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="false" android:src="@drawable/ic_menu_preferences"
+            android:layout_alignParentBottom="true" android:layout_marginBottom="50dp"
+            android:focusableInTouchMode="false" android:layout_marginLeft="11dp"
+            android:background="@drawable/layout_border"/>
 </RelativeLayout>
 

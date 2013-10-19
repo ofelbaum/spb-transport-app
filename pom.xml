@@ -9,7 +9,7 @@
     <name>spb-transport-app</name>
 
     <properties>
-        <platform.version>17</platform.version>
+        <platform.version>18</platform.version>
         <android.sdk.path>${maven.prop.android.sdk.path}</android.sdk.path>
         <keystore.location>${maven.prop.keystore.location}</keystore.location>
         <keystore.password>${maven.prop.keystore.password}</keystore.password>
@@ -17,42 +17,48 @@
         <keystore.alias>${maven.prop.keystore.alias}</keystore.alias>
         <google.maps.key>${maven.prop.google.maps.key}</google.maps.key>
         <google.maps.v2.key>${maven.prop.google.maps.v2.key}</google.maps.v2.key>
+
+        <platform.sdk.min.version>11</platform.sdk.min.version>
+        <platform.sdk.target.version>11</platform.sdk.target.version>
+        <version.code>11</version.code>
+
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.android</groupId>
+            <groupId>android</groupId>
             <artifactId>android</artifactId>
-            <version>${platform.version}</version>
+            <version>4.3_r1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.android</groupId>
+            <groupId>com.google.android.maps</groupId>
             <artifactId>maps</artifactId>
-            <version>${platform.version}</version>
+            <version>17_r3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.android.gms</groupId>
             <artifactId>google-play-services</artifactId>
-            <version>5</version>
+            <version>10</version>
             <type>apklib</type>
         </dependency>
         <dependency>
             <groupId>com.google.android.gms</groupId>
-            <artifactId>google-play-services-jar</artifactId>
-            <version>5</version>
+            <artifactId>google-play-services</artifactId>
+            <version>10</version>
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.google.android</groupId>
-            <artifactId>support</artifactId>
-            <version>17</version>
+            <groupId>android.support</groupId>
+            <artifactId>compatibility-v13</artifactId>
+            <version>18</version>
         </dependency>
     </dependencies>
 
 
     <build>
+        <finalName>spb-transport-app-11</finalName>
         <resources>
             <resource>
                 <directory>${project.basedir}/res</directory>
@@ -187,31 +193,31 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>Android 2.2 (api level 8)</id>
-            <properties>
-                <platform.sdk.min.version>8</platform.sdk.min.version>
-                <platform.sdk.target.version>8</platform.sdk.target.version>
-                <version.code>08</version.code>
-            </properties>
-            <build>
-                <finalName>spb-transport-app-8</finalName>
-            </build>
-        </profile>
-        <profile>
-            <id>Android 3.0 (api level 11)</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <platform.sdk.min.version>11</platform.sdk.min.version>
-                <platform.sdk.target.version>11</platform.sdk.target.version>
-                <version.code>11</version.code>
-            </properties>
-            <build>
-                <finalName>spb-transport-app-11</finalName>
-            </build>
-        </profile>
+        <!--<profile>-->
+            <!--<id>level8</id>-->
+            <!--<properties>-->
+                <!--<platform.sdk.min.version>8</platform.sdk.min.version>-->
+                <!--<platform.sdk.target.version>8</platform.sdk.target.version>-->
+                <!--<version.code>08</version.code>-->
+            <!--</properties>-->
+            <!--<build>-->
+                <!--<finalName>spb-transport-app-8</finalName>-->
+            <!--</build>-->
+        <!--</profile>-->
+        <!--<profile>-->
+            <!--<id>level11</id>-->
+            <!--<activation>-->
+                <!--<activeByDefault>true</activeByDefault>-->
+            <!--</activation>-->
+            <!--<properties>-->
+                <!--<platform.sdk.min.version>11</platform.sdk.min.version>-->
+                <!--<platform.sdk.target.version>11</platform.sdk.target.version>-->
+                <!--<version.code>11</version.code>-->
+            <!--</properties>-->
+            <!--<build>-->
+                <!--<finalName>spb-transport-app-11</finalName>-->
+            <!--</build>-->
+        <!--</profile>-->
     </profiles>
 
     <repositories>

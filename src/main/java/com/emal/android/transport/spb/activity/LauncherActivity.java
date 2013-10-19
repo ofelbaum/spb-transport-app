@@ -15,6 +15,7 @@ public class LauncherActivity extends Activity {
     protected void onStart() {
         super.onStart();
         initActivity();
+        getActionBar().hide();
     }
 
     private void initActivity() {

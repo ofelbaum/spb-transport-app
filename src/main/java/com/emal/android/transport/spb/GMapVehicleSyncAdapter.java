@@ -4,8 +4,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import com.emal.android.transport.spb.utils.GeoConverter;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
@@ -17,15 +15,15 @@ import com.google.android.gms.maps.model.*;
 public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private static final String TAG = GMapVehicleSyncAdapter.class.getName();
     private SupportMapFragment mapFragment;
-    private ProgressBar progressBar;
-    private RelativeLayout errorSign;
+    private View progressBar;
+    private View errorSign;
     private GroundOverlay vehicleOverlay;
     private LatLngBounds latLngBounds;
 
     public GMapVehicleSyncAdapter(SupportMapFragment mapFragment) {
         this.mapFragment = mapFragment;
-        this.progressBar = (ProgressBar) mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.progressBar);
-        this.errorSign = (RelativeLayout) mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.errorSignLayout);
+        this.progressBar = mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.progressBar);
+        this.errorSign = mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.errorSignLayout);
     }
 
     @Override

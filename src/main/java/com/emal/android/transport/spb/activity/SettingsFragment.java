@@ -14,7 +14,6 @@ import com.emal.android.transport.spb.Vehicle;
 import com.emal.android.transport.spb.utils.ApplicationParams;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.utils.LoadAddressTask;
-import com.google.android.maps.GeoPoint;
 
 import java.util.*;
 
@@ -119,13 +118,19 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         StringBuffer buffer = new StringBuffer();
         Iterator<Vehicle> iterator = vehicles.iterator();
+        Set<String> selectedVehicles = new HashSet<String>();
         while (iterator.hasNext()) {
-            buffer.append(entries.get(values.indexOf(iterator.next().name())));
+            String name = iterator.next().name();
+            int i = values.indexOf(name);
+            String s = entries.get(i);
+            buffer.append(s);
+            selectedVehicles.add(name);
             if (iterator.hasNext()) {
                 buffer.append(", ");
             }
 
         }
+        vehicleTypes.setValues(selectedVehicles);
         vehicleTypes.setSummary(buffer.toString());
 
         vehicleTypes.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
