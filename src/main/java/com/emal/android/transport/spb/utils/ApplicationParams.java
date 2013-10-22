@@ -137,6 +137,8 @@ public class ApplicationParams {
         editor.putBoolean(Constants.SAT_VIEW_FLAG, Boolean.TRUE.equals(satView));
         editor.putInt(Constants.LAST_LOC_LAT_FLAG, lastLocation.getLatitudeE6());
         editor.putInt(Constants.LAST_LOC_LONG_FLAG, lastLocation.getLongitudeE6());
+        editor.putInt(Constants.HOME_LOC_LAT_FLAG, homeLocation.getLatitudeE6());
+        editor.putInt(Constants.HOME_LOC_LONG_FLAG, homeLocation.getLongitudeE6());
         editor.putInt(Constants.ZOOM_FLAG, zoomSize);
 
         Log.d(TAG, "Saving app prefs: " + this);

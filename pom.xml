@@ -19,7 +19,7 @@
         <google.maps.v2.key>${maven.prop.google.maps.v2.key}</google.maps.v2.key>
 
         <platform.sdk.min.version>11</platform.sdk.min.version>
-        <platform.sdk.target.version>11</platform.sdk.target.version>
+        <platform.sdk.target.version>15</platform.sdk.target.version>
         <version.code>11</version.code>
 
     </properties>

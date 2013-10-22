@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Где автобус</string>
+    <string name="satellite_view">Спутник</string>
+    <string name="street_view">Улица</string>
+    <string name="vehicle_bus">Автобус</string>
+    <string name="vehicle_trolley">Троллейбус</string>
+    <string name="vehicle_tram">Трамвай</string>
+    <string name="vehicle_ship">Водное такси</string>
+    <string name="cur_location">Где я</string>
+    <string name="home_location">Закладка</string>
+    <string name="settings">Настройки</string>
+    <string name="vehicle_type">Слои</string>
+    <string name="map_type">Тип карты</string>
+    <string name="refresh_period">Частота обновления</string>
+    <string name="my_place">Закладка</string>
+    <string name="save">Сохранить</string>
+    <string name="cancel">Отмена</string>
+    <string name="choose_period">Выбор</string>
+    <integer name="width">100</integer>
+    <integer name="heigth">100</integer>
+    <string name="sync_picker">Выберите частоту (сек)</string>
+    <string name="info">Информация</string>
+    <string name="version">версия 1.5</string>
+    <string name="copyright">&#169; 2013 Алексей Емельяненко</string>
+    <string name="email">alexey.emelyanenko@gmail.com</string>
+    <string name="addmyplace">Установить закладку на %1$s?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="wait">Пожалуйста подождите...</string>
+    <string name="notfound">Адрес не определен</string>
+    <string name="server_error">Нет связи с сервером</string>
+    <string name="error_title">Ошибка</string>
+    <string name="ok">OK</string>
+    <string name="vehicles">Транспорт</string>
+    <string name="map_params">Параметры карты</string>
+    <string name="map_sync_time">Частота обновления</string>
+    <string name="map_provider">Провайдер карты</string>
+    <string name="version_title">Версия</string>
+    <string name="copyright_title">Copyright</string>
+    <string name="vehicle_types">Типы транспорта</string>
+    <string name="choose_vehicles">Выберите транспорт</string>
+    <string-array name="sync_string_array">
+        <item>5 сек</item>
+        <item>10 сек</item>
+        <item>15 сек</item>
+        <item>20 сек</item>
+        <item>30 сек</item>
+        <item>45 сек</item>
+        <item>60 сек</item>
+        <item>90 сек</item>
+        <item>120 сек</item>
+    </string-array>
+    <string-array name="map_types_entries">
+        <item>Обычная</item>
+        <item>Спутниковая</item>
+        <!--<item>Топографическая</item>-->
+        <!--<item>Спутниковая с дорогами</item>-->
+    </string-array>
+    <string-array name="vehicle_types_entries">
+        <item>Автобус</item>
+        <item>Трамвай</item>
+        <item>Троллейбус</item>
+        <item>Аквабус</item>
+    </string-array>
+
+    <string-array name="planets_array">
+        <item>Поиск</item>
+        <item>Закладка</item>
+        <item>Настройки</item>
+        <item>Информация</item>
+        <item>Оставить отзыв</item>
+    </string-array>
+</resources>

@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Где автобус</string>
-    <string name="satellite_view">Спутник</string>
-    <string name="street_view">Улица</string>
-    <string name="vehicle_bus">Автобус</string>
-    <string name="vehicle_trolley">Троллейбус</string>
-    <string name="vehicle_tram">Трамвай</string>
-    <string name="vehicle_ship">Водное такси</string>
-    <string name="cur_location">Где я</string>
-    <string name="home_location">Закладка</string>
-    <string name="settings">Настройки</string>
-    <string name="vehicle_type">Слои</string>
-    <string name="map_type">Тип карты</string>
-    <string name="refresh_period">Частота обновления</string>
-    <string name="my_place">Закладка</string>
-    <string name="save">Сохранить</string>
-    <string name="cancel">Отмена</string>
-    <string name="choose_period">Выбор</string>
+    <string name="app_name">St-Pete Bus</string>
+    <string name="satellite_view">Satellite</string>
+    <string name="street_view">Street</string>
+    <string name="vehicle_bus">Autobus</string>
+    <string name="vehicle_trolley">Trolley</string>
+    <string name="vehicle_tram">Tram</string>
+    <string name="vehicle_ship">Aquabus</string>
+    <string name="cur_location">Current</string>
+    <string name="home_location">My Place</string>
+    <string name="settings">Settings</string>
+    <string name="vehicle_type">Layers</string>
+    <string name="map_type">Map type</string>
+    <string name="refresh_period">Refresh Time</string>
+    <string name="my_place">My Place</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="choose_period">Choose</string>
     <integer name="width">100</integer>
     <integer name="heigth">100</integer>
-    <string name="sync_picker">Выберите частоту (сек)</string>
-    <string name="info">Информация</string>
-    <string name="version">версия 1.5</string>
-    <string name="copyright">&#169; 2013 Алексей Емельяненко</string>
+    <string name="sync_picker">Choose refresh period (sec)</string>
+    <string name="info">Information</string>
+    <string name="version">1.5</string>
+    <string name="copyright">&#169; 2013 Alexey Emelyanenko</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
-    <string name="addmyplace">Установить закладку на %1$s?</string>
-    <string name="yes">Да</string>
-    <string name="no">Нет</string>
-    <string name="wait">Пожалуйста подождите...</string>
-    <string name="notfound">Адрес не определен</string>
-    <string name="server_error">Нет связи с сервером</string>
-    <string name="error_title">Ошибка</string>
+    <string name="addmyplace">Add my place at %1$s?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="wait">Please wait...</string>
+    <string name="notfound">Address not defined</string>
+    <string name="server_error">No connection to server</string>
+    <string name="error_title">Error</string>
     <string name="ok">OK</string>
-    <string name="vehicles">Транспорт</string>
-    <string name="map_params">Параметры карты</string>
-    <string name="map_sync_time">Частота обновления</string>
-    <string name="map_provider">Провайдер карты</string>
-    <string name="version_title">Версия</string>
+    <string name="vehicles">Transport</string>
+    <string name="map_params">Map Parameters</string>
+    <string name="map_sync_time">Refrest Time</string>
+    <string name="map_provider">Map provider</string>
+    <string name="version_title">Version</string>
     <string name="copyright_title">Copyright</string>
-    <string name="vehicle_types">Типы транспорта</string>
-    <string name="choose_vehicles">Выберите транспорт</string>
+    <string name="vehicle_types">Transport Type</string>
+    <string name="choose_vehicles">Choose Transport</string>
     <string-array name="sync_string_array">
-        <item>5 сек</item>
-        <item>10 сек</item>
-        <item>15 сек</item>
-        <item>20 сек</item>
-        <item>30 сек</item>
-        <item>45 сек</item>
-        <item>60 сек</item>
-        <item>90 сек</item>
-        <item>120 сек</item>
+        <item>5 sec</item>
+        <item>10 sec</item>
+        <item>15 sec</item>
+        <item>20 sec</item>
+        <item>30 sec</item>
+        <item>45 sec</item>
+        <item>60 sec</item>
+        <item>90 sec</item>
+        <item>120 sec</item>
     </string-array>
     <string-array name="sync_string_values">
         <item>5000</item>
@@ -63,8 +63,8 @@
         <item>120000</item>
     </string-array>
     <string-array name="map_types_entries">
-        <item>Обычная</item>
-        <item>Спутниковая</item>
+        <item>Street</item>
+        <item>Satellite</item>
         <!--<item>Топографическая</item>-->
         <!--<item>Спутниковая с дорогами</item>-->
     </string-array>
@@ -91,9 +91,22 @@
         <item>SHIP</item>
     </string-array>
     <string-array name="vehicle_types_entries">
-        <item>Автобус</item>
-        <item>Трамвай</item>
-        <item>Троллейбус</item>
-        <item>Аквабус</item>
+        <item>Autobus</item>
+        <item>Tram</item>
+        <item>Trolley</item>
+        <item>Aquabus</item>
     </string-array>
+
+    <string-array name="planets_array">
+        <item>Search</item>
+        <item>My Place</item>
+        <item>Settings</item>
+        <item>Info</item>
+        <item>Feedback</item>
+    </string-array>
+    <string name="drawer_open">Open menu</string>
+    <string name="drawer_close">Close menu</string>
+    <string name="action_websearch">Search</string>
+    <string name="app_not_available">Sorry, action not available</string>
+
 </resources>
