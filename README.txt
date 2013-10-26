@@ -1,10 +1,13 @@
-                          Где автобус
+                          Где автобус/St:Pete Bus
 
-  Что это такое?
+  What is it about?
   -------------
-  Приложение для Android, позволяющее определять положение общественного наземного транспорта города Санкт-Петербурга.
-  https://play.google.com/store/apps/details?id=com.emal.android.transport.spb
-
+  Application that helps to locate public transport (buses/trams/trolleyes) in Saint-Petersburg (Russia).
+  Available for Android platform. Please visit https://play.google.com/store/apps/details?id=com.emal.android.transport.spb
+  
+  Would like to receive new features before official release? Join to early access program. 
+  Visit https://groups.google.com/d/forum/gde-autobus and ask membership
+  
   Release Notes
   -------------
 
