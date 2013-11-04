@@ -16,5 +16,5 @@ public interface VehicleSyncAdapter {
     int getScreenHeight();
     String getBBox();
     void setBBox(LatLngBounds latLngBounds);
-
+    void clearOverlay();
 }

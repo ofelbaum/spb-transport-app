@@ -5,6 +5,7 @@ import android.util.Pair;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.maps.MapView;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -26,7 +27,7 @@ public class GeoConverter {
     }
 
     /**
-     * Get bbox parameter from map view
+     * Get BBOX parameter from map view
      * @param mapView
      * @return
      */
@@ -67,5 +68,30 @@ public class GeoConverter {
         Pair<Double, Double> p2 = GeoConverter.fromLatLonToMeters(northeast.latitude, northeast.longitude);
 
         return p1.first.toString() + "," + p1.second.toString() + "," + p2.first.toString() + "," + p2.second.toString();
+    }
+
+    /*
+    "Converts XY point from Spherical Mercator EPSG:900913 to lat/lon in WGS84 Datum"
+ */
+    public static org.apache.commons.lang3.tuple.Pair<Double, Double> convertMetersToLatLon(double mx, double my) {
+        double originShift = 2 * Math.PI * 6378137 / 2.0;
+        double lon = (mx / originShift) * 180.0;
+        double lat = (my / originShift) * 180.0;
+        lat = 180 / Math.PI * (2 * Math.atan( Math.exp( lat * Math.PI / 180.0)) - Math.PI / 2.0);
+        return new ImmutablePair<Double, Double>(lat, lon);
+    }
+
+    public static double distance(double lat1, double lon1, double lat2, double lon2){
+        double lat1r = lat1 * Math.PI / 180;
+        double lon1r = lon1 * Math.PI / 180;
+        double lat2r = lat2 * Math.PI / 180;
+        double lon2r = lon2 * Math.PI / 180;
+
+        double lonDelta = lon2r - lon1r;
+
+        double up = Math.sqrt(Math.pow(Math.cos(lat2r) * Math.sin(lonDelta), 2) + Math.pow(Math.cos(lat1r) * Math.sin(lat2r) - Math.sin(lat1r) * Math.cos(lat2r) * Math.cos(lonDelta), 2));
+        double down = Math.sin(lat1r) * Math.sin(lat2r) + Math.cos(lat1r) * Math.cos(lat2r) * Math.cos(lonDelta);
+        double res = Math.atan(up /down) * 6367444.6571225;
+        return res;
     }
 }

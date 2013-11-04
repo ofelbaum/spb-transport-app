@@ -64,7 +64,7 @@
         <item>Аквабус</item>
     </string-array>
 
-    <string-array name="planets_array">
+    <string-array name="menu_items_array">
         <item>Поиск</item>
         <item>Закладка</item>
         <item>Настройки</item>

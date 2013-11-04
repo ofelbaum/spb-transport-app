@@ -91,4 +91,13 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     public void setBBox(LatLngBounds latLngBounds) {
         this.latLngBounds = latLngBounds;
     }
+
+    @Override
+    public void clearOverlay() {
+        if (vehicleOverlay != null) {
+            vehicleOverlay.remove();
+        }
+        progressBar.setVisibility(View.INVISIBLE);
+        errorSign.setVisibility(View.INVISIBLE);
+    }
 }

@@ -1,7 +1,6 @@
 package com.emal.android.transport.spb.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 
 /**
@@ -16,11 +15,5 @@ public class PreferencesActivity extends Activity {
         getFragmentManager().beginTransaction()
                 .replace(android.R.id.content, new SettingsFragment())
                 .commit();
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        startActivity(new Intent(this, LauncherActivity.class));
     }
 }

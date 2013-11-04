@@ -42,6 +42,10 @@ public class NewVehicleTracker {
         return vehicles.remove(vehicle);
     }
 
+    public boolean isEmpty() {
+        return vehicles.isEmpty();
+    }
+
     public void syncVehicles() {
         syncVehicles(false);
     }

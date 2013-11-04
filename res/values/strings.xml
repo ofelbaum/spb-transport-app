@@ -97,12 +97,13 @@
         <item>Aquabus</item>
     </string-array>
 
-    <string-array name="planets_array">
+    <string-array name="menu_items_array">
         <item>Search</item>
         <item>My Place</item>
         <item>Settings</item>
         <item>Info</item>
         <item>Feedback</item>
+        <item>Show Stops</item>
     </string-array>
     <string name="drawer_open">Open menu</string>
     <string name="drawer_close">Close menu</string>

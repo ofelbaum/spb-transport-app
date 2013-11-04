@@ -2,16 +2,16 @@ package com.emal.android.transport.spb.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.SearchManager;
-import android.content.DialogInterface;
-import android.content.Intent;
+import android.content.*;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
@@ -20,15 +20,16 @@ import android.widget.*;
 import com.emal.android.transport.spb.*;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import com.emal.android.transport.spb.utils.ApplicationParams;
-import com.emal.android.transport.spb.utils.Constants;
-import com.emal.android.transport.spb.utils.GeoConverter;
+import com.emal.android.transport.spb.Vehicle;
+import com.emal.android.transport.spb.portal.*;
+import com.emal.android.transport.spb.utils.*;
 import com.google.android.gms.R;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
 import com.google.android.maps.GeoPoint;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -56,7 +57,10 @@ public class GMapsV2Activity extends FragmentActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private CharSequence mDrawerTitle;
     private CharSequence mTitle;
-    private String[] mPlanetTitles;
+    private String[] menuItems;
+    private PortalClient portalClient;
+    private List<Marker> stopsMarkers = new ArrayList<Marker>();
+    private List<Marker> vehiclesMarkers = new ArrayList<Marker>();
 
     public class MapUpdateTimerTask extends TimerTask {
         @Override
@@ -74,8 +78,28 @@ public class GMapsV2Activity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gmapsv2);
 
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                new BroadcastReceiver() {
+                    @Override
+                    public void onReceive(Context context, Intent intent) {
+                        String s = intent.getStringExtra("ROUTE_KEY");
+                        String routeId = s.split("#")[0];
+
+                        if (!vehiclesMarkers.isEmpty()) {
+                            for (Marker m : vehiclesMarkers) {
+                                m.remove();
+                            }
+                            vehiclesMarkers.clear();
+
+                        }
+                        AsyncTask asyncTask = new DrawVehicle(portalClient, mMap, vehiclesMarkers);
+                        asyncTask.execute(routeId);
+                    }
+                },
+                new IntentFilter("1"));
+        portalClient = new PortalClient();
         mTitle = mDrawerTitle = getTitle();
-        mPlanetTitles = getResources().getStringArray(com.emal.android.transport.spb.R.array.planets_array);
+        menuItems = getResources().getStringArray(com.emal.android.transport.spb.R.array.menu_items_array);
         mDrawerLayout = (DrawerLayout) findViewById(com.emal.android.transport.spb.R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(com.emal.android.transport.spb.R.id.left_drawer);
 
@@ -83,25 +107,42 @@ public class GMapsV2Activity extends FragmentActivity {
         mDrawerLayout.setDrawerShadow(com.emal.android.transport.spb.R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                com.emal.android.transport.spb.R.layout.drawer_list_item, mPlanetTitles));
+                com.emal.android.transport.spb.R.layout.drawer_list_item, menuItems));
+
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
-                    case 1: {
-                        mDrawerLayout.closeDrawer(mDrawerList);
-                        moveToLocation(appParams.getHomeLocation());
+                    case 0: {
 
+                        startActivity(new Intent(getApplicationContext(), SearchActivity.class));
+                        break;
+                    }
+                    case 1: {
+                        moveToLocation(appParams.getHomeLocation());
                         break;
                     }
                     case 2: {
                         startActivity(new Intent(activity, PreferencesActivity.class));
                         break;
                     }
-                    default: {
-                        mDrawerLayout.closeDrawer(mDrawerList);
+                    case 5: {
+                        switch (stopsMarkers.size()) {
+                            case 0: {
+                                AsyncTask asyncTask = new DrawStops(portalClient, mMap, stopsMarkers);
+                                asyncTask.execute();
+
+                            }
+                            default: {
+                                for (Marker m : stopsMarkers) {
+                                    m.remove();
+                                }
+                                stopsMarkers.clear();
+                            }
+                        }
                     }
                 }
+                mDrawerLayout.closeDrawer(mDrawerList);
             }
         });
 
@@ -130,6 +171,8 @@ public class GMapsV2Activity extends FragmentActivity {
         };
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
+        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
+        setUpMapIfNeeded();
         initApplication();
 //        getActionBar().hide();
         ImageView settingButton = (ImageView) findViewById(R.id.settingsButton);
@@ -166,10 +209,6 @@ public class GMapsV2Activity extends FragmentActivity {
     }
 
     private void initApplication() {
-        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
-
-        setUpMapIfNeeded();
-
         newVehicleTracker.stopTrackAll();
         if (appParams.isShowBus()) {
             newVehicleTracker.startTrack(Vehicle.BUS);
@@ -203,7 +242,11 @@ public class GMapsV2Activity extends FragmentActivity {
                 appParams.setLastLocation(cameraPosition.target);
                 appParams.setZoomSize((int) cameraPosition.zoom);
 
-                startSync();
+                if (!newVehicleTracker.isEmpty()) {
+                    startSync();
+                } else {
+                    vehicleSyncAdapter.clearOverlay();
+                }
             }
         });
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
@@ -249,7 +292,6 @@ public class GMapsV2Activity extends FragmentActivity {
         mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
 
 
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         Resources resources = getResources();
         String yes = resources.getString(com.emal.android.transport.spb.R.string.yes);
@@ -259,7 +301,7 @@ public class GMapsV2Activity extends FragmentActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         //longPressLoc
-                        GeoPoint homeLocation = new GeoPoint((int)(longPressLoc.getLatitude() * 1E6), (int)(longPressLoc.getLongitude() * 1E6));
+                        GeoPoint homeLocation = new GeoPoint((int) (longPressLoc.getLatitude() * 1E6), (int) (longPressLoc.getLongitude() * 1E6));
                         appParams.setHomeLocation(homeLocation);
 
                         LatLng homePoint = new LatLng(longPressLoc.getLatitude(), longPressLoc.getLongitude());
@@ -283,6 +325,13 @@ public class GMapsV2Activity extends FragmentActivity {
         LatLng latLng = new LatLng(geoPoint.getLatitudeE6() / 1E6, geoPoint.getLongitudeE6() / 1E6);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, appParams.getZoomSize()));
         appParams.setLastLocation(geoPoint);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
+        initApplication();
     }
 
     @Override
@@ -324,17 +373,10 @@ public class GMapsV2Activity extends FragmentActivity {
             return true;
         }
         // Handle action buttons
-        switch(item.getItemId()) {
+        final Context activity = this;
+        switch (item.getItemId()) {
             case com.emal.android.transport.spb.R.id.action_websearch:
-                // create intent to perform web search for this planet
-                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                intent.putExtra(SearchManager.QUERY, getActionBar().getTitle());
-                // catch event that there's no activity to handle intent
-                if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, com.emal.android.transport.spb.R.string.app_not_available, Toast.LENGTH_LONG).show();
-                }
+                startActivity(new Intent(activity, SearchActivity.class));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

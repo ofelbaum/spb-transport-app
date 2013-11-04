@@ -29,6 +29,7 @@
         <ListPreference
                 android:title="@string/map_provider"
                 android:key="map_provider_type"
+                android:enabled="false"
                 android:entries="@array/map_provider_entries"
                 android:entryValues="@array/map_provider_values"/>
         <Preference
