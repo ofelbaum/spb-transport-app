@@ -2,14 +2,11 @@ package com.emal.android.transport.spb.activity;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.preference.ListPreference;
-import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
+import android.preference.*;
 import android.util.Log;
 import com.emal.android.transport.spb.MapProviderType;
 import com.emal.android.transport.spb.R;
 import android.os.Bundle;
-import android.preference.PreferenceFragment;
 import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.utils.ApplicationParams;
 import com.emal.android.transport.spb.utils.Constants;
@@ -28,6 +25,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final String MAP_TYPE = "map_type";
     private static final String VEHICLE_TYPES = "vehicle_types";
     private static final String MY_PLACE = "my_place";
+    private static final String MAP_SHOW_TRAFFIC = "map_show_traffic";
 
     private ListPreference syncTimePref;
     private MultiSelectListPreference vehicleTypes;
@@ -35,6 +33,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private ListPreference mapProviderType;
     private ApplicationParams appParams;
     private Preference myPlace;
+    private CheckBoxPreference showTraffic;
 
     public class PrefData {
         private int index;
@@ -85,6 +84,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mapTypePref = (ListPreference) findPreference(MAP_TYPE);
         mapProviderType = (ListPreference) findPreference(MAP_PROVIDER_TYPE);
         myPlace= findPreference(MY_PLACE);
+
+        showTraffic = (CheckBoxPreference) findPreference(MAP_SHOW_TRAFFIC);
+        showTraffic.setChecked(appParams.isShowTraffic());
 
         PrefData prefData = getEntryByValue(String.valueOf(syncTime), R.array.sync_string_array, R.array.sync_string_values);
         syncTimePref.setSummary(prefData.getValue());
@@ -175,6 +177,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         {
             String res = setSummary(sharedPreferences, key, R.array.map_types_entries, R.array.map_types_values);
             appParams.setSatView(Integer.valueOf(res) == 2);
+        }
+        if (MAP_SHOW_TRAFFIC.equals(key)) {
+            appParams.setShowTraffic(showTraffic.isChecked());
         }
         if (VEHICLE_TYPES.equals(key)) {
             Set<String> selected = sharedPreferences.getStringSet(VEHICLE_TYPES, new HashSet<String>());

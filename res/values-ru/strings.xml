@@ -41,6 +41,7 @@
     <string name="vehicle_types">Типы транспорта</string>
     <string name="choose_vehicles">Выберите транспорт</string>
     <string name="search_hint">Введите номер маршрута</string>
+    <string name="show_traffic">Пробки</string>
     <string-array name="sync_string_array">
         <item>5 сек</item>
         <item>10 сек</item>

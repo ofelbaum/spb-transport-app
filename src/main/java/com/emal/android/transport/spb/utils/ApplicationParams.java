@@ -19,6 +19,7 @@ public class ApplicationParams {
     private boolean showTram = false;
     private boolean showShip = false;
     private boolean satView = true;
+    private boolean showTraffic = false;
     private MapProviderType mapProviderType;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
     private int zoomSize;
@@ -31,6 +32,7 @@ public class ApplicationParams {
         this.showTrolley = sharedPreferences.getBoolean(Constants.SHOW_TROLLEY_FLAG, true);
         this.showTram = sharedPreferences.getBoolean(Constants.SHOW_TRAM_FLAG, true);
         this.showShip = sharedPreferences.getBoolean(Constants.SHOW_SHIP_FLAG, true);
+        this.showTraffic = sharedPreferences.getBoolean(Constants.SHOW_TRAFFIC_FLAG, false);
         this.syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
         Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, MapUtils.SPB_CENTER_LAT_DEF_VALUE);
@@ -64,6 +66,10 @@ public class ApplicationParams {
 
     public boolean isSatView() {
         return satView;
+    }
+
+    public boolean isShowTraffic() {
+        return showTraffic;
     }
 
     public int getSyncTime() {
@@ -106,6 +112,10 @@ public class ApplicationParams {
         this.satView = satView;
     }
 
+    public void setShowTraffic(boolean showTraffic) {
+        this.showTraffic = showTraffic;
+    }
+
     public void setMapProviderType(MapProviderType mapProviderType) {
         this.mapProviderType = mapProviderType;
     }
@@ -134,6 +144,7 @@ public class ApplicationParams {
         editor.putBoolean(Constants.SHOW_TRAM_FLAG, Boolean.TRUE.equals(showTram));
         editor.putBoolean(Constants.SHOW_TROLLEY_FLAG, Boolean.TRUE.equals(showTrolley));
         editor.putBoolean(Constants.SHOW_SHIP_FLAG, Boolean.TRUE.equals(showShip));
+        editor.putBoolean(Constants.SHOW_TRAFFIC_FLAG, Boolean.TRUE.equals(showTraffic));
         editor.putBoolean(Constants.SAT_VIEW_FLAG, Boolean.TRUE.equals(satView));
         editor.putInt(Constants.LAST_LOC_LAT_FLAG, lastLocation.getLatitudeE6());
         editor.putInt(Constants.LAST_LOC_LONG_FLAG, lastLocation.getLongitudeE6());

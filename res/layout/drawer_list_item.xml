@@ -1,14 +1,32 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@android:id/text1"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:textAppearance="?android:attr/textAppearanceListItemSmall"
-    android:gravity="center_vertical"
-    android:paddingLeft="36dp"
-    android:paddingRight="16dp"
-    android:textColor="#fff"
-    android:textStyle="bold"
-    android:background="?android:attr/activatedBackgroundIndicator"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"
-    android:text="Test" android:phoneNumber="false"
-    android:password="false"/>
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:minHeight="60dp">
+
+    <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="18dp"
+            android:layout_alignParentTop="true"/>
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/textView"
+              android:layout_width="97dp"
+              android:layout_height="match_parent"
+              android:layout_alignBottom="@+id/imageView"
+              android:layout_alignParentLeft="true"
+              android:layout_marginLeft="60dp"
+              android:layout_alignParentRight="true"
+              android:gravity="center_vertical"
+              android:textAppearance="?android:attr/textAppearanceListItemSmall"
+              android:textColor="#fff"
+              android:textStyle="bold"
+              android:background="?android:attr/activatedBackgroundIndicator"
+              android:minHeight="?android:attr/listPreferredItemHeightSmall"
+              android:text="Test" android:phoneNumber="false"
+              android:password="false"/>
+</RelativeLayout>

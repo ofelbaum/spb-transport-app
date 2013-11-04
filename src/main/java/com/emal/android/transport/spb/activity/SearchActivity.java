@@ -100,7 +100,7 @@ public class SearchActivity extends Activity {
                 results.add(String.valueOf(id) + "#" + routeNumber + "/" + routeType + "/" + routePoints);
             }
 
-            ArrayAdapter<String> listArrayAdapter = new ArrayAdapter<String>(context, com.emal.android.transport.spb.R.layout.drawer_list_item, results);
+            ArrayAdapter<String> listArrayAdapter = new ArrayAdapter<String>(context, R.layout.search_list_item, results);
             listView.setAdapter(listArrayAdapter);
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override

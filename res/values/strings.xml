@@ -106,10 +106,20 @@
         <item>Show Stops</item>
         <item>Clear Search</item>
     </string-array>
+    <array name="menu_items_icon_array">
+        <item>@drawable/ic_menu_search</item>
+        <item>@drawable/ic_menu_myplaces</item>
+        <item>@drawable/ic_menu_settings_holo_light</item>
+        <item>@drawable/ic_menu_info_details</item>
+        <item>@drawable/ic_menu_compose</item>
+        <item></item>
+        <item></item>
+    </array>
     <string name="drawer_open">Open menu</string>
     <string name="drawer_close">Close menu</string>
     <string name="action_websearch">Search</string>
     <string name="app_not_available">Sorry, action not available</string>
     <string name="search_hint">Enter route number</string>
+    <string name="show_traffic">Show Traffic</string>
 
 </resources>

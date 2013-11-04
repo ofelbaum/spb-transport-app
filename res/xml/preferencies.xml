@@ -26,6 +26,11 @@
                 android:key="map_sync_time"
                 android:entries="@array/sync_string_array"
                 android:entryValues="@array/sync_string_values"/>
+        <CheckBoxPreference
+                android:title="@string/show_traffic"
+                android:key="map_show_traffic"
+                android:defaultValue="false"
+                />
         <ListPreference
                 android:title="@string/map_provider"
                 android:key="map_provider_type"

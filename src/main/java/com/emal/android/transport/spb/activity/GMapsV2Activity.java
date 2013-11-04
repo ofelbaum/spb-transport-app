@@ -15,6 +15,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.*;
+import android.view.MenuItem;
 import android.widget.*;
 import com.emal.android.transport.spb.*;
 import android.os.Bundle;
@@ -95,8 +96,10 @@ public class GMapsV2Activity extends FragmentActivity {
         // set activity custom shadow that overlays the main content when the drawer opens
         mDrawerLayout.setDrawerShadow(com.emal.android.transport.spb.R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
-        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-                com.emal.android.transport.spb.R.layout.drawer_list_item, menuItems));
+
+        MenuModel menuModel = new MenuModel(getResources());
+
+        mDrawerList.setAdapter(new MenuItemAdapter(this, com.emal.android.transport.spb.R.layout.drawer_list_item, menuModel));
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -215,6 +218,7 @@ public class GMapsV2Activity extends FragmentActivity {
             vehicleTracker.startTrack(VehicleType.TROLLEY);
         }
 
+        mMap.setTrafficEnabled(appParams.isShowTraffic());
         mMap.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
 
         moveToLocation(appParams.getLastLocation());
