@@ -30,22 +30,27 @@ public class PortalClient {
     public static final String BBOX = "3236938.2945543,8256172.549016,3492103.4398571,8480968.3457368";
 
     private DefaultHttpClient httpClient = new DefaultHttpClient();
+    private String scope;
 
     public VehicleCollection getRouteData(String route, String bbox) throws IOException {
-        HttpGet httppost = new HttpGet(String.format(GET_ROUTE_QUERY, route));
-        HttpResponse httpResponse = httpClient.execute(httppost);
-        String content = readResponse(httpResponse);
-
-        Pattern p = Pattern.compile(SCOPE_PARAM_PATTERN);
-        Matcher m = p.matcher(content);
-        String scope = "";
-        while (m.find()) {
-            scope = URLEncoder.encode(m.group(2), "UTF-8");
-            break;
-        }
-
+        HttpResponse httpResponse;
+        String content;
         if (StringUtils.isEmpty(scope)) {
-            throw new IllegalStateException("SCOPE is not defined");
+            HttpGet httppost = new HttpGet(String.format(GET_ROUTE_QUERY, route));
+            httpResponse = httpClient.execute(httppost);
+            content = readResponse(httpResponse);
+
+            Pattern p = Pattern.compile(SCOPE_PARAM_PATTERN);
+            Matcher m = p.matcher(content);
+
+            while (m.find()) {
+                scope = URLEncoder.encode(m.group(2), "UTF-8");
+                break;
+            }
+
+            if (StringUtils.isEmpty(scope)) {
+                throw new IllegalStateException("SCOPE is not defined");
+            }
         }
 
         String format = GET_ROUTE_INFO_QUERY.replace("{1}", route).replace("{2}", scope).replace("{3}", bbox);

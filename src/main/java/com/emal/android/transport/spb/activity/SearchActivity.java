@@ -27,6 +27,7 @@ import java.util.Map;
  */
 public class SearchActivity extends Activity {
     private static final String TAG = SearchActivity.class.getName();
+    public static final String SEARCH_INTEND_ID = TAG;
     private SearchView searchView;
     private ListView listView;
     private AsyncTask searchTask;
@@ -105,7 +106,7 @@ public class SearchActivity extends Activity {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     CharSequence text = ((TextView) view).getText();
-                    Intent mapIntent = new Intent("1");
+                    Intent mapIntent = new Intent(SEARCH_INTEND_ID);
                     mapIntent.putExtra("ROUTE_KEY", (String) text);
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(mapIntent);
                     finish();

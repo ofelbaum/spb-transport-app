@@ -21,20 +21,20 @@ import java.util.Set;
  * User: alexey.emelyanenko@gmail.com
  * Date: 5/18/13 5:11 AM
  */
-public class SyncVehiclePositionTask extends AsyncTask<String, Void, Bitmap> {
+public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
     private static final String TAG = SyncVehiclePositionTask.class.getName();
 
     private HttpClient httpClient;
     private VehicleSyncAdapter vehicleSyncAdapter;
     private String vehiclesStr;
     private boolean clearBeforeUpdate = false;
-    private Set<Vehicle> vehicles;
+    private Set<VehicleType> vehicleTypes;
 
-    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<Vehicle> vehicles, boolean clearBeforeUpdate, HttpClient httpClient) {
+    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<VehicleType> vehicleTypes, boolean clearBeforeUpdate, HttpClient httpClient) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;
         this.httpClient = httpClient;
         this.clearBeforeUpdate = clearBeforeUpdate;
-        this.vehicles = vehicles;
+        this.vehicleTypes = vehicleTypes;
     }
 
     @Override
@@ -43,12 +43,12 @@ public class SyncVehiclePositionTask extends AsyncTask<String, Void, Bitmap> {
     }
 
     @Override
-    protected Bitmap doInBackground(String... params) {
+    protected Bitmap doInBackground(Object... params) {
         String bbox = vehicleSyncAdapter.getBBox();
         StringBuffer vs = new StringBuffer();
-        Iterator<Vehicle> iterator = vehicles.iterator();
+        Iterator<VehicleType> iterator = vehicleTypes.iterator();
         while (iterator.hasNext()) {
-            Vehicle next = iterator.next();
+            VehicleType next = iterator.next();
             vs.append(next.getCode());
             if (iterator.hasNext()) {
                 vs.append(",");

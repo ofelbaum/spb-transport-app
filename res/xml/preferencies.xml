@@ -3,7 +3,7 @@
                   android:layout_height="fill_parent"
                   android:layout_width="fill_parent">
     <PreferenceCategory
-            android:title="@string/vehicles"
+            android:title="@string/vehicleTypes"
             android:key="pref_transport">
         <MultiSelectListPreference
                 android:key="vehicle_types"

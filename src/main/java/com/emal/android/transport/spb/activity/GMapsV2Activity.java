@@ -1,6 +1,5 @@
 package com.emal.android.transport.spb.activity;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.*;
 import android.content.res.Configuration;
@@ -20,7 +19,7 @@ import android.widget.*;
 import com.emal.android.transport.spb.*;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import com.emal.android.transport.spb.Vehicle;
+import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.portal.*;
 import com.emal.android.transport.spb.utils.*;
 import com.google.android.gms.R;
@@ -29,9 +28,7 @@ import com.google.android.gms.maps.model.*;
 import com.google.android.maps.GeoPoint;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TimerTask;
+import java.util.*;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -45,7 +42,7 @@ public class GMapsV2Activity extends FragmentActivity {
     private UiSettings mUiSettings;
     private ApplicationParams appParams;
 
-    private NewVehicleTracker newVehicleTracker;
+    private VehicleTracker vehicleTracker;
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private TimerTask timerTask;
     private VehicleSyncAdapter vehicleSyncAdapter;
@@ -60,21 +57,20 @@ public class GMapsV2Activity extends FragmentActivity {
     private String[] menuItems;
     private PortalClient portalClient;
     private List<Marker> stopsMarkers = new ArrayList<Marker>();
-    private List<Marker> vehiclesMarkers = new ArrayList<Marker>();
+    private Map<String, List<Marker>> vehiclesMarkers = new HashMap<String, List<Marker>>();
 
     public class MapUpdateTimerTask extends TimerTask {
         @Override
         public void run() {
             int syncTime = appParams.getSyncTime();
             Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
-            newVehicleTracker.syncVehicles();
+            vehicleTracker.syncVehicles();
             mHandler.postDelayed(this, syncTime);
         }
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        final Activity activity = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gmapsv2);
 
@@ -83,20 +79,13 @@ public class GMapsV2Activity extends FragmentActivity {
                     @Override
                     public void onReceive(Context context, Intent intent) {
                         String s = intent.getStringExtra("ROUTE_KEY");
-                        String routeId = s.split("#")[0];
+                        final String routeId = s.split("#")[0];
 
-                        if (!vehiclesMarkers.isEmpty()) {
-                            for (Marker m : vehiclesMarkers) {
-                                m.remove();
-                            }
-                            vehiclesMarkers.clear();
-
-                        }
-                        AsyncTask asyncTask = new DrawVehicle(portalClient, mMap, vehiclesMarkers);
-                        asyncTask.execute(routeId);
+                        vehicleTracker.startTrack(routeId);
+                        vehicleTracker.syncVehicles();
                     }
                 },
-                new IntentFilter("1"));
+                new IntentFilter(SearchActivity.SEARCH_INTEND_ID));
         portalClient = new PortalClient();
         mTitle = mDrawerTitle = getTitle();
         menuItems = getResources().getStringArray(com.emal.android.transport.spb.R.array.menu_items_array);
@@ -123,7 +112,7 @@ public class GMapsV2Activity extends FragmentActivity {
                         break;
                     }
                     case 2: {
-                        startActivity(new Intent(activity, PreferencesActivity.class));
+                        startActivity(new Intent(getApplicationContext(), PreferencesActivity.class));
                         break;
                     }
                     case 5: {
@@ -140,6 +129,9 @@ public class GMapsV2Activity extends FragmentActivity {
                                 stopsMarkers.clear();
                             }
                         }
+                    }
+                    case 6: {
+                        vehicleTracker.stopTrackAllIds();
                     }
                 }
                 mDrawerLayout.closeDrawer(mDrawerList);
@@ -180,7 +172,7 @@ public class GMapsV2Activity extends FragmentActivity {
         settingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(activity, PreferencesActivity.class));
+                startActivity(new Intent(getApplicationContext(), PreferencesActivity.class));
             }
         });
 
@@ -209,18 +201,18 @@ public class GMapsV2Activity extends FragmentActivity {
     }
 
     private void initApplication() {
-        newVehicleTracker.stopTrackAll();
+        vehicleTracker.stopTrackAll();
         if (appParams.isShowBus()) {
-            newVehicleTracker.startTrack(Vehicle.BUS);
+            vehicleTracker.startTrack(VehicleType.BUS);
         }
         if (appParams.isShowShip()) {
-            newVehicleTracker.startTrack(Vehicle.SHIP);
+            vehicleTracker.startTrack(VehicleType.SHIP);
         }
         if (appParams.isShowTram()) {
-            newVehicleTracker.startTrack(Vehicle.TRAM);
+            vehicleTracker.startTrack(VehicleType.TRAM);
         }
         if (appParams.isShowTrolley()) {
-            newVehicleTracker.startTrack(Vehicle.TROLLEY);
+            vehicleTracker.startTrack(VehicleType.TROLLEY);
         }
 
         mMap.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
@@ -241,12 +233,7 @@ public class GMapsV2Activity extends FragmentActivity {
             public void onCameraChange(CameraPosition cameraPosition) {
                 appParams.setLastLocation(cameraPosition.target);
                 appParams.setZoomSize((int) cameraPosition.zoom);
-
-                if (!newVehicleTracker.isEmpty()) {
-                    startSync();
-                } else {
-                    vehicleSyncAdapter.clearOverlay();
-                }
+                startSync();
             }
         });
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
@@ -256,7 +243,7 @@ public class GMapsV2Activity extends FragmentActivity {
                     public void run() {
                         Log.d(TAG, "Long press. Point " + latLng);
 
-                        Geocoder geo = new Geocoder(mapFragment.getActivity().getApplicationContext());
+                        Geocoder geo = new Geocoder(getApplicationContext());
                         try {
                             List<Address> myAddrs = geo.getFromLocation(latLng.latitude, latLng.longitude, 1);
                             if (myAddrs.size() > 0) {
@@ -285,7 +272,7 @@ public class GMapsV2Activity extends FragmentActivity {
 
 //        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         vehicleSyncAdapter = new GMapVehicleSyncAdapter(mapFragment);
-        newVehicleTracker = new NewVehicleTracker(vehicleSyncAdapter);
+        vehicleTracker = new VehicleTracker(vehicleSyncAdapter, portalClient, mMap, vehiclesMarkers);
 
         GeoPoint home = appParams.getHomeLocation();
         LatLng homePoint = new LatLng(home.getLatitudeE6() / 1E6, home.getLongitudeE6() / 1E6);

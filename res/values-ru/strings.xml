@@ -32,7 +32,7 @@
     <string name="server_error">Нет связи с сервером</string>
     <string name="error_title">Ошибка</string>
     <string name="ok">OK</string>
-    <string name="vehicles">Транспорт</string>
+    <string name="vehicleTypes">Транспорт</string>
     <string name="map_params">Параметры карты</string>
     <string name="map_sync_time">Частота обновления</string>
     <string name="map_provider">Провайдер карты</string>
@@ -40,6 +40,7 @@
     <string name="copyright_title">Copyright</string>
     <string name="vehicle_types">Типы транспорта</string>
     <string name="choose_vehicles">Выберите транспорт</string>
+    <string name="search_hint">Введите номер маршрута</string>
     <string-array name="sync_string_array">
         <item>5 сек</item>
         <item>10 сек</item>

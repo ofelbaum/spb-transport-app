@@ -10,7 +10,7 @@ import com.emal.android.transport.spb.MapProviderType;
 import com.emal.android.transport.spb.R;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
-import com.emal.android.transport.spb.Vehicle;
+import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.utils.ApplicationParams;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.utils.LoadAddressTask;
@@ -81,7 +81,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
 
         syncTimePref = (ListPreference) findPreference(MAP_SYNC_TIME);
-        vehicleTypes = (MultiSelectListPreference) findPreference(VEHICLE_TYPES);
+        this.vehicleTypes = (MultiSelectListPreference) findPreference(VEHICLE_TYPES);
         mapTypePref = (ListPreference) findPreference(MAP_TYPE);
         mapProviderType = (ListPreference) findPreference(MAP_PROVIDER_TYPE);
         myPlace= findPreference(MY_PLACE);
@@ -98,18 +98,18 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mapProviderType.setSummary(prefData.getValue());
         mapProviderType.setValueIndex(prefData.getIndex());
 
-        Set<Vehicle> vehicles = new HashSet<Vehicle>();
+        Set<VehicleType> vehicleTypes = new HashSet<VehicleType>();
         if (appParams.isShowBus()) {
-            vehicles.add(Vehicle.BUS);
+            vehicleTypes.add(VehicleType.BUS);
         }
         if (appParams.isShowTrolley()) {
-            vehicles.add(Vehicle.TROLLEY);
+            vehicleTypes.add(VehicleType.TROLLEY);
         }
         if (appParams.isShowTram()) {
-            vehicles.add(Vehicle.TRAM);
+            vehicleTypes.add(VehicleType.TRAM);
         }
         if (appParams.isShowShip()) {
-            vehicles.add(Vehicle.SHIP);
+            vehicleTypes.add(VehicleType.SHIP);
         }
 
         Resources res = getResources();
@@ -117,7 +117,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         List<String> values = Arrays.asList(res.getStringArray(R.array.vehicle_types_values));
 
         StringBuffer buffer = new StringBuffer();
-        Iterator<Vehicle> iterator = vehicles.iterator();
+        Iterator<VehicleType> iterator = vehicleTypes.iterator();
         Set<String> selectedVehicles = new HashSet<String>();
         while (iterator.hasNext()) {
             String name = iterator.next().name();
@@ -130,10 +130,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
 
         }
-        vehicleTypes.setValues(selectedVehicles);
-        vehicleTypes.setSummary(buffer.toString());
+        this.vehicleTypes.setValues(selectedVehicles);
+        this.vehicleTypes.setSummary(buffer.toString());
 
-        vehicleTypes.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        this.vehicleTypes.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
                 return true;
@@ -197,13 +197,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     buffer.append(", ");
                 }
 
-                if (Vehicle.SHIP.name().equals(next)) {
+                if (VehicleType.SHIP.name().equals(next)) {
                     appParams.setShowShip(true);
-                } else if (Vehicle.BUS.name().equals(next)) {
+                } else if (VehicleType.BUS.name().equals(next)) {
                     appParams.setShowBus(true);
-                } else if (Vehicle.TROLLEY.name().equals(next)) {
+                } else if (VehicleType.TROLLEY.name().equals(next)) {
                     appParams.setShowTrolley(true);
-                } else if (Vehicle.TRAM.name().equals(next)) {
+                } else if (VehicleType.TRAM.name().equals(next)) {
                     appParams.setShowTram(true);
                 }
 

@@ -28,6 +28,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public void beforeSync(boolean clearBeforeUpdate) {
+        progressBar.setVisibility(View.VISIBLE);
         if (errorSign.getVisibility() == View.INVISIBLE) {
             progressBar.setVisibility(View.VISIBLE);
         }
@@ -37,6 +38,24 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
                 vehicleOverlay.remove();
             }
         }
+    }
+
+    @Override
+    public void afterSync(boolean result) {
+        progressBar.setVisibility(View.INVISIBLE);
+
+        if (Boolean.TRUE.equals(result)) {
+            errorSign.setVisibility(View.INVISIBLE);
+
+        } else {
+            new Handler().postAtTime(new Runnable() {
+                @Override
+                public void run() {
+                    errorSign.setVisibility(View.VISIBLE);
+                }
+            }, 1000);
+        }
+
     }
 
     @Override
@@ -83,7 +102,6 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public String getBBox() {
-//        LatLngBounds latLngBounds = mapFragment.getMap().getProjection().getVisibleRegion().latLngBounds;
         return GeoConverter.calculateBBox(latLngBounds);
     }
 

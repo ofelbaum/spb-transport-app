@@ -4,7 +4,7 @@ package com.emal.android.transport.spb;
  * User: alexey.emelyanenko@gmail.com
  * Date: 4/12/12 2:31 AM
  */
-public enum Vehicle {
+public enum VehicleType {
     BUS("vehicle_bus"),
     TROLLEY("vehicle_trolley"),
     TRAM("vehicle_tram"),
@@ -12,7 +12,7 @@ public enum Vehicle {
 
     private String code;
 
-    private Vehicle(String code) {
+    private VehicleType(String code) {
         this.code = code;
     }
 

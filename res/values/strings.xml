@@ -32,7 +32,7 @@
     <string name="server_error">No connection to server</string>
     <string name="error_title">Error</string>
     <string name="ok">OK</string>
-    <string name="vehicles">Transport</string>
+    <string name="vehicleTypes">Transport</string>
     <string name="map_params">Map Parameters</string>
     <string name="map_sync_time">Refrest Time</string>
     <string name="map_provider">Map provider</string>
@@ -104,10 +104,12 @@
         <item>Info</item>
         <item>Feedback</item>
         <item>Show Stops</item>
+        <item>Clear Search</item>
     </string-array>
     <string name="drawer_open">Open menu</string>
     <string name="drawer_close">Close menu</string>
     <string name="action_websearch">Search</string>
     <string name="app_not_available">Sorry, action not available</string>
+    <string name="search_hint">Enter route number</string>
 
 </resources>
