@@ -72,5 +72,7 @@
         <item>Настройки</item>
         <item>Информация</item>
         <item>Оставить отзыв</item>
+        <item>Остановки</item>
+        <item>Очистить поиск</item>
     </string-array>
 </resources>

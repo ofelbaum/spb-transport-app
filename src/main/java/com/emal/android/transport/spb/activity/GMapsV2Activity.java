@@ -192,7 +192,19 @@ public class GMapsV2Activity extends FragmentActivity {
     }
 
     private void startSync() {
-        LatLngBounds latLngBounds = mapFragment.getMap().getProjection().getVisibleRegion().latLngBounds;
+        GoogleMap map = mapFragment.getMap();
+        if (map == null) {
+            TimerTask waitForMapTask = new TimerTask() {
+                @Override
+                public void run() {
+                    startSync();
+                }
+            };
+            mHandler.removeCallbacks(waitForMapTask);
+            mHandler.postDelayed(waitForMapTask, 50);
+            return;
+        }
+        LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
         vehicleSyncAdapter.setBBox(latLngBounds);
         if (timerTask != null) {
             timerTask.cancel();
@@ -204,7 +216,6 @@ public class GMapsV2Activity extends FragmentActivity {
     }
 
     private void initApplication() {
-        vehicleTracker.stopTrackAll();
         if (appParams.isShowBus()) {
             vehicleTracker.startTrack(VehicleType.BUS);
         }
@@ -328,15 +339,12 @@ public class GMapsV2Activity extends FragmentActivity {
     @Override
     protected void onPause() {
         mHandler.removeCallbacks(timerTask);
+        if (timerTask != null) {
+            timerTask.cancel();
+        }
+        vehicleTracker.stopTrackAll();
         appParams.saveAll();
         super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        mHandler.removeCallbacks(timerTask);
-        appParams.saveAll();
-        super.onStop();
     }
 
     @Override
@@ -393,5 +401,4 @@ public class GMapsV2Activity extends FragmentActivity {
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
-
 }

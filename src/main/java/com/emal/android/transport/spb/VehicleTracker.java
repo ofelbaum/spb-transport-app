@@ -34,7 +34,6 @@ public class VehicleTracker {
 
     private PortalClient portalClient;
     private final GoogleMap googleMap;
-    private GoogleMap mMap;
     private Map<String, List<Marker>> markers;
 
     private static DefaultHttpClient CLIENT;
@@ -53,31 +52,13 @@ public class VehicleTracker {
         return vehicleTypes.add(vehicleType);
     }
 
-    public boolean stopTrack(VehicleType vehicleType) {
-        return vehicleTypes.remove(vehicleType);
-    }
-
     public boolean startTrack(String vehicleId) {
-        return vehicleIds.add(vehicleId );
+        return vehicleIds.add(vehicleId);
     }
 
     public void stopTrackAllIds() {
         vehicleIds.clear();
-        for (Map.Entry<String, AsyncTask> task : taskMap.entrySet()) {
-            AsyncTask value = task.getValue();
-            if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
-                value.cancel(true);
-            }
-
-            for(Marker marker : markers.get(task.getKey())) {
-                marker.remove();
-            }
-
-        }
-    }
-
-    public boolean isEmpty() {
-        return vehicleTypes.isEmpty() && vehicleIds.isEmpty();
+        stopAllTasks();
     }
 
     public void syncVehicles() {
@@ -137,5 +118,27 @@ public class VehicleTracker {
     public void stopTrackAll() {
         vehicleSyncAdapter.clearOverlay();
         vehicleTypes.clear();
+        if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
+            syncTypesTask.cancel(true);
+        }
+
+        stopAllTasks();
+    }
+
+    private void stopAllTasks() {
+        for (Map.Entry<String, AsyncTask> task : taskMap.entrySet()) {
+            AsyncTask value = task.getValue();
+            if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
+                value.cancel(true);
+            }
+
+            List<Marker> markers1 = markers.get(task.getKey());
+            if (markers1 == null || markers1.isEmpty()) {
+                return;
+            }
+            for(Marker marker : markers1) {
+                marker.remove();
+            }
+        }
     }
 }
