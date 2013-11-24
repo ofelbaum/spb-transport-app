@@ -1,14 +1,18 @@
 package com.emal.android.transport.spb.portal;
 
+import com.emal.android.transport.spb.VehicleType;
+
+import java.io.Serializable;
+
 /**
  * @author alexey.emelyanenko@gmail.com
  * @since 1.5
  */
 
-public class Route {
+public class Route implements Serializable{
 
     private int id;
-    private Object transportType;
+    private VehicleType transportType;
     private String routeNumber;
     private String name;
     private boolean urban;
@@ -23,7 +27,7 @@ public class Route {
         return id;
     }
 
-    public Object getTransportType() {
+    public VehicleType getTransportType() {
         return transportType;
     }
 
@@ -79,7 +83,7 @@ public class Route {
 
     public static class RouteBuilder {
         private int id;
-        private Object transportType;
+        private VehicleType transportType;
         private String routeNumber;
         private String name;
         private boolean urban;
@@ -99,8 +103,8 @@ public class Route {
             return this;
         }
 
-        public RouteBuilder transportType(Object transportType) {
-            this.transportType = transportType;
+        public RouteBuilder transportType(String transportType) {
+            this.transportType = VehicleType.getType(transportType);
             return this;
         }
 

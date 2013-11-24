@@ -3,20 +3,10 @@ package com.emal.android.transport.spb;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.emal.android.transport.spb.portal.PortalClient;
+import com.emal.android.transport.spb.portal.Route;
 import com.emal.android.transport.spb.utils.DrawVehicle;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.HttpClient;
-import org.apache.http.conn.params.ConnManagerPNames;
-import org.apache.http.conn.params.ConnPerRouteBean;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.*;
 
 import java.util.*;
 
@@ -29,22 +19,23 @@ public class VehicleTracker {
     private AsyncTask syncTypesTask;
     private Map<String, AsyncTask> taskMap;
     private Set<VehicleType> vehicleTypes;
-    private Set<String> vehicleIds;
+    private Set<Route> routes;
     private VehicleSyncAdapter vehicleSyncAdapter;
 
     private PortalClient portalClient;
     private final GoogleMap googleMap;
     private Map<String, List<Marker>> markers;
 
-    private static DefaultHttpClient CLIENT;
-
-    public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter, PortalClient portalClient, GoogleMap googleMap, Map<String, List<Marker>> markers) {
+    public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter,
+                          PortalClient portalClient,
+                          GoogleMap googleMap,
+                          Map<String, List<Marker>> markers) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;
         this.portalClient = portalClient;
         this.googleMap = googleMap;
         this.markers = markers;
         vehicleTypes = new HashSet<VehicleType>();
-        vehicleIds = new HashSet<String>();
+        routes = new HashSet<Route>();
         taskMap = new HashMap<String, AsyncTask>();
     }
 
@@ -52,12 +43,19 @@ public class VehicleTracker {
         return vehicleTypes.add(vehicleType);
     }
 
-    public boolean startTrack(String vehicleId) {
-        return vehicleIds.add(vehicleId);
+    public boolean startTrack(Route route) {
+        return routes.add(route);
+    }
+
+    public void startTrack(Set<String> routesToTrack) {
+        for (String s : routesToTrack) {
+            //TODO
+            //startTrack(s);
+        }
     }
 
     public void stopTrackAllIds() {
-        vehicleIds.clear();
+        routes.clear();
         stopAllTasks();
     }
 
@@ -70,49 +68,22 @@ public class VehicleTracker {
             Log.d(TAG, "Reschedule vehicleTypes");
             syncTypesTask.cancel(true);
         }
-        if (!vehicleTypes.isEmpty() && vehicleIds.isEmpty()) {
-            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate, getHttpClient());
+        if (!vehicleTypes.isEmpty() && routes.isEmpty()) {
+            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate, portalClient.getHttpClient());
             syncTypesTask.execute();
         }
 
-        for (String vId : vehicleIds) {
-            AsyncTask value = taskMap.get(vId);
+        for (Route route : routes) {
+            String routeId = String.valueOf(route.getId());
+            AsyncTask value = taskMap.get(routeId);
             if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
                 value.cancel(true);
             }
-            value = new DrawVehicle(vId, portalClient, googleMap, markers, vehicleSyncAdapter);
+            value = new DrawVehicle(route, portalClient, googleMap, markers, vehicleSyncAdapter);
             value.execute();
-            taskMap.put(vId, value);
+            taskMap.put(routeId, value);
 
         }
-    }
-
-    private static HttpClient getHttpClient() {
-        if (CLIENT == null) {
-            synchronized (VehicleTracker.class) {
-                if (CLIENT == null) {
-                    SchemeRegistry schemeRegistry = new SchemeRegistry();
-                    schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
-
-                    HttpParams params = new BasicHttpParams();
-                    params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 6);
-                    params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new ConnPerRouteBean(3));
-                    params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
-                    params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
-                    int timeoutConnection = 5000;
-                    HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
-                    int timeoutSocket = 5000;
-                    HttpConnectionParams.setSoTimeout(params, timeoutSocket);
-
-                    HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-
-                    ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
-                    CLIENT = new DefaultHttpClient(cm, params);
-                    CLIENT.setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
-                }
-            }
-        }
-        return CLIENT;
     }
 
     public void stopTrackAll() {
@@ -140,5 +111,10 @@ public class VehicleTracker {
                 marker.remove();
             }
         }
+    }
+
+    public Set<String> getRoutes() {
+        //TODO
+        return Collections.emptySet();
     }
 }

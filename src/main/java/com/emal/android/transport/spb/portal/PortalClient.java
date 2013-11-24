@@ -1,14 +1,25 @@
 package com.emal.android.transport.spb.portal;
 
+import com.emal.android.transport.spb.VehicleTracker;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.params.ConnManagerPNames;
+import org.apache.http.conn.params.ConnPerRouteBean;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.*;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
@@ -31,6 +42,37 @@ public class PortalClient {
 
     private DefaultHttpClient httpClient = new DefaultHttpClient();
     private String scope;
+
+    //TODO
+    public HttpClient getHttpClient() {
+        DefaultHttpClient httpClient = null;
+        if (httpClient == null) {
+            synchronized (VehicleTracker.class) {
+                if (httpClient == null) {
+                    SchemeRegistry schemeRegistry = new SchemeRegistry();
+                    schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+
+                    HttpParams params = new BasicHttpParams();
+                    params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 6);
+                    params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new ConnPerRouteBean(3));
+                    params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
+                    params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
+                    int timeoutConnection = 5000;
+                    HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
+                    int timeoutSocket = 5000;
+                    HttpConnectionParams.setSoTimeout(params, timeoutSocket);
+
+                    HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+
+                    ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+                    httpClient = new DefaultHttpClient(cm, params);
+                    ((DefaultHttpClient)httpClient).setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
+                }
+            }
+        }
+        return httpClient;
+    }
+
 
     public VehicleCollection getRouteData(String route, String bbox) throws IOException {
         HttpResponse httpResponse;

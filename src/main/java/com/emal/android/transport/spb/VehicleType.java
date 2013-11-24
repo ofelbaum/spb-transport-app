@@ -19,4 +19,20 @@ public enum VehicleType {
     public String getCode() {
         return code;
     }
+
+    public static VehicleType getType(String value) {
+        if ("bus".equals(value)) {
+            return BUS;
+        }
+        if ("tram".equals(value)) {
+            return TRAM;
+        }
+        if ("trolley".equals(value)) {
+            return TROLLEY;
+        }
+        if ("ship".equals(value)) {
+            return SHIP;
+        }
+        throw new IllegalStateException("Wrong vehicle type");
+    }
 }

@@ -19,7 +19,7 @@
         <google.maps.v2.key>${maven.prop.google.maps.v2.key}</google.maps.v2.key>
 
         <platform.sdk.min.version>11</platform.sdk.min.version>
-        <platform.sdk.target.version>15</platform.sdk.target.version>
+        <platform.sdk.target.version>11</platform.sdk.target.version>
         <version.code>11</version.code>
 
     </properties>
@@ -109,6 +109,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>2.3</version>
                 <executions>
                     <execution>
                         <phase>initialize</phase>
@@ -177,6 +178,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jarsigner-plugin</artifactId>
+                        <version>1.2</version>
                         <executions>
                             <execution>
                                 <id>signing</id>

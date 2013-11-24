@@ -79,10 +79,8 @@ public class GMapsV2Activity extends FragmentActivity {
                 new BroadcastReceiver() {
                     @Override
                     public void onReceive(Context context, Intent intent) {
-                        String s = intent.getStringExtra("ROUTE_KEY");
-                        final String routeId = s.split("#")[0];
-
-                        vehicleTracker.startTrack(routeId);
+                        Route route = (Route) intent.getSerializableExtra(SearchActivity.ROUTE_DATA_KEY);
+                        vehicleTracker.startTrack(route);
                         vehicleTracker.syncVehicles();
                     }
                 },
@@ -134,6 +132,7 @@ public class GMapsV2Activity extends FragmentActivity {
                         }
                     }
                     case 6: {
+                        appParams.getRoutesToTrack().clear();
                         vehicleTracker.stopTrackAllIds();
                     }
                 }
@@ -228,6 +227,9 @@ public class GMapsV2Activity extends FragmentActivity {
         if (appParams.isShowTrolley()) {
             vehicleTracker.startTrack(VehicleType.TROLLEY);
         }
+
+        //TODO
+        vehicleTracker.startTrack(appParams.getRoutesToTrack());
 
         mMap.setTrafficEnabled(appParams.isShowTraffic());
         mMap.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
@@ -343,6 +345,8 @@ public class GMapsV2Activity extends FragmentActivity {
             timerTask.cancel();
         }
         vehicleTracker.stopTrackAll();
+        //TODO
+        appParams.getRoutesToTrack().addAll(vehicleTracker.getRoutes());
         appParams.saveAll();
         super.onPause();
     }

@@ -33,6 +33,7 @@ public class SearchActivity extends Activity {
     private AsyncTask searchTask;
     private PortalClient portalClient;
     private Activity _this;
+    public static final String ROUTE_DATA_KEY = "ROUTE_DATA";
 
 
     @Override
@@ -78,24 +79,23 @@ public class SearchActivity extends Activity {
 
         @Override
         protected List<Route> doInBackground(Object... params) {
-            List<Route> routes;
+            List<Route> routes = null;
             try {
                 routes = portalClient.findRoutes((String) params[0]);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
-                routes = Collections.emptyList();
             }
-            return routes;
+            return routes != null ? routes : Collections.<Route>emptyList();
 
         }
 
         @Override
-        protected void onPostExecute(List<Route> list) {
+        protected void onPostExecute(final List<Route> list) {
             List<String> results = new ArrayList<String>();
             for (Route r : list) {
                 String routeNumber = r.getRouteNumber();
                 String routePoints = r.getName();
-                String routeType = (String) ((Map)(r.getTransportType())).get("name");
+                String routeType = r.getTransportType().name();
                 int id = r.getId();
                 results.add(String.valueOf(id) + "#" + routeNumber + "/" + routeType + "/" + routePoints);
             }
@@ -105,9 +105,8 @@ public class SearchActivity extends Activity {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    CharSequence text = ((TextView) view).getText();
                     Intent mapIntent = new Intent(SEARCH_INTEND_ID);
-                    mapIntent.putExtra("ROUTE_KEY", (String) text);
+                    mapIntent.putExtra(ROUTE_DATA_KEY, list.get(position));
                     LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(mapIntent);
                     finish();
                 }

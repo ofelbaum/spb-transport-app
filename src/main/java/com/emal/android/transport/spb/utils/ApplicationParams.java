@@ -7,6 +7,10 @@ import com.emal.android.transport.spb.map.MapUtils;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.maps.GeoPoint;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * User: alexey.emelyanenko@gmail.com
  * Date: 5/18/13 2:38 AM
@@ -25,6 +29,7 @@ public class ApplicationParams {
     private int zoomSize;
     private GeoPoint homeLocation;
     private GeoPoint lastLocation;
+    private Set<String> routesToTrack;
 
     public ApplicationParams(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
@@ -46,6 +51,7 @@ public class ApplicationParams {
         this.satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, false);
         this.mapProviderType = MapProviderType.getByValue(sharedPreferences.getString(Constants.MAP_PROVIDER_TYPE_FLAG, MapProviderType.GMAPSV2.name()));
         this.zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
+        this.routesToTrack = sharedPreferences.getStringSet(Constants.ROUTES_TO_TRACK, Collections.<String>emptySet());
     }
 
     public boolean isShowBus() {
@@ -136,6 +142,17 @@ public class ApplicationParams {
         this.lastLocation = lastLocation;
     }
 
+    public Set<String> getRoutesToTrack() {
+        if (routesToTrack == null) {
+            routesToTrack = new HashSet<String>();
+        }
+        return routesToTrack;
+    }
+
+    public void setRoutesToTrack(Set<String> routesToTrack) {
+        this.routesToTrack = routesToTrack;
+    }
+
     public void saveAll() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(Constants.SYNC_TIME_FLAG, syncTime);
@@ -151,6 +168,7 @@ public class ApplicationParams {
         editor.putInt(Constants.HOME_LOC_LAT_FLAG, homeLocation.getLatitudeE6());
         editor.putInt(Constants.HOME_LOC_LONG_FLAG, homeLocation.getLongitudeE6());
         editor.putInt(Constants.ZOOM_FLAG, zoomSize);
+        editor.putStringSet(Constants.ROUTES_TO_TRACK, routesToTrack);
 
         Log.d(TAG, "Saving app prefs: " + this);
 

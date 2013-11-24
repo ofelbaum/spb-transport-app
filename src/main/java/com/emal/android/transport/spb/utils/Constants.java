@@ -24,4 +24,5 @@ public final class Constants {
     public static final int DEFAULT_ZOOM_LEVEL = 15;
     public static final int MS_IN_SEC = 1000;
     public static final int DEFAULT_SYNC_MS = 10000;
+    public static final String ROUTES_TO_TRACK = "ROUTES_TO_TRACK";
 }

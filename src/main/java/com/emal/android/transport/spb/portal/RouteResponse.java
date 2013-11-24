@@ -5,6 +5,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -54,8 +55,10 @@ public class RouteResponse {
         for (int i = 0; i < data.size(); i++) {
             List routeItem = data.get(i);
 
+            Map<String, String> map = (Map) routeItem.get(1);
+            String systemName = map.get("systemName");
             Route route = Route.RouteBuilder.getInstance().id((Integer) routeItem.get(0))
-                    .transportType(routeItem.get(1))
+                    .transportType(systemName)
                     .routeNumber((String) routeItem.get(2))
                     .name((String) routeItem.get(3))
                     .urban((Boolean) routeItem.get(4))

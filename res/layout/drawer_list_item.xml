@@ -22,11 +22,10 @@
               android:layout_marginLeft="60dp"
               android:layout_alignParentRight="true"
               android:gravity="center_vertical"
-              android:textAppearance="?android:attr/textAppearanceListItemSmall"
+              android:textAppearance="?android:attr/textAppearanceMedium"
               android:textColor="#fff"
               android:textStyle="bold"
               android:background="?android:attr/activatedBackgroundIndicator"
-              android:minHeight="?android:attr/listPreferredItemHeightSmall"
               android:text="Test" android:phoneNumber="false"
               android:password="false"/>
 </RelativeLayout>
