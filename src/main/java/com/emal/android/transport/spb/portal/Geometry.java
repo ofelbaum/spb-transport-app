@@ -1,7 +1,6 @@
 package com.emal.android.transport.spb.portal;
 
 import com.emal.android.transport.spb.utils.GeoConverter;
-import org.apache.commons.lang3.tuple.Pair;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 import java.util.Arrays;
@@ -37,9 +36,9 @@ public class Geometry {
 
     @JsonProperty(value = "coordinates")
     public void setCoordinates(List<Double> coordinates) {
-        Pair<Double,Double> doubleDoublePair = GeoConverter.convertMetersToLatLon(coordinates.get(0), coordinates.get(1));
-        this.latitude = doubleDoublePair.getLeft();
-        this.longtitude = doubleDoublePair.getRight();
+        Double[] doubleDoublePair = GeoConverter.convertMetersToLatLon(coordinates.get(0), coordinates.get(1));
+        this.latitude = doubleDoublePair[0];
+        this.longtitude = doubleDoublePair[1];
     }
 
     public Double getLongtitude() {

@@ -13,13 +13,12 @@ import android.widget.*;
 import com.emal.android.transport.spb.R;
 import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.portal.Route;
+import com.emal.android.transport.spb.utils.UIHelper;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -44,9 +43,9 @@ public class SearchActivity extends Activity {
 
         portalClient = new PortalClient();
         searchView = (SearchView) findViewById(R.id.searchView);
+        searchView.setIconified(false);
         listView = (ListView) findViewById(R.id.searchResultView);
 
-        final Context a = this;
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -59,7 +58,7 @@ public class SearchActivity extends Activity {
                 if (searchTask != null) {
                     searchTask.cancel(true);
                 }
-                searchTask = new SearchTask(listView, a);
+                searchTask = new SearchTask(listView, _this);
                 searchTask.execute(newText);
                 return true;
             }
@@ -79,25 +78,29 @@ public class SearchActivity extends Activity {
 
         @Override
         protected List<Route> doInBackground(Object... params) {
-            List<Route> routes = null;
+            List<Route> routes;
             try {
                 routes = portalClient.findRoutes((String) params[0]);
             } catch (Exception e) {
                 e.printStackTrace();
+                return null;
             }
             return routes != null ? routes : Collections.<Route>emptyList();
-
         }
 
         @Override
         protected void onPostExecute(final List<Route> list) {
+            if (list == null) {
+                //An error occurred
+                UIHelper.getErrorDialog(listView.getContext());
+                return;
+            }
             List<String> results = new ArrayList<String>();
             for (Route r : list) {
                 String routeNumber = r.getRouteNumber();
                 String routePoints = r.getName();
                 String routeType = r.getTransportType().name();
-                int id = r.getId();
-                results.add(String.valueOf(id) + "#" + routeNumber + "/" + routeType + "/" + routePoints);
+                results.add(routeNumber + "/" + routeType + "/" + routePoints);
             }
 
             ArrayAdapter<String> listArrayAdapter = new ArrayAdapter<String>(context, R.layout.search_list_item, results);

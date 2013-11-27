@@ -4,11 +4,13 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.portal.Route;
-import com.emal.android.transport.spb.utils.DrawVehicle;
+import com.emal.android.transport.spb.task.DrawVehicleTask;
+import com.emal.android.transport.spb.task.SyncVehiclePositionTask;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -17,46 +19,49 @@ import java.util.*;
 public class VehicleTracker {
     private static final String TAG = VehicleTracker.class.getName();
     private AsyncTask syncTypesTask;
-    private Map<String, AsyncTask> taskMap;
+    private Map<Route, AsyncTask> routeTaskMap;
     private Set<VehicleType> vehicleTypes;
-    private Set<Route> routes;
     private VehicleSyncAdapter vehicleSyncAdapter;
 
     private PortalClient portalClient;
     private final GoogleMap googleMap;
-    private Map<String, List<Marker>> markers;
+    private Map<String, Map<String, Marker>> markers;
 
     public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter,
                           PortalClient portalClient,
-                          GoogleMap googleMap,
-                          Map<String, List<Marker>> markers) {
+                          GoogleMap googleMap) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;
         this.portalClient = portalClient;
         this.googleMap = googleMap;
-        this.markers = markers;
+        this.markers = new ConcurrentHashMap<String, Map<String, Marker>>();
         vehicleTypes = new HashSet<VehicleType>();
-        routes = new HashSet<Route>();
-        taskMap = new HashMap<String, AsyncTask>();
+        routeTaskMap = new HashMap<Route, AsyncTask>();
     }
 
     public boolean startTrack(VehicleType vehicleType) {
         return vehicleTypes.add(vehicleType);
     }
 
-    public boolean startTrack(Route route) {
-        return routes.add(route);
+    public void startTrack(Route route) {
+        routeTaskMap.put(route, null);
     }
 
-    public void startTrack(Set<String> routesToTrack) {
-        for (String s : routesToTrack) {
-            //TODO
-            //startTrack(s);
+    public void stopTrackAllRoutes() {
+        for (Map.Entry<Route, AsyncTask> task : routeTaskMap.entrySet()) {
+            Route key = task.getKey();
+            AsyncTask value = task.getValue();
+            if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
+                value.cancel(true);
+            }
+
+            Map<String, Marker> markers1 = markers.get(key.getId());
+            if (markers1 != null) {
+                for(Marker marker : markers1.values()) {
+                    marker.remove();
+                }
+            }
         }
-    }
-
-    public void stopTrackAllIds() {
-        routes.clear();
-        stopAllTasks();
+        routeTaskMap.clear();
     }
 
     public void syncVehicles() {
@@ -68,53 +73,39 @@ public class VehicleTracker {
             Log.d(TAG, "Reschedule vehicleTypes");
             syncTypesTask.cancel(true);
         }
-        if (!vehicleTypes.isEmpty() && routes.isEmpty()) {
+        if (!vehicleTypes.isEmpty() && routeTaskMap.isEmpty()) {
+            Log.d(TAG, "Scheduling typed layout for types: " + vehicleTypes);
             syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate, portalClient.getHttpClient());
             syncTypesTask.execute();
         }
 
-        for (Route route : routes) {
-            String routeId = String.valueOf(route.getId());
-            AsyncTask value = taskMap.get(routeId);
+        for (Route route : routeTaskMap.keySet()) {
+            Log.d(TAG, "Scheduling route: " + route);
+            String routeId = route.getId();
+            AsyncTask value = routeTaskMap.get(routeId);
             if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
                 value.cancel(true);
             }
-            value = new DrawVehicle(route, portalClient, googleMap, markers, vehicleSyncAdapter);
+            Map<String, Marker> markersForRoute = markers.get(routeId);
+            if (markersForRoute == null) {
+                Log.d(TAG, "Add new map for markers for route: " + route);
+                markersForRoute = new HashMap<String, Marker>();
+                markers.put(routeId, markersForRoute);
+            }
+            value = new DrawVehicleTask(route, portalClient, googleMap, markersForRoute, vehicleSyncAdapter);
             value.execute();
-            taskMap.put(routeId, value);
+            routeTaskMap.put(route, value);
 
         }
     }
 
-    public void stopTrackAll() {
+    public void stopTracking() {
         vehicleSyncAdapter.clearOverlay();
         vehicleTypes.clear();
         if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
             syncTypesTask.cancel(true);
         }
 
-        stopAllTasks();
-    }
-
-    private void stopAllTasks() {
-        for (Map.Entry<String, AsyncTask> task : taskMap.entrySet()) {
-            AsyncTask value = task.getValue();
-            if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
-                value.cancel(true);
-            }
-
-            List<Marker> markers1 = markers.get(task.getKey());
-            if (markers1 == null || markers1.isEmpty()) {
-                return;
-            }
-            for(Marker marker : markers1) {
-                marker.remove();
-            }
-        }
-    }
-
-    public Set<String> getRoutes() {
-        //TODO
-        return Collections.emptySet();
+        stopTrackAllRoutes();
     }
 }

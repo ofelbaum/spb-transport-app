@@ -1,9 +1,11 @@
-package com.emal.android.transport.spb;
+package com.emal.android.transport.spb.task;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Log;
+import com.emal.android.transport.spb.VehicleSyncAdapter;
+import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.utils.Constants;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

@@ -5,19 +5,25 @@ package com.emal.android.transport.spb;
  * Date: 4/12/12 2:31 AM
  */
 public enum VehicleType {
-    BUS("vehicle_bus"),
-    TROLLEY("vehicle_trolley"),
-    TRAM("vehicle_tram"),
-    SHIP("vehicle_ship");
+    BUS("vehicle_bus", "0"),
+    TROLLEY("vehicle_trolley", "1"),
+    TRAM("vehicle_tram", "2"),
+    SHIP("vehicle_ship", "46");
 
     private String code;
+    private String id;
 
-    private VehicleType(String code) {
+    private VehicleType(String code, String id) {
         this.code = code;
+        this.id = id;
     }
 
     public String getCode() {
         return code;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public static VehicleType getType(String value) {

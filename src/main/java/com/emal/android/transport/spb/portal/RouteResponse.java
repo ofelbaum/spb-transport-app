@@ -57,7 +57,7 @@ public class RouteResponse {
 
             Map<String, String> map = (Map) routeItem.get(1);
             String systemName = map.get("systemName");
-            Route route = Route.RouteBuilder.getInstance().id((Integer) routeItem.get(0))
+            Route route = Route.RouteBuilder.getInstance().id(String.valueOf(routeItem.get(0)))
                     .transportType(systemName)
                     .routeNumber((String) routeItem.get(2))
                     .name((String) routeItem.get(3))

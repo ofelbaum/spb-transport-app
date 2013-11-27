@@ -143,14 +143,7 @@ public class ApplicationParams {
     }
 
     public Set<String> getRoutesToTrack() {
-        if (routesToTrack == null) {
-            routesToTrack = new HashSet<String>();
-        }
         return routesToTrack;
-    }
-
-    public void setRoutesToTrack(Set<String> routesToTrack) {
-        this.routesToTrack = routesToTrack;
     }
 
     public void saveAll() {

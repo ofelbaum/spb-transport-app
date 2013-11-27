@@ -10,8 +10,7 @@ import java.io.Serializable;
  */
 
 public class Route implements Serializable{
-
-    private int id;
+    private String id;
     private VehicleType transportType;
     private String routeNumber;
     private String name;
@@ -23,7 +22,7 @@ public class Route implements Serializable{
     private Object scheduleLinkColumn;
     private Object mapLinkColumn;
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
@@ -67,6 +66,24 @@ public class Route implements Serializable{
         return mapLinkColumn;
     }
 
+    public static String encode(Route r) {
+        return r.getId() + "@" + r.getRouteNumber();
+    }
+
+    public static String[] decode(String s) {
+        return s.split("@");
+    }
+
+    @Override
+    public String toString() {
+        return "Route{" +
+                "id='" + id + '\'' +
+                ", transportType=" + transportType +
+                ", routeNumber='" + routeNumber + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
+
     private Route(RouteBuilder routeBuilder) {
         this.id = routeBuilder.id;
         this.transportType = routeBuilder.transportType;
@@ -82,7 +99,7 @@ public class Route implements Serializable{
     }
 
     public static class RouteBuilder {
-        private int id;
+        private String id;
         private VehicleType transportType;
         private String routeNumber;
         private String name;
@@ -98,7 +115,7 @@ public class Route implements Serializable{
             return new RouteBuilder();
         }
 
-        public RouteBuilder id(int id) {
+        public RouteBuilder id(String id) {
             this.id = id;
             return this;
         }

@@ -1,7 +1,7 @@
 package com.emal.android.transport.spb.portal;
 
 import com.emal.android.transport.spb.VehicleTracker;
-import org.apache.commons.lang3.StringUtils;
+import com.emal.android.transport.spb.VehicleType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
@@ -10,6 +10,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerPNames;
 import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -34,14 +35,27 @@ import java.util.regex.Pattern;
  */
 public class PortalClient {
     private static final String SCOPE_PARAM_PATTERN = "(?:.*(scope:.\"))([a-zA-Z0-9+/]*)(?:\".*)";
+    private static final String TAG = PortalClient.class.getName();
     private static String GET_ROUTES_LIST_QUERY = "http://transport.orgp.spb.ru/Portal/transport/routes/list";
     private static String GET_STOPS_LIST_QUERY = "http://transport.orgp.spb.ru/Portal/transport/stops/list";
     private static String GET_ROUTE_QUERY = "http://transport.orgp.spb.ru/Portal/transport/route/%s";
     private static String GET_ROUTE_INFO_QUERY = "http://transport.orgp.spb.ru/Portal/transport/mapx/innerRouteVehicle?ROUTE={1}&SCOPE={2}&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetFeature&SRS=EPSG%3A900913&LAYERS=&WHEELCHAIRONLY=false&_OLSALT=0.6481046043336391&BBOX={3}";
+//    private static String GET_ROUTE_INFO_QUERY2 = "http://transport.orgp.spb.ru/Portal/transport/map/poi?ROUTE={1}&REQUEST=GetFeature&_=1385406049565";
+//    http://transport.orgp.spb.ru/Portal/transport/route/1504/stops/direct
+//    http://transport.orgp.spb.ru/Portal/transport/route/1504/stops/return
+
     public static final String BBOX = "3236938.2945543,8256172.549016,3492103.4398571,8480968.3457368";
 
-    private DefaultHttpClient httpClient = new DefaultHttpClient();
+    private DefaultHttpClient httpClient;
     private String scope;
+
+    public PortalClient() {
+        BasicHttpParams params = new BasicHttpParams();
+        SchemeRegistry schemeRegistry = new SchemeRegistry();
+        schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+        ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+        httpClient = new DefaultHttpClient(cm, params);
+    }
 
     //TODO
     public HttpClient getHttpClient() {
@@ -77,7 +91,7 @@ public class PortalClient {
     public VehicleCollection getRouteData(String route, String bbox) throws IOException {
         HttpResponse httpResponse;
         String content;
-        if (StringUtils.isEmpty(scope)) {
+        if (scope == null || scope.length() == 0) {
             HttpGet httppost = new HttpGet(String.format(GET_ROUTE_QUERY, route));
             httpResponse = httpClient.execute(httppost);
             content = readResponse(httpResponse);
@@ -90,7 +104,7 @@ public class PortalClient {
                 break;
             }
 
-            if (StringUtils.isEmpty(scope)) {
+            if (scope == null || scope.length() == 0) {
                 throw new IllegalStateException("SCOPE is not defined");
             }
         }
@@ -109,8 +123,9 @@ public class PortalClient {
         StringBuffer respBuf = new StringBuffer();
 
         HttpEntity httpEntity = httpResponse.getEntity();
+        InputStream inputStream = null;
         try {
-            InputStream inputStream = httpEntity.getContent();
+            inputStream = httpEntity.getContent();
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             String strLine;
             while ((strLine = br.readLine()) != null)   {
@@ -118,13 +133,35 @@ public class PortalClient {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return respBuf.toString();
     }
 
-    public List<Route> findRoutes(String... s) throws IOException {
+    public List<Route> findRoutes(String s) throws IOException {
+        return findRoutes(s, VehicleType.values());
+    }
+
+    public Route findRoute(String id, String number) throws IOException {
+        List<Route> routes = findRoutes(number);
+        for (Route route : routes) {
+            if (id.equals(route.getId())) {
+                return route;
+            }
+        }
+        return null;
+    }
+
+    public List<Route> findRoutes(String s, VehicleType... types) throws IOException {
         HttpPost httppost = new HttpPost(GET_ROUTES_LIST_QUERY);
-        httppost.setEntity(getRoutesFormParams(s.length > 0 ? s[0] : null));
+        httppost.setEntity(getRoutesFormParams(s, types));
 
         HttpResponse httpResponse = httpClient.execute(httppost);
         String content = readResponse(httpResponse);
@@ -162,7 +199,7 @@ public class PortalClient {
         return routesIndex;
     }
 
-    private static UrlEncodedFormEntity getRoutesFormParams(String routerNumber) throws UnsupportedEncodingException {
+    private static UrlEncodedFormEntity getRoutesFormParams(String routerNumber, VehicleType... types) throws UnsupportedEncodingException {
         List<NameValuePair> formparams = new ArrayList<NameValuePair>();
         formparams.add(new BasicNameValuePair("sEcho", "2"));
         formparams.add(new BasicNameValuePair("iColumns", "10"));
@@ -183,14 +220,13 @@ public class PortalClient {
         formparams.add(new BasicNameValuePair("bSortable_7", "true"));
         formparams.add(new BasicNameValuePair("bSortable_8", "false"));
         formparams.add(new BasicNameValuePair("bSortable_9", "false"));
-        formparams.add(new BasicNameValuePair("transport-type", "0"));
-        formparams.add(new BasicNameValuePair("transport-type", "46"));
-        formparams.add(new BasicNameValuePair("transport-type", "2"));
-        formparams.add(new BasicNameValuePair("transport-type", "1"));
 
-        if (!StringUtils.isEmpty(routerNumber)) {
+        for (VehicleType type : types) {
+            formparams.add(new BasicNameValuePair("transport-type", type.getId()));
+        }
+
+        if (routerNumber != null && routerNumber.length() > 0) {
             formparams.add(new BasicNameValuePair("route-number", routerNumber));
-
         }
 
         return new UrlEncodedFormEntity(formparams, "UTF-8");

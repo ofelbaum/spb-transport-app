@@ -10,6 +10,7 @@
             style="@android:style/Theme.Holo.Light"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:iconifiedByDefault="true"
             android:queryHint="@string/search_hint"
             android:id="@+id/searchView" android:layout_gravity="center|left"/>
     <ListView

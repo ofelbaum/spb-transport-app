@@ -1,4 +1,4 @@
-package com.emal.android.transport.spb.utils;
+package com.emal.android.transport.spb.task;
 
 import android.content.Context;
 import android.location.Address;
@@ -6,6 +6,8 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.emal.android.transport.spb.R;
+import com.emal.android.transport.spb.utils.ApplicationParams;
+import com.emal.android.transport.spb.utils.GeoConverter;
 import com.google.android.maps.GeoPoint;
 
 import java.io.IOException;

@@ -2,9 +2,8 @@ package com.emal.android.transport.spb.activity;
 
 import android.app.AlertDialog;
 import android.os.Handler;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.TextView;
+import com.emal.android.transport.spb.utils.UIHelper;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -19,15 +18,7 @@ public class ErrorSignOnClickListener implements View.OnClickListener{
 
     @Override
     public void onClick(View v) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-
-        builder.setTitle(com.emal.android.transport.spb.R.string.error_title);
-        builder.setMessage(com.emal.android.transport.spb.R.string.server_error);
-        builder.setPositiveButton(com.emal.android.transport.spb.R.string.ok, null);
-
-        final AlertDialog dialog = builder.show();
-        TextView messageText = (TextView) dialog.findViewById(android.R.id.message);
-        messageText.setGravity(Gravity.CENTER);
+        final AlertDialog dialog = UIHelper.getErrorDialog(view.getContext());
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {

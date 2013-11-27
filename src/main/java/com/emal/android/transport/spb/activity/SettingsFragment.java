@@ -10,7 +10,7 @@ import android.os.Bundle;
 import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.utils.ApplicationParams;
 import com.emal.android.transport.spb.utils.Constants;
-import com.emal.android.transport.spb.utils.LoadAddressTask;
+import com.emal.android.transport.spb.task.LoadAddressTask;
 
 import java.util.*;
 

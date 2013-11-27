@@ -1,4 +1,4 @@
-package com.emal.android.transport.spb.utils;
+package com.emal.android.transport.spb.task;
 
 import android.os.AsyncTask;
 import com.emal.android.transport.spb.portal.PortalClient;
@@ -13,14 +13,14 @@ import java.util.List;
 
 /**
  * @author alexey.emelyanenko@gmail.com
- * @since:
+ * @since: 1.5
  */
-public class DrawStops extends AsyncTask<Object, Void, List<Stop>>{
+public class DrawStopsTask extends AsyncTask<Object, Void, List<Stop>>{
     private PortalClient portalClient;
     private GoogleMap mMap;
     private List<Marker> stopList;
 
-    public DrawStops(PortalClient portalClient, GoogleMap mMap, List<Marker> stopList) {
+    public DrawStopsTask(PortalClient portalClient, GoogleMap mMap, List<Marker> stopList) {
         this.portalClient = portalClient;
         this.mMap = mMap;
         this.stopList = stopList;
