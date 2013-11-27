@@ -43,7 +43,10 @@ public class VehicleTracker {
     }
 
     public void startTrack(Route route) {
-        routeTaskMap.put(route, null);
+        AsyncTask asyncTask = routeTaskMap.get(route);
+        if (asyncTask == null) {
+            routeTaskMap.put(route, null);
+        }
     }
 
     public void stopTrackAllRoutes() {

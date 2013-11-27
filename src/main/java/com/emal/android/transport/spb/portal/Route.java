@@ -75,6 +75,26 @@ public class Route implements Serializable{
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Route route = (Route) o;
+
+        if (id != null ? !id.equals(route.id) : route.id != null) return false;
+        if (routeNumber != null ? !routeNumber.equals(route.routeNumber) : route.routeNumber != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (routeNumber != null ? routeNumber.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "Route{" +
                 "id='" + id + '\'' +

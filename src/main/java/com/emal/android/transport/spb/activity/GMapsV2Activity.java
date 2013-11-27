@@ -61,6 +61,7 @@ public class GMapsV2Activity extends FragmentActivity {
     private String[] menuItems;
     private PortalClient portalClient;
     private List<Marker> stopsMarkers = new ArrayList<Marker>();
+    private boolean mMapIsTouched = false;
 
     public class MapUpdateTimerTask extends TimerTask {
         @Override
@@ -256,7 +257,9 @@ public class GMapsV2Activity extends FragmentActivity {
             public void onCameraChange(CameraPosition cameraPosition) {
                 appParams.setLastLocation(cameraPosition.target);
                 appParams.setZoomSize((int) cameraPosition.zoom);
-                startSync();
+                if (Boolean.FALSE.equals(mMapIsTouched)) {
+                    startSync();
+                }
             }
         });
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
@@ -408,5 +411,9 @@ public class GMapsV2Activity extends FragmentActivity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    public void setTouched(boolean touched) {
+        this.mMapIsTouched = touched;
     }
 }
