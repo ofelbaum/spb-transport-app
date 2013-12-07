@@ -145,6 +145,11 @@ public class PortalClient {
         return respBuf.toString();
     }
 
+
+    public List<Route> findAllRoutes() throws IOException {
+        return findRoutes("");
+    }
+
     public List<Route> findRoutes(String s) throws IOException {
         return findRoutes(s, VehicleType.values());
     }

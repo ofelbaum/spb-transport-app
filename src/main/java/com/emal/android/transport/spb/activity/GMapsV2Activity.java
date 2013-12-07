@@ -21,6 +21,9 @@ import com.emal.android.transport.spb.*;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import com.emal.android.transport.spb.VehicleType;
+import com.emal.android.transport.spb.model.ApplicationParams;
+import com.emal.android.transport.spb.model.MenuItemAdapter;
+import com.emal.android.transport.spb.model.MenuModel;
 import com.emal.android.transport.spb.portal.*;
 import com.emal.android.transport.spb.task.DrawStopsTask;
 import com.emal.android.transport.spb.task.LoadTrackRoutesTask;
@@ -109,7 +112,9 @@ public class GMapsV2Activity extends FragmentActivity {
                 switch (position) {
                     case 0: {
 
-                        startActivity(new Intent(getApplicationContext(), SearchActivity.class));
+                        Intent intent = new Intent(getApplicationContext(), SearchActivity.class);
+                        intent.putExtra(SearchActivity.SELECTED_ROUTES, vehicleTracker.getTracked());
+                        startActivity(intent);
                         break;
                     }
                     case 1: {
@@ -121,6 +126,7 @@ public class GMapsV2Activity extends FragmentActivity {
                         break;
                     }
                     case 5: {
+                        //TODO remove
                         switch (stopsMarkers.size()) {
                             case 0: {
                                 AsyncTask asyncTask = new DrawStopsTask(portalClient, mMap, stopsMarkers);
@@ -134,11 +140,6 @@ public class GMapsV2Activity extends FragmentActivity {
                                 stopsMarkers.clear();
                             }
                         }
-                    }
-                    case 6: {
-                        appParams.getRoutesToTrack().clear();
-                        vehicleTracker.stopTrackAllRoutes();
-                        initApplication();//TODO
                     }
                 }
                 mDrawerLayout.closeDrawer(mDrawerList);
@@ -386,7 +387,9 @@ public class GMapsV2Activity extends FragmentActivity {
         final Context activity = this;
         switch (item.getItemId()) {
             case com.emal.android.transport.spb.R.id.action_websearch:
-                startActivity(new Intent(activity, SearchActivity.class));
+                Intent intent = new Intent(activity, SearchActivity.class);
+                intent.putExtra(SearchActivity.SELECTED_ROUTES, vehicleTracker.getTracked());
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

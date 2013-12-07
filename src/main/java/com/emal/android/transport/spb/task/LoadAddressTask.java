@@ -6,7 +6,7 @@ import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.emal.android.transport.spb.R;
-import com.emal.android.transport.spb.utils.ApplicationParams;
+import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.utils.GeoConverter;
 import com.google.android.maps.GeoPoint;
 

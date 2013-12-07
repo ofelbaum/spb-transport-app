@@ -1,14 +1,14 @@
-package com.emal.android.transport.spb.utils;
+package com.emal.android.transport.spb.model;
 
 import android.content.SharedPreferences;
 import android.util.Log;
 import com.emal.android.transport.spb.MapProviderType;
 import com.emal.android.transport.spb.map.MapUtils;
+import com.emal.android.transport.spb.utils.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.maps.GeoPoint;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 
 /**

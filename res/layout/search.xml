@@ -1,21 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              style="@android:style/Theme.Holo.Light"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                style="@android:style/Theme.Holo.Light"
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
-    <SearchView
-            style="@android:style/Theme.Holo.Light"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:iconifiedByDefault="true"
-            android:queryHint="@string/search_hint"
-            android:id="@+id/searchView" android:layout_gravity="center|left"/>
-    <ListView
-            style="@android:style/Theme.Holo.Light"
+    <LinearLayout
+            android:orientation="vertical"
             android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:id="@+id/searchResultView" android:layout_gravity="left|center_vertical"/>
-</LinearLayout>
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/selectedRoutes" android:layout_alignParentTop="true">
+        <SearchView
+                style="@android:style/Theme.Holo.Light"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:iconifiedByDefault="true"
+                android:queryHint="@string/search_hint"
+                android:id="@+id/searchView" android:layout_gravity="center|top" android:baselineAligned="false"/>
+        <ListView
+                style="@android:style/Theme.Holo.Light"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/searchResultView" android:layout_gravity="center_vertical|top"/>
+    </LinearLayout>
+    <View android:id="@+id/separator"
+          android:background="#ffffff"
+          android:layout_width="fill_parent"
+          android:layout_height="1dip"
+          android:layout_above="@+id/selectedRoutes"/>
+    <LinearLayout
+            android:id="@+id/selectedRoutes"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_height="100dp" android:padding="10dp">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/selected_routes"/>
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/selectedRoutesList"/>
+        <Button android:id="@+id/clearSelectedRoutes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15dp" android:text="@string/clear_selection"/>
+    </LinearLayout>
+</RelativeLayout>

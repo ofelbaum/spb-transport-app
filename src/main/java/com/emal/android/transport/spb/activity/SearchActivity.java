@@ -1,24 +1,23 @@
 package com.emal.android.transport.spb.activity;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.view.View;
+import android.view.*;
+import android.view.MenuItem;
 import android.widget.*;
 import com.emal.android.transport.spb.R;
+import com.emal.android.transport.spb.model.ApplicationParams;
+import com.emal.android.transport.spb.model.RouteItemsAdapter;
+import com.emal.android.transport.spb.model.RoutesStorage;
 import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.portal.Route;
-import com.emal.android.transport.spb.utils.UIHelper;
+import com.emal.android.transport.spb.utils.*;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -33,13 +32,23 @@ public class SearchActivity extends Activity {
     private PortalClient portalClient;
     private Activity _this;
     public static final String ROUTE_DATA_KEY = "ROUTE_DATA";
-
+    public static final String SELECTED_ROUTES = "SELECTED_ROUTES";
+    private ApplicationParams appParams;
+    private RoutesStorage routesStorage = new RoutesStorage();
+    private List<Route> findedRoutes;
+    private Set<Route> selectedRoutes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         _this = this;
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.search);
+        getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setTitle(R.string.search_page);
+
+        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
 
         portalClient = new PortalClient();
         searchView = (SearchView) findViewById(R.id.searchView);
@@ -55,32 +64,99 @@ public class SearchActivity extends Activity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 Log.d(TAG, "Search query [" + newText + "]");
-                if (searchTask != null) {
-                    searchTask.cancel(true);
-                }
-                searchTask = new SearchTask(listView, _this);
-                searchTask.execute(newText);
+                queryAndShowResult(newText);
                 return true;
             }
         });
 
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                finish();
+                return true;
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Route route = findedRoutes.get(position);
+//                Intent mapIntent = new Intent(SEARCH_INTEND_ID);
+//                mapIntent.putExtra(ROUTE_DATA_KEY, findedRoutes.get(position));
+//                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(mapIntent);
+//                finish();
+                selectedRoutes.add(route);
+                redrawSelection(selectedRoutes);
+                appParams.getRoutesToTrack().add(Route.encode(route));
+
+            }
+        });
+
+        Button button = (Button) findViewById(R.id.clearSelectedRoutes);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedRoutes.clear();
+                redrawSelection(selectedRoutes);
+                appParams.getRoutesToTrack().clear();
+            }
+        });
+
+        Bundle b = getIntent().getExtras();
+        ArrayList<Route> routes = (ArrayList<Route>) b.getSerializable(SELECTED_ROUTES);
+        redrawSelection(routes);
+        selectedRoutes = new HashSet<Route>(routes);
+
+        initIndex();
+    }
+
+    private void queryAndShowResult(String newText) {
+        findedRoutes = routesStorage.find(newText);
+        RouteItemsAdapter adapter = new RouteItemsAdapter(searchView.getContext(), R.layout.search_list_item, findedRoutes);
+        listView.setAdapter(adapter);
+    }
+
+    private void redrawSelection(Collection<Route> routes) {
+        StringBuilder builder = new StringBuilder();
+        Iterator<Route> it = routes.iterator();
+        while (it.hasNext()) {
+            builder.append(it.next().getRouteNumber());
+            if (it.hasNext()) {
+                builder.append(", ");
+            }
+        }
+        TextView textView = (TextView) findViewById(R.id.selectedRoutesList);
+        textView.setText(builder.toString());
+    }
+
+    private void initIndex() {
+        Log.d(TAG, "Init index");
+        if (searchTask != null) {
+            searchTask.cancel(true);
+        }
+        searchTask = new SearchTask();
+        searchTask.execute();
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        int itemId = item.getItemId();
+        switch (itemId) {
+            case android.R.id.home: {
+                finish();
+            }
+        }
+        return true;
     }
 
     private class SearchTask extends AsyncTask<Object, Void, List<Route>> {
 
-        private ListView listView;
-        private Context context;
-
-        private SearchTask(ListView listView, Context context) {
-            this.listView = listView;
-            this.context = context;
-        }
-
         @Override
         protected List<Route> doInBackground(Object... params) {
+            setProgressBarIndeterminateVisibility(true);
             List<Route> routes;
             try {
-                routes = portalClient.findRoutes((String) params[0]);
+                routes = portalClient.findAllRoutes();
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
@@ -90,30 +166,15 @@ public class SearchActivity extends Activity {
 
         @Override
         protected void onPostExecute(final List<Route> list) {
+            setProgressBarIndeterminateVisibility(false);
             if (list == null) {
                 //An error occurred
                 UIHelper.getErrorDialog(listView.getContext());
                 return;
             }
-            List<String> results = new ArrayList<String>();
-            for (Route r : list) {
-                String routeNumber = r.getRouteNumber();
-                String routePoints = r.getName();
-                String routeType = r.getTransportType().name();
-                results.add(routeNumber + "/" + routeType + "/" + routePoints);
-            }
-
-            ArrayAdapter<String> listArrayAdapter = new ArrayAdapter<String>(context, R.layout.search_list_item, results);
-            listView.setAdapter(listArrayAdapter);
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Intent mapIntent = new Intent(SEARCH_INTEND_ID);
-                    mapIntent.putExtra(ROUTE_DATA_KEY, list.get(position));
-                    LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(mapIntent);
-                    finish();
-                }
-            });
+            routesStorage.setRouteList(list);
+            findedRoutes = list;
+            queryAndShowResult(searchView.getQuery().toString());
         }
     }
 }

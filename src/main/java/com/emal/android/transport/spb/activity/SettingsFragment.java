@@ -8,7 +8,7 @@ import com.emal.android.transport.spb.MapProviderType;
 import com.emal.android.transport.spb.R;
 import android.os.Bundle;
 import com.emal.android.transport.spb.VehicleType;
-import com.emal.android.transport.spb.utils.ApplicationParams;
+import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.task.LoadAddressTask;
 

@@ -49,6 +49,10 @@ public class VehicleTracker {
         }
     }
 
+    public ArrayList<Route> getTracked() {
+        return new ArrayList<Route>(routeTaskMap.keySet());
+    }
+
     public void stopTrackAllRoutes() {
         for (Map.Entry<Route, AsyncTask> task : routeTaskMap.entrySet()) {
             Route key = task.getKey();

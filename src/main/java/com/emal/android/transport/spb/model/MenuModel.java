@@ -1,4 +1,4 @@
-package com.emal.android.transport.spb.utils;
+package com.emal.android.transport.spb.model;
 
 import android.content.res.Resources;
 import android.content.res.TypedArray;

@@ -65,22 +65,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
             VehicleProps properties = v.getProperties();
             String stateNumber = properties.getStateNumber() + " @ " + properties.getVelocity() + " km/h";
 
-            String routeLetter = "S";
-            int routeColor = Color.YELLOW;
-            VehicleType transportType = route.getTransportType();
-            if (VehicleType.TROLLEY.equals(transportType)) {
-                routeLetter = "U";
-                routeColor = Color.GREEN;
-            } else if (VehicleType.BUS.equals(transportType)) {
-                routeLetter = "A";
-                routeColor = Color.BLUE;
-            } else if (VehicleType.TRAM.equals(transportType)) {
-                routeLetter = "T";
-                routeColor = Color.RED;
-            }
-
-            Bitmap bitmap = getVehicleBitmap(route.getRouteNumber(), properties, routeLetter, routeColor);
-
+            Bitmap bitmap = getVehicleBitmap(route, properties);
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
             MarkerOptions title = new MarkerOptions()
                     .position(homePoint)
@@ -108,7 +93,9 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
         vehicleSyncAdapter.afterSync(true);
     }
 
-    private static Bitmap getVehicleBitmap(String routeNumber, VehicleProps properties, String routeLetter, int routeColor) {
+    private static Bitmap getVehicleBitmap(Route route, VehicleProps properties) {
+        VehicleType transportType = route.getTransportType();
+
         int bHeigth = 80;
         int bWidth = 80;
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
@@ -119,30 +106,41 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
         vehiclePaint.setColor(Color.WHITE);
         vehiclePaint.setTypeface(Typeface.DEFAULT_BOLD);
         vehiclePaint.setTextAlign(Paint.Align.CENTER);
+        vehiclePaint.setAntiAlias(true);
+        vehiclePaint.setFilterBitmap(true);
 
         Paint vehicleNumberPaint = new Paint();
         vehicleNumberPaint.setTextSize(25);
         vehicleNumberPaint.setColor(Color.BLACK);
         vehicleNumberPaint.setTypeface(Typeface.DEFAULT_BOLD);
         vehicleNumberPaint.setTextAlign(Paint.Align.CENTER);
+        vehicleNumberPaint.setAntiAlias(true);
+        vehicleNumberPaint.setFilterBitmap(true);
 
         Paint rectPaint = new Paint();
-        rectPaint.setColor(routeColor);
+        rectPaint.setColor(transportType.getColor());
         rectPaint.setStyle(Paint.Style.FILL);
+        rectPaint.setFilterBitmap(true);
+        rectPaint.setAntiAlias(true);
 
         Canvas canvas = new Canvas(bitmap);
         int x = canvas.getClipBounds().centerX();
         int y = canvas.getClipBounds().centerY();
 
-        canvas.drawText(routeNumber, 20, 20, vehicleNumberPaint);
+        canvas.drawText(route.getRouteNumber(), 20, 20, vehicleNumberPaint);
         canvas.save();
-        canvas.rotate(properties.getDirection(), x, y);
+
+        int direction = properties.getDirection();
+        if (transportType.isUpsideDown()) {
+            direction += 180;
+        }
+        canvas.rotate(direction, x, y);
         canvas.drawRect(x - 15, y + 20, x + 15, y - 20, rectPaint);
 
         int xPos = (canvas.getWidth() / 2);
         int yPos = (int) ((canvas.getHeight() / 2) - ((vehiclePaint.descent() + vehiclePaint.ascent()) / 2)) ;
 
-        canvas.drawText(routeLetter, xPos, yPos, vehiclePaint);
+        canvas.drawText(transportType.getLetter(), xPos, yPos, vehiclePaint);
         canvas.restore();
         return bitmap;
     }

@@ -1,13 +1,27 @@
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          android:id="@android:id/text1"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:textAppearance="?android:attr/textAppearanceMedium"
-          android:gravity="center_vertical"
-          android:paddingLeft="36dp"
-          android:paddingRight="16dp"
-          android:textColor="#fff"
-          android:textStyle="bold"
-          android:background="?android:attr/activatedBackgroundIndicator"
-          android:text="Test" android:phoneNumber="false"
-          android:password="false"/>
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_vertical"
+              android:padding="2dp" android:minHeight="40dp">
+
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/searchRouteNumber"
+              android:layout_width="50dp"
+              android:layout_height="fill_parent"
+              android:textStyle="bold"
+
+              android:text="146MA"
+              android:gravity="center"/>
+    <ImageView
+            android:id="@+id/searchRouteType"
+            android:layout_width="32dp"
+            android:layout_height="32dp" android:baselineAlignBottom="false"/>
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/searchRouteDescr"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:gravity="center|left"
+              android:text="откуда - куда" android:paddingLeft="5dp"/>
+</LinearLayout>

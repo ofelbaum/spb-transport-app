@@ -1,4 +1,4 @@
-package com.emal.android.transport.spb.utils;
+package com.emal.android.transport.spb.model;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
