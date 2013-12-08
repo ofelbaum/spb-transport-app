@@ -1,6 +1,7 @@
 package com.emal.android.transport.spb.activity;
 
 import android.app.Activity;
+import android.graphics.*;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -9,6 +10,7 @@ import android.view.*;
 import android.view.MenuItem;
 import android.widget.*;
 import com.emal.android.transport.spb.R;
+import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.model.RouteItemsAdapter;
 import com.emal.android.transport.spb.model.RoutesStorage;
@@ -37,6 +39,7 @@ public class SearchActivity extends Activity {
     private RoutesStorage routesStorage = new RoutesStorage();
     private List<Route> findedRoutes;
     private Set<Route> selectedRoutes;
+    private LinearLayout selectedRoutesPics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +49,7 @@ public class SearchActivity extends Activity {
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.search);
         getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle(R.string.search_page);
 
         appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
@@ -54,6 +58,7 @@ public class SearchActivity extends Activity {
         searchView = (SearchView) findViewById(R.id.searchView);
         searchView.setIconified(false);
         listView = (ListView) findViewById(R.id.searchResultView);
+        selectedRoutesPics = (LinearLayout) findViewById(R.id.selectedRoutesList);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -85,20 +90,13 @@ public class SearchActivity extends Activity {
 //                mapIntent.putExtra(ROUTE_DATA_KEY, findedRoutes.get(position));
 //                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(mapIntent);
 //                finish();
-                selectedRoutes.add(route);
-                redrawSelection(selectedRoutes);
-                appParams.getRoutesToTrack().add(Route.encode(route));
-
-            }
-        });
-
-        Button button = (Button) findViewById(R.id.clearSelectedRoutes);
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedRoutes.clear();
-                redrawSelection(selectedRoutes);
-                appParams.getRoutesToTrack().clear();
+                Set<String> routesToTrack = appParams.getRoutesToTrack();
+                String encode = Route.encode(route);
+                if (!routesToTrack.contains(encode)) {
+                    routesToTrack.add(encode);
+                    selectedRoutes.add(route);
+                    drawSelection(route);
+                }
             }
         });
 
@@ -116,17 +114,31 @@ public class SearchActivity extends Activity {
         listView.setAdapter(adapter);
     }
 
-    private void redrawSelection(Collection<Route> routes) {
-        StringBuilder builder = new StringBuilder();
+    private void redrawSelection(final Collection<Route> routes) {
         Iterator<Route> it = routes.iterator();
         while (it.hasNext()) {
-            builder.append(it.next().getRouteNumber());
-            if (it.hasNext()) {
-                builder.append(", ");
-            }
+            final Route next = it.next();
+            drawSelection(next);
         }
-        TextView textView = (TextView) findViewById(R.id.selectedRoutesList);
-        textView.setText(builder.toString());
+    }
+
+    private void drawSelection(final Route next) {
+        Bitmap vehicleBitmap = getVehicleBitmap(next);
+        final ImageView imageView = new ImageView(searchView.getContext());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(5, 5, 5, 5);
+        imageView.setLayoutParams(lp);
+        imageView.setImageBitmap(vehicleBitmap);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                imageView.setImageBitmap(null);
+                selectedRoutesPics.removeView(imageView);
+                selectedRoutesPics.refreshDrawableState();
+                appParams.getRoutesToTrack().remove(Route.encode(next));
+            }
+        });
+        selectedRoutesPics.addView(imageView);
     }
 
     private void initIndex() {
@@ -153,7 +165,13 @@ public class SearchActivity extends Activity {
 
         @Override
         protected List<Route> doInBackground(Object... params) {
-            setProgressBarIndeterminateVisibility(true);
+            SearchActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setProgressBarIndeterminateVisibility(true);
+                }
+            });
+
             List<Route> routes;
             try {
                 routes = portalClient.findAllRoutes();
@@ -166,7 +184,13 @@ public class SearchActivity extends Activity {
 
         @Override
         protected void onPostExecute(final List<Route> list) {
-            setProgressBarIndeterminateVisibility(false);
+            SearchActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    setProgressBarIndeterminateVisibility(false);
+                }
+            });
+
             if (list == null) {
                 //An error occurred
                 UIHelper.getErrorDialog(listView.getContext());
@@ -176,5 +200,48 @@ public class SearchActivity extends Activity {
             findedRoutes = list;
             queryAndShowResult(searchView.getQuery().toString());
         }
+    }
+
+    private Bitmap getVehicleBitmap(Route route) {
+        VehicleType type = route.getTransportType();
+        int bHeigth = 60;
+        int bWidth = 60;
+        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = Bitmap.createBitmap(bWidth, bHeigth, conf);
+
+        Paint textPaint = new Paint();
+        textPaint.setAntiAlias(true);
+        textPaint.setFilterBitmap(true);
+        textPaint.setTextSize(25);
+        textPaint.setColor(Color.WHITE);
+        textPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        textPaint.setTextAlign(Paint.Align.CENTER);
+
+        Paint rectPaint = new Paint();
+        rectPaint.setColor(type.getColor());
+        rectPaint.setStyle(Paint.Style.FILL);
+        rectPaint.setFilterBitmap(true);
+        rectPaint.setAntiAlias(true);
+
+        Canvas canvas = new Canvas(bitmap);
+        int xPos = (canvas.getWidth() / 2);
+        int yPos = (int) ((canvas.getHeight() / 2) - ((textPaint.descent() + textPaint.ascent()) / 2));
+
+        canvas.drawRect(0, 0, bHeigth, bWidth, rectPaint);
+        canvas.save();
+//        if (type.isUpsideDown()) {
+//            int x = canvas.getClipBounds().centerX();
+//            int y = canvas.getClipBounds().centerY();
+//            canvas.rotate(180, x, y);
+//
+//            yPos += 2; //TODO fix
+//        } else {
+//        }
+
+//        yPos++; //TODO fix
+        canvas.drawText(route.getRouteNumber(), xPos, yPos, textPaint);
+        canvas.restore();
+
+        return bitmap;
     }
 }

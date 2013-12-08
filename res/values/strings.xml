@@ -98,7 +98,6 @@
         <item>Settings</item>
         <item>Info</item>
         <item>Feedback</item>
-        <item>Show Stops</item>
     </string-array>
     <array name="menu_items_icon_array">
         <item>@drawable/ic_menu_search</item>

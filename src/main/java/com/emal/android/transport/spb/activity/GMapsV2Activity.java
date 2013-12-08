@@ -1,11 +1,13 @@
 package com.emal.android.transport.spb.activity;
 
 import android.app.AlertDialog;
+import android.app.Application;
 import android.content.*;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -79,6 +81,7 @@ public class GMapsV2Activity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.gmapsv2);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
@@ -123,6 +126,11 @@ public class GMapsV2Activity extends FragmentActivity {
                     }
                     case 2: {
                         startActivity(new Intent(getApplicationContext(), PreferencesActivity.class));
+                        break;
+                    }
+                    case 4: {
+                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.emal.android.transport.spb"));
+                        startActivity(browserIntent);
                         break;
                     }
                     case 5: {
@@ -298,7 +306,7 @@ public class GMapsV2Activity extends FragmentActivity {
         mUiSettings.setRotateGesturesEnabled(false);
 
 //        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        vehicleSyncAdapter = new GMapVehicleSyncAdapter(mapFragment);
+        vehicleSyncAdapter = new GMapVehicleSyncAdapter(this, mapFragment);
         vehicleTracker = new VehicleTracker(vehicleSyncAdapter, portalClient, mMap);
 
         GeoPoint home = appParams.getHomeLocation();

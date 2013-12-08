@@ -1,5 +1,6 @@
 package com.emal.android.transport.spb;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -14,23 +15,33 @@ import com.google.android.gms.maps.model.*;
  */
 public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private static final String TAG = GMapVehicleSyncAdapter.class.getName();
+    private Activity activity;
     private SupportMapFragment mapFragment;
-    private View progressBar;
     private View errorSign;
     private GroundOverlay vehicleOverlay;
     private LatLngBounds latLngBounds;
 
-    public GMapVehicleSyncAdapter(SupportMapFragment mapFragment) {
+    public GMapVehicleSyncAdapter(Activity activity, SupportMapFragment mapFragment) {
+        this.activity = activity;
         this.mapFragment = mapFragment;
-        this.progressBar = mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.progressBar);
         this.errorSign = mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.errorSignLayout);
     }
 
     @Override
     public void beforeSync(boolean clearBeforeUpdate) {
-        progressBar.setVisibility(View.VISIBLE);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.setProgressBarIndeterminateVisibility(true);
+            }
+        });
         if (errorSign.getVisibility() == View.INVISIBLE) {
-            progressBar.setVisibility(View.VISIBLE);
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    activity.setProgressBarIndeterminateVisibility(true);
+                }
+            });
         }
 
         if (clearBeforeUpdate) {
@@ -42,7 +53,12 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public void afterSync(boolean result) {
-        progressBar.setVisibility(View.INVISIBLE);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.setProgressBarIndeterminateVisibility(false);
+            }
+        });
 
         if (Boolean.TRUE.equals(result)) {
             errorSign.setVisibility(View.INVISIBLE);
@@ -60,7 +76,12 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public void afterSync(Bitmap result) {
-        progressBar.setVisibility(View.INVISIBLE);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.setProgressBarIndeterminateVisibility(false);
+            }
+        });
 
         if (result != null) {
             errorSign.setVisibility(View.INVISIBLE);
@@ -115,7 +136,13 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
         if (vehicleOverlay != null) {
             vehicleOverlay.remove();
         }
-        progressBar.setVisibility(View.INVISIBLE);
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.setProgressBarIndeterminateVisibility(false);
+            }
+        });
+
         errorSign.setVisibility(View.INVISIBLE);
     }
 }

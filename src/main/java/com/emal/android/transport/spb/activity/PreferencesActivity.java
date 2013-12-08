@@ -14,6 +14,7 @@ public class PreferencesActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getActionBar().setHomeButtonEnabled(true);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle(R.string.settings);
 
         getFragmentManager().beginTransaction()
