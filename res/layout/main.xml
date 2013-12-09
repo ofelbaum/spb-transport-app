@@ -1,46 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout android:id="@+id/layout" xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <RelativeLayout android:id="@+id/layout" xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent">
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:id="@+id/map"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  class="com.emal.android.transport.spb.activity.TouchableMapFragment"/>
+
+        <LinearLayout
+                android:id="@+id/errorSignLayout"
+                android:orientation="vertical"
                 android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
+                android:layout_height="50dp" android:layout_alignLeft="@+id/map"
+                android:layout_alignParentTop="false" android:layout_alignParentBottom="true"
+                android:layout_margin="10dp" android:visibility="invisible">
+            <ImageView android:layout_width="30dp" android:layout_height="30dp" android:id="@+id/errorSign"
+                       android:src="@drawable/indicator_input_error" android:layout_alignParentLeft="false"
+                       android:layout_alignParentTop="false" android:layout_alignParentBottom="false"
+                       android:layout_alignParentRight="false" android:layout_centerInParent="true"
+                       android:visibility="visible" android:layout_gravity="center"
+                       android:layout_weight="30"/>
 
-    <com.emal.android.transport.spb.map.ExtendedMapView
-            android:id="@+id/mapView"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:enabled="true"
-            android:clickable="true"
-            android:apiKey="${google.maps.key}"
-            />
-
-    <LinearLayout android:id="@+id/zoom"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_alignParentBottom="true"
-                  android:layout_centerHorizontal="true"
-            />
-
-    <ProgressBar android:id="@+id/progressBar" android:layout_width="wrap_content" android:layout_height="wrap_content"
-                 android:indeterminateOnly="true"
-                 android:indeterminateDrawable="@drawable/progress_bar_ring"
-                 android:layout_alignRight="@+id/mapView" android:layout_alignTop="@+id/mapView"
-                 android:layout_margin="10dp" android:indeterminate="false"/>
-
-    <RelativeLayout
-            android:id="@+id/errorSignLayout"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_alignTop="@+id/progressBar"
-            android:visibility="invisible" android:layout_alignRight="@+id/progressBar"
-            android:layout_alignParentTop="false" android:layout_alignParentLeft="false"
-            android:layout_alignParentBottom="false" android:layout_alignParentRight="false"
-            android:layout_alignWithParentIfMissing="false" android:clickable="false">
-        <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/errorSign"
-                android:src="@drawable/indicator_input_error"
-                android:layout_margin="13dp"/>
-
+        </LinearLayout>
     </RelativeLayout>
 
-</RelativeLayout>
+    <ListView
+            android:id="@+id/left_drawer"
+            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="left"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:background="#ee444444">
+    </ListView>
+</android.support.v4.widget.DrawerLayout>

@@ -3,7 +3,6 @@ package com.emal.android.transport.spb.model;
 import android.content.SharedPreferences;
 import android.util.Log;
 import com.emal.android.transport.spb.MapProviderType;
-import com.emal.android.transport.spb.map.MapUtils;
 import com.emal.android.transport.spb.utils.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.maps.GeoPoint;
@@ -16,6 +15,9 @@ import java.util.Set;
  * Date: 5/18/13 2:38 AM
  */
 public class ApplicationParams {
+    public static final int SPB_CENTER_LAT_DEF_VALUE = (int) (59.95f * 1E6);
+    public static final int SPB_CENTER_LONG_DEF_VALUE = (int) (30.316667f * 1E6);
+
     private static final String TAG = "ApplicationParams";
     private SharedPreferences sharedPreferences;
     private boolean showBus = false;
@@ -40,12 +42,12 @@ public class ApplicationParams {
         this.showTraffic = sharedPreferences.getBoolean(Constants.SHOW_TRAFFIC_FLAG, false);
         this.syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
 
-        Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, MapUtils.SPB_CENTER_LAT_DEF_VALUE);
-        Integer homeLong = sharedPreferences.getInt(Constants.HOME_LOC_LONG_FLAG, MapUtils.SPB_CENTER_LONG_DEF_VALUE);
+        Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, SPB_CENTER_LAT_DEF_VALUE);
+        Integer homeLong = sharedPreferences.getInt(Constants.HOME_LOC_LONG_FLAG, SPB_CENTER_LONG_DEF_VALUE);
         this.homeLocation = new GeoPoint(homeLat, homeLong);
 
-        Integer currLat = sharedPreferences.getInt(Constants.LAST_LOC_LAT_FLAG, MapUtils.SPB_CENTER_LAT_DEF_VALUE);
-        Integer currLong = sharedPreferences.getInt(Constants.LAST_LOC_LONG_FLAG, MapUtils.SPB_CENTER_LONG_DEF_VALUE);
+        Integer currLat = sharedPreferences.getInt(Constants.LAST_LOC_LAT_FLAG, SPB_CENTER_LAT_DEF_VALUE);
+        Integer currLong = sharedPreferences.getInt(Constants.LAST_LOC_LONG_FLAG, SPB_CENTER_LONG_DEF_VALUE);
         this.lastLocation = new GeoPoint(currLat, currLong);
 
         this.satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, false);

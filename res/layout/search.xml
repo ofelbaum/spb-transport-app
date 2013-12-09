@@ -25,7 +25,7 @@
                 android:id="@+id/searchResultView" android:layout_gravity="center_vertical|top"/>
     </LinearLayout>
     <View android:id="@+id/separator"
-          android:background="#ffffff"
+          android:background="@android:color/darker_gray"
           android:layout_width="fill_parent"
           android:layout_height="1dip"
           android:layout_above="@+id/selectedRoutes"/>

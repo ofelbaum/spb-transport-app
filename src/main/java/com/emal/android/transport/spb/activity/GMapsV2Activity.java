@@ -82,7 +82,7 @@ public class GMapsV2Activity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        setContentView(R.layout.gmapsv2);
+        setContentView(R.layout.main);
 
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 new BroadcastReceiver() {
@@ -102,7 +102,7 @@ public class GMapsV2Activity extends FragmentActivity {
         mDrawerList = (ListView) findViewById(com.emal.android.transport.spb.R.id.left_drawer);
 
         // set activity custom shadow that overlays the main content when the drawer opens
-        mDrawerLayout.setDrawerShadow(com.emal.android.transport.spb.R.drawable.drawer_shadow, GravityCompat.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         // set up the drawer's list view with items and click listener
 
         MenuModel menuModel = new MenuModel(getResources());
@@ -163,7 +163,7 @@ public class GMapsV2Activity extends FragmentActivity {
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
-                com.emal.android.transport.spb.R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
+                R.drawable.ic_drawer,  /* nav drawer image to replace 'Up' caret */
                 com.emal.android.transport.spb.R.string.drawer_open,  /* "open drawer" description for accessibility */
                 com.emal.android.transport.spb.R.string.drawer_close  /* "close drawer" description for accessibility */
         ) {
@@ -182,21 +182,6 @@ public class GMapsV2Activity extends FragmentActivity {
         appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
         setUpMapIfNeeded();
 
-        ImageView settingButton = (ImageView) findViewById(R.id.settingsButton);
-        settingButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(), PreferencesActivity.class));
-            }
-        });
-
-        ImageView myPlaceButton = (ImageView) findViewById(R.id.myPlaceButton);
-        myPlaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                moveToLocation(appParams.getHomeLocation());
-            }
-        });
         errorSignLayout = mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.errorSignLayout);
         errorSignLayout.setOnClickListener(new ErrorSignOnClickListener(errorSignLayout));
 
