@@ -13,22 +13,6 @@
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   class="com.emal.android.transport.spb.activity.TouchableMapFragment"/>
-
-        <LinearLayout
-                android:id="@+id/errorSignLayout"
-                android:orientation="vertical"
-                android:layout_width="fill_parent"
-                android:layout_height="50dp" android:layout_alignLeft="@+id/map"
-                android:layout_alignParentTop="false" android:layout_alignParentBottom="true"
-                android:layout_margin="10dp" android:visibility="invisible">
-            <ImageView android:layout_width="30dp" android:layout_height="30dp" android:id="@+id/errorSign"
-                       android:src="@drawable/indicator_input_error" android:layout_alignParentLeft="false"
-                       android:layout_alignParentTop="false" android:layout_alignParentBottom="false"
-                       android:layout_alignParentRight="false" android:layout_centerInParent="true"
-                       android:visibility="visible" android:layout_gravity="center"
-                       android:layout_weight="30"/>
-
-        </LinearLayout>
     </RelativeLayout>
 
     <ListView

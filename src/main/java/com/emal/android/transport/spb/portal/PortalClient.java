@@ -1,6 +1,6 @@
 package com.emal.android.transport.spb.portal;
 
-import com.emal.android.transport.spb.VehicleTracker;
+import android.util.Log;
 import com.emal.android.transport.spb.VehicleType;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -16,6 +16,7 @@ import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.entity.BufferedHttpEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
@@ -24,6 +25,7 @@ import org.apache.http.params.*;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.*;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -35,65 +37,88 @@ import java.util.regex.Pattern;
  */
 public class PortalClient {
     private static final String SCOPE_PARAM_PATTERN = "(?:.*(scope:.\"))([a-zA-Z0-9+/]*)(?:\".*)";
-    private static final String TAG = PortalClient.class.getName();
+    private static final String TAG = PortalClient.class.getSimpleName();
     private static String GET_ROUTES_LIST_QUERY = "http://transport.orgp.spb.ru/Portal/transport/routes/list";
     private static String GET_STOPS_LIST_QUERY = "http://transport.orgp.spb.ru/Portal/transport/stops/list";
     private static String GET_ROUTE_QUERY = "http://transport.orgp.spb.ru/Portal/transport/route/%s";
     private static String GET_ROUTE_INFO_QUERY = "http://transport.orgp.spb.ru/Portal/transport/mapx/innerRouteVehicle?ROUTE={1}&SCOPE={2}&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetFeature&SRS=EPSG%3A900913&LAYERS=&WHEELCHAIRONLY=false&_OLSALT=0.6481046043336391&BBOX={3}";
-//    private static String GET_ROUTE_INFO_QUERY2 = "http://transport.orgp.spb.ru/Portal/transport/map/poi?ROUTE={1}&REQUEST=GetFeature&_=1385406049565";
+    //    private static String GET_ROUTE_INFO_QUERY2 = "http://transport.orgp.spb.ru/Portal/transport/map/poi?ROUTE={1}&REQUEST=GetFeature&_=1385406049565";
 //    http://transport.orgp.spb.ru/Portal/transport/route/1504/stops/direct
 //    http://transport.orgp.spb.ru/Portal/transport/route/1504/stops/return
+    private List<Route> allRoutes;
 
-    public static final String BBOX = "3236938.2945543,8256172.549016,3492103.4398571,8480968.3457368";
-
-    private DefaultHttpClient httpClient;
+    private static final String BBOX = "3236938.2945543,8256172.549016,3492103.4398571,8480968.3457368";
+    private HttpClient scopeBasedHttpClient;
+    private HttpClient defaultHttpClient;
     private String scope;
+    private static PortalClient instance = new PortalClient();
 
-    public PortalClient() {
+    public static PortalClient getInstance() {
+        return instance;
+    }
+
+    private PortalClient() {
+        Log.d(TAG, "Constructor");
+    }
+
+    public synchronized InputStream doGet(String address) throws IOException {
+        if (defaultHttpClient == null) {
+            SchemeRegistry schemeRegistry = new SchemeRegistry();
+            schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+
+            HttpParams params = new BasicHttpParams();
+            params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 6);
+            params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new ConnPerRouteBean(3));
+            params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
+            params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
+            int timeoutConnection = 5000;
+            HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
+            int timeoutSocket = 5000;
+            HttpConnectionParams.setSoTimeout(params, timeoutSocket);
+
+            HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+
+            ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+            defaultHttpClient = new DefaultHttpClient(cm, params);
+            ((DefaultHttpClient) defaultHttpClient).setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
+
+        }
+        HttpGet httpRequest = new HttpGet(URI.create(address));
+        httpRequest.setHeader("User-Agent", "Mozilla/5.0 (X11; Linux i686)");
+        HttpResponse response = defaultHttpClient.execute(httpRequest);
+        HttpEntity entity = response.getEntity();
+        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+        return bufHttpEntity.getContent();
+    }
+
+    private HttpClient getScopeBasedHttpClient() {
         BasicHttpParams params = new BasicHttpParams();
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
-        httpClient = new DefaultHttpClient(cm, params);
+        return new DefaultHttpClient(cm, params);
     }
 
-    //TODO
-    public HttpClient getHttpClient() {
-        DefaultHttpClient httpClient = null;
-        if (httpClient == null) {
-            synchronized (VehicleTracker.class) {
-                if (httpClient == null) {
-                    SchemeRegistry schemeRegistry = new SchemeRegistry();
-                    schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+    public synchronized VehicleCollection getRouteData(String route) throws IOException {
+        Log.d(TAG, "getRouteData for route:" + route);
 
-                    HttpParams params = new BasicHttpParams();
-                    params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 6);
-                    params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new ConnPerRouteBean(3));
-                    params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
-                    params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
-                    int timeoutConnection = 5000;
-                    HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
-                    int timeoutSocket = 5000;
-                    HttpConnectionParams.setSoTimeout(params, timeoutSocket);
-
-                    HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
-
-                    ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
-                    httpClient = new DefaultHttpClient(cm, params);
-                    ((DefaultHttpClient)httpClient).setHttpRequestRetryHandler(new DefaultHttpRequestRetryHandler(0, false));
-                }
-            }
-        }
-        return httpClient;
-    }
-
-
-    public VehicleCollection getRouteData(String route, String bbox) throws IOException {
         HttpResponse httpResponse;
         String content;
-        if (scope == null || scope.length() == 0) {
+
+        Log.d(TAG, "Get client: " + scopeBasedHttpClient + "scope:" + scope);
+
+        if (scopeBasedHttpClient == null) {
+            Log.d(TAG, "Creating http client for route: " + route);
+
+            BasicHttpParams params = new BasicHttpParams();
+            SchemeRegistry schemeRegistry = new SchemeRegistry();
+            schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+            ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
+
+            scopeBasedHttpClient = new DefaultHttpClient(cm, params);
+
             HttpGet httppost = new HttpGet(String.format(GET_ROUTE_QUERY, route));
-            httpResponse = httpClient.execute(httppost);
+            httpResponse = scopeBasedHttpClient.execute(httppost);
             content = readResponse(httpResponse);
 
             Pattern p = Pattern.compile(SCOPE_PARAM_PATTERN);
@@ -101,6 +126,7 @@ public class PortalClient {
 
             while (m.find()) {
                 scope = URLEncoder.encode(m.group(2), "UTF-8");
+                Log.d(TAG, "Creating scope for route: " + route);
                 break;
             }
 
@@ -109,12 +135,13 @@ public class PortalClient {
             }
         }
 
-        String format = GET_ROUTE_INFO_QUERY.replace("{1}", route).replace("{2}", scope).replace("{3}", bbox);
+        String format = GET_ROUTE_INFO_QUERY.replace("{1}", route).replace("{2}", scope).replace("{3}", BBOX);
         HttpGet httpGet = new HttpGet(format);
 
-        httpResponse = httpClient.execute(httpGet);
+        httpResponse = scopeBasedHttpClient.execute(httpGet);
         content = readResponse(httpResponse);
 
+        Log.d(TAG, "Route: " + route + " Scope:" + scope + " \nContent=" + content);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readValue(content, VehicleCollection.class);
     }
@@ -128,7 +155,7 @@ public class PortalClient {
             inputStream = httpEntity.getContent();
             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
             String strLine;
-            while ((strLine = br.readLine()) != null)   {
+            while ((strLine = br.readLine()) != null) {
                 respBuf.append(strLine);
             }
         } catch (IOException e) {
@@ -145,17 +172,16 @@ public class PortalClient {
         return respBuf.toString();
     }
 
-
     public List<Route> findAllRoutes() throws IOException {
-        return findRoutes("");
-    }
-
-    public List<Route> findRoutes(String s) throws IOException {
-        return findRoutes(s, VehicleType.values());
+        if (allRoutes == null) {
+            Log.d(TAG, "Retrieving all routes");
+            allRoutes = internalFindRoutes("", VehicleType.values());
+        }
+        return allRoutes;
     }
 
     public Route findRoute(String id, String number) throws IOException {
-        List<Route> routes = findRoutes(number);
+        List<Route> routes = internalFindRoutes(number, VehicleType.values());
         for (Route route : routes) {
             if (id.equals(route.getId())) {
                 return route;
@@ -164,11 +190,11 @@ public class PortalClient {
         return null;
     }
 
-    public List<Route> findRoutes(String s, VehicleType... types) throws IOException {
+    private List<Route> internalFindRoutes(String s, VehicleType... types) throws IOException {
         HttpPost httppost = new HttpPost(GET_ROUTES_LIST_QUERY);
         httppost.setEntity(getRoutesFormParams(s, types));
 
-        HttpResponse httpResponse = httpClient.execute(httppost);
+        HttpResponse httpResponse = getScopeBasedHttpClient().execute(httppost);
         String content = readResponse(httpResponse);
 
         ObjectMapper mapper = new ObjectMapper();
@@ -180,28 +206,12 @@ public class PortalClient {
         HttpPost httppost = new HttpPost(GET_STOPS_LIST_QUERY);
         httppost.setEntity(getStopsFormParams());
 
-        HttpResponse httpResponse = httpClient.execute(httppost);
+        HttpResponse httpResponse = getScopeBasedHttpClient().execute(httppost);
         String content = readResponse(httpResponse);
 
         ObjectMapper mapper = new ObjectMapper();
         StopResponse stopResponse = mapper.readValue(content, StopResponse.class);
         return stopResponse.getAaData();
-    }
-
-    public Map<String, List<Route>> getRoutesIndex(List<Route> routeList) {
-        Map<String, List<Route>> routesIndex = new HashMap<String, List<Route>>();
-
-        for (Route route : routeList) {
-            String routeNumber = route.getRouteNumber();
-
-            List<Route> routes = routesIndex.get(routeNumber);
-            if (routes == null) {
-                routes = new ArrayList<Route>();
-                routesIndex.put(routeNumber, routes);
-            }
-            routes.add(route);
-        }
-        return routesIndex;
     }
 
     private static UrlEncodedFormEntity getRoutesFormParams(String routerNumber, VehicleType... types) throws UnsupportedEncodingException {
@@ -266,5 +276,12 @@ public class PortalClient {
 
 
         return new UrlEncodedFormEntity(formparams, "UTF-8");
+    }
+
+    public void reset() {
+        Log.d(TAG, "Reset portal client");
+        allRoutes = null;
+        scopeBasedHttpClient = null;
+        defaultHttpClient = null;
     }
 }

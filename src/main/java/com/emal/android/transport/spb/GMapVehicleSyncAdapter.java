@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
-import android.view.View;
+import com.emal.android.transport.spb.utils.ErrorSignCallback;
 import com.emal.android.transport.spb.utils.GeoConverter;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
@@ -17,14 +17,14 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private static final String TAG = GMapVehicleSyncAdapter.class.getName();
     private Activity activity;
     private SupportMapFragment mapFragment;
-    private View errorSign;
     private GroundOverlay vehicleOverlay;
     private LatLngBounds latLngBounds;
+    private ErrorSignCallback errorSignCallback;
 
-    public GMapVehicleSyncAdapter(Activity activity, SupportMapFragment mapFragment) {
+    public GMapVehicleSyncAdapter(Activity activity, SupportMapFragment mapFragment, ErrorSignCallback callback) {
         this.activity = activity;
         this.mapFragment = mapFragment;
-        this.errorSign = mapFragment.getActivity().findViewById(com.emal.android.transport.spb.R.id.errorSignLayout);
+        this.errorSignCallback = callback;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
                 activity.setProgressBarIndeterminateVisibility(true);
             }
         });
-        if (errorSign.getVisibility() == View.INVISIBLE) {
+        if (errorSignCallback.isShowed()) {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -61,13 +61,12 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
         });
 
         if (Boolean.TRUE.equals(result)) {
-            errorSign.setVisibility(View.INVISIBLE);
-
+            errorSignCallback.hide();
         } else {
             new Handler().postAtTime(new Runnable() {
                 @Override
                 public void run() {
-                    errorSign.setVisibility(View.VISIBLE);
+                    errorSignCallback.show();
                 }
             }, 1000);
         }
@@ -84,7 +83,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
         });
 
         if (result != null) {
-            errorSign.setVisibility(View.INVISIBLE);
+            errorSignCallback.hide();
 
             BitmapFactory.Options o2 = new BitmapFactory.Options();
             o2.inSampleSize=4;
@@ -105,7 +104,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
             new Handler().postAtTime(new Runnable() {
                 @Override
                 public void run() {
-                    errorSign.setVisibility(View.VISIBLE);
+                    errorSignCallback.show();
                 }
             }, 1000);
         }
@@ -143,6 +142,6 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
             }
         });
 
-        errorSign.setVisibility(View.INVISIBLE);
+        errorSignCallback.hide();
     }
 }

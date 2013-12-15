@@ -41,18 +41,22 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
         List<Vehicle> list = null;
         try {
             Log.d(TAG, "Get vehicles fro route: " + route);
-            VehicleCollection routeData = portalClient.getRouteData(route.getId(), PortalClient.BBOX);
+            VehicleCollection routeData = portalClient.getRouteData(route.getId());
             list = routeData.getList();
             Log.d(TAG, "Found vehicles size: " + list.size());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return list != null ? list : Collections.EMPTY_LIST;
+        return list;
     }
 
     @Override
     protected void onPostExecute(List<Vehicle> vehicles) {
-        Log.d(TAG, "Found new vehciles size: " + vehicles.size());
+        if (vehicles == null) {
+            vehicleSyncAdapter.afterSync(false);
+            return;
+        }
+        Log.d(TAG, "Found new vehicles size: " + vehicles.size());
         Collection<Marker> routeMarkers = new ArrayList<Marker>(markers.values());
         Log.d(TAG, "Found markers " + routeMarkers.size() + " for route " + route);
 

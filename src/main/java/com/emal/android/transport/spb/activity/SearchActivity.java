@@ -19,6 +19,7 @@ import com.emal.android.transport.spb.portal.Route;
 import com.emal.android.transport.spb.utils.*;
 
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -27,16 +28,13 @@ import java.util.*;
  */
 public class SearchActivity extends Activity {
     private static final String TAG = SearchActivity.class.getName();
-    public static final String SEARCH_INTEND_ID = TAG;
     private SearchView searchView;
     private ListView listView;
     private AsyncTask searchTask;
-    private PortalClient portalClient;
-    private Activity _this;
-    public static final String ROUTE_DATA_KEY = "ROUTE_DATA";
+    private PortalClient portalClient = PortalClient.getInstance();
     public static final String SELECTED_ROUTES = "SELECTED_ROUTES";
     private ApplicationParams appParams;
-    private RoutesStorage routesStorage = new RoutesStorage();
+    private RoutesStorage routesStorage = new RoutesStorage();;
     private List<Route> findedRoutes;
     private Set<Route> selectedRoutes;
     private LinearLayout selectedRoutesPics;
@@ -44,7 +42,6 @@ public class SearchActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        _this = this;
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         setContentView(R.layout.search);
@@ -54,7 +51,6 @@ public class SearchActivity extends Activity {
 
         appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
 
-        portalClient = new PortalClient();
         searchView = (SearchView) findViewById(R.id.searchView);
         searchView.setIconified(false);
         listView = (ListView) findViewById(R.id.searchResultView);
@@ -86,10 +82,6 @@ public class SearchActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Route route = findedRoutes.get(position);
-//                Intent mapIntent = new Intent(SEARCH_INTEND_ID);
-//                mapIntent.putExtra(ROUTE_DATA_KEY, findedRoutes.get(position));
-//                LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(mapIntent);
-//                finish();
                 Set<String> routesToTrack = appParams.getRoutesToTrack();
                 String encode = Route.encode(route);
                 if (!routesToTrack.contains(encode)) {
@@ -106,6 +98,12 @@ public class SearchActivity extends Activity {
         selectedRoutes = new HashSet<Route>(routes);
 
         initIndex();
+    }
+
+    @Override
+    protected void onPause() {
+        appParams.saveAll();
+        super.onPause();
     }
 
     private void queryAndShowResult(String newText) {
@@ -135,7 +133,8 @@ public class SearchActivity extends Activity {
                 imageView.setImageBitmap(null);
                 selectedRoutesPics.removeView(imageView);
                 selectedRoutesPics.refreshDrawableState();
-                appParams.getRoutesToTrack().remove(Route.encode(next));
+                Boolean res = appParams.getRoutesToTrack().remove(Route.encode(next));
+                Log.d(TAG, res.toString());
             }
         });
         selectedRoutesPics.addView(imageView);
@@ -175,7 +174,7 @@ public class SearchActivity extends Activity {
             List<Route> routes;
             try {
                 routes = portalClient.findAllRoutes();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
                 return null;
             }
@@ -196,8 +195,7 @@ public class SearchActivity extends Activity {
                 UIHelper.getErrorDialog(listView.getContext());
                 return;
             }
-            routesStorage.setRouteList(list);
-            findedRoutes = list;
+            findedRoutes = routesStorage.rebuildStorage(list, appParams.getSelectedVehicleTypes());
             queryAndShowResult(searchView.getQuery().toString());
         }
     }

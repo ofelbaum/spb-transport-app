@@ -1,10 +1,10 @@
 package com.emal.android.transport.spb.task;
 
 import android.os.AsyncTask;
-import android.view.View;
 import com.emal.android.transport.spb.VehicleTracker;
 import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.portal.Route;
+import com.emal.android.transport.spb.utils.ErrorSignCallback;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -17,16 +17,16 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
     private Collection<String> routesToTrack;
     private PortalClient portalClient;
     private VehicleTracker vehicleTracker;
-    private View errorSignLayout;
+    private ErrorSignCallback errorSignCallback;
 
     public LoadTrackRoutesTask(Collection<String> routesToTrack,
                                PortalClient portalClient,
                                VehicleTracker vehicleTracker,
-                               View errorSignLayout) {
+                               ErrorSignCallback errorSignCallback) {
         this.routesToTrack = routesToTrack;
         this.portalClient = portalClient;
         this.vehicleTracker = vehicleTracker;
-        this.errorSignLayout = errorSignLayout; //TODO remove it
+        this.errorSignCallback = errorSignCallback;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
         if (Boolean.TRUE.equals(o)) {
             vehicleTracker.syncVehicles();
         } else {
-            errorSignLayout.setVisibility(View.VISIBLE);
+            errorSignCallback.show();
         }
     }
 }

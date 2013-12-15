@@ -6,16 +6,10 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.VehicleType;
+import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.utils.Constants;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.entity.BufferedHttpEntity;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -26,15 +20,15 @@ import java.util.Set;
 public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
     private static final String TAG = SyncVehiclePositionTask.class.getName();
 
-    private HttpClient httpClient;
+    private PortalClient portalClient;
     private VehicleSyncAdapter vehicleSyncAdapter;
     private String vehiclesStr;
     private boolean clearBeforeUpdate = false;
     private Set<VehicleType> vehicleTypes;
 
-    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<VehicleType> vehicleTypes, boolean clearBeforeUpdate, HttpClient httpClient) {
+    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<VehicleType> vehicleTypes, boolean clearBeforeUpdate, PortalClient portalClient) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;
-        this.httpClient = httpClient;
+        this.portalClient = portalClient;
         this.clearBeforeUpdate = clearBeforeUpdate;
         this.vehicleTypes = vehicleTypes;
     }
@@ -67,7 +61,7 @@ public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
         Log.d(TAG, "Download " + vehiclesStr + " START for " + Thread.currentThread().getName());
 
         try {
-            InputStream in = fetch(url);
+            InputStream in = portalClient.doGet(url);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 1;
             Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
@@ -82,15 +76,6 @@ public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
             double duration = (System.currentTimeMillis() - start) / 1000d;
             Log.d(TAG, "Download " + vehiclesStr + " FINISHED takes " + duration + " sec for " + Thread.currentThread().getName());
         }
-    }
-
-    private InputStream fetch(String address) throws IOException {
-        HttpGet httpRequest = new HttpGet(URI.create(address));
-        httpRequest.setHeader("User-Agent","Mozilla/5.0 (X11; Linux i686)");
-        HttpResponse response = httpClient.execute(httpRequest);
-        HttpEntity entity = response.getEntity();
-        BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
-        return bufHttpEntity.getContent();
     }
 
     @Override

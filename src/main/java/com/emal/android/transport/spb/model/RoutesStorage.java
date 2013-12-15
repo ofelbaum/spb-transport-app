@@ -1,5 +1,6 @@
 package com.emal.android.transport.spb.model;
 
+import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.portal.Route;
 
 import java.util.*;
@@ -11,11 +12,20 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class RoutesStorage {
     private List<Route> routeList;
+    private List<VehicleType> types;
     private Map<String, List<Route>> index = new ConcurrentHashMap<String, List<Route>>(100);
 
-    public void setRouteList(List<Route> routeList) {
-        this.routeList = routeList;
+    public List<Route> rebuildStorage(List<Route> routes, List<VehicleType> types) {
+        this.routeList = new ArrayList<Route>();
+        this.types = types;
+        for (Route route : routes) {
+            if (!types.contains(route.getTransportType())) {
+                continue;
+            }
+            routeList.add(route);
+        }
         buildIndex();
+        return routeList;
     }
 
     private void buildIndex() {

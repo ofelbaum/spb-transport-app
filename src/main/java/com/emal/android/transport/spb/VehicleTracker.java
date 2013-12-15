@@ -53,7 +53,8 @@ public class VehicleTracker {
         return new ArrayList<Route>(routeTaskMap.keySet());
     }
 
-    public void stopTrackAllRoutes() {
+    private void stopTrackAllRoutes() {
+        Log.d(TAG, "stopTrackAllRoutes <<");
         for (Map.Entry<Route, AsyncTask> task : routeTaskMap.entrySet()) {
             Route key = task.getKey();
             AsyncTask value = task.getValue();
@@ -69,6 +70,7 @@ public class VehicleTracker {
             }
         }
         routeTaskMap.clear();
+        Log.d(TAG, "stopTrackAllRoutes >>");
     }
 
     public void syncVehicles() {
@@ -76,13 +78,14 @@ public class VehicleTracker {
     }
 
     public void syncVehicles(boolean clearBeforeUpdate) {
+        Log.d(TAG, "syncVehicles <<");
         if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
             Log.d(TAG, "Reschedule vehicleTypes");
             syncTypesTask.cancel(true);
         }
         if (!vehicleTypes.isEmpty() && routeTaskMap.isEmpty()) {
             Log.d(TAG, "Scheduling typed layout for types: " + vehicleTypes);
-            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate, portalClient.getHttpClient());
+            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate, portalClient);
             syncTypesTask.execute();
         }
 
@@ -104,6 +107,7 @@ public class VehicleTracker {
             routeTaskMap.put(route, value);
 
         }
+        Log.d(TAG, "syncVehicles >>");
     }
 
     public void stopTracking() {

@@ -3,12 +3,12 @@ package com.emal.android.transport.spb.model;
 import android.content.SharedPreferences;
 import android.util.Log;
 import com.emal.android.transport.spb.MapProviderType;
+import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.utils.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.maps.GeoPoint;
 
-import java.util.Collections;
-import java.util.Set;
+import java.util.*;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -145,7 +145,29 @@ public class ApplicationParams {
     }
 
     public Set<String> getRoutesToTrack() {
+        Log.d(TAG, "getRoutesToTrack");
+        for (String s : routesToTrack) {
+            Log.d(TAG, s);
+        }
         return routesToTrack;
+    }
+
+    public List<VehicleType> getSelectedVehicleTypes() {
+        List<VehicleType> list = new ArrayList<VehicleType>();
+        if (isShowBus()) {
+            list.add(VehicleType.BUS);
+        }
+        if (isShowTram()) {
+            list.add(VehicleType.TRAM);
+        }
+        if (isShowTrolley()) {
+            list.add(VehicleType.TROLLEY);
+        }
+        if (isShowShip()) {
+            list.add(VehicleType.SHIP);
+        }
+
+        return list;
     }
 
     public void saveAll() {
