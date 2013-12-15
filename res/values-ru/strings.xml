@@ -21,7 +21,7 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Выберите частоту (сек)</string>
     <string name="info">Информация</string>
-    <string name="version">версия 1.5</string>
+    <string name="version">версия 2.0</string>
     <string name="copyright">&#169; 2013 Алексей Емельяненко</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Установить закладку на %1$s?</string>
@@ -45,6 +45,7 @@
     <string name="selected_routes">Выбранные маршруты</string>
     <string name="clear_selection">Очистить</string>
     <string name="search_page">Поиск</string>
+    <string name="feedback">Отзыв</string>
     <string-array name="sync_string_array">
         <item>5 сек</item>
         <item>10 сек</item>
@@ -72,6 +73,5 @@
         <item>Закладка</item>
         <item>Настройки</item>
         <item>Информация</item>
-        <item>Оставить отзыв</item>
     </string-array>
 </resources>

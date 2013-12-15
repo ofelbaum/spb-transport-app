@@ -21,7 +21,7 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Choose refresh period (sec)</string>
     <string name="info">Information</string>
-    <string name="version">1.5</string>
+    <string name="version">2.0</string>
     <string name="copyright">&#169; 2013 Alexey Emelyanenko</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Add my place at %1$s?</string>
@@ -97,14 +97,13 @@
         <item>My Place</item>
         <item>Settings</item>
         <item>Info</item>
-        <item>Feedback</item>
     </string-array>
     <array name="menu_items_icon_array">
         <item>@android:drawable/ic_menu_search</item>
         <item>@android:drawable/ic_menu_myplaces</item>
         <item>@android:drawable/ic_menu_preferences</item>
         <item>@android:drawable/ic_menu_info_details</item>
-        <item>@android:drawable/ic_menu_edit</item>
+        <item></item>
         <item></item>
     </array>
     <string name="drawer_open">Open menu</string>
@@ -115,5 +114,6 @@
     <string name="show_traffic">Show Traffic</string>
     <string name="selected_routes">Selected Routes</string>
     <string name="clear_selection">Clear</string>
+    <string name="feedback">Feedback</string>
 
 </resources>

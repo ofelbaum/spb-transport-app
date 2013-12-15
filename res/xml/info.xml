@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:layout_height="fill_parent"
+                  android:layout_width="fill_parent">
+    <PreferenceCategory
+            android:title="@string/info"
+            android:key="pref_info">
+        <Preference
+                android:key="pref_version"
+                android:selectable="true"
+                android:summary="@string/version"
+                android:title="@string/version_title"/>
+        <Preference
+                android:key="pref_feedback"
+                android:selectable="true"
+                android:title="@string/feedback"/>
+        <Preference
+                android:key="pref_copyright"
+                android:selectable="true"
+                android:summary="@string/copyright"
+                android:title="@string/copyright_title"/>
+    </PreferenceCategory>
+</PreferenceScreen>

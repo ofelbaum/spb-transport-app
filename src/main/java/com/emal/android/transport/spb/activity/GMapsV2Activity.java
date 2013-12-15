@@ -103,7 +103,6 @@ public class GMapsV2Activity extends FragmentActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 switch (position) {
                     case 0: {
-
                         Intent intent = new Intent(GMapsV2Activity.this, SearchActivity.class);
                         intent.putExtra(SearchActivity.SELECTED_ROUTES, vehicleTracker.getTracked());
                         startActivity(intent);
@@ -117,26 +116,9 @@ public class GMapsV2Activity extends FragmentActivity {
                         startActivity(new Intent(getApplicationContext(), PreferencesActivity.class));
                         break;
                     }
-                    case 4: {
-                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.emal.android.transport.spb"));
-                        startActivity(browserIntent);
+                    case 3: {
+                        startActivity(new Intent(getApplicationContext(), InfoActivity.class));
                         break;
-                    }
-                    case 5: {
-                        //TODO remove
-                        switch (stopsMarkers.size()) {
-                            case 0: {
-                                AsyncTask asyncTask = new DrawStopsTask(portalClient, mMap, stopsMarkers);
-                                asyncTask.execute();
-
-                            }
-                            default: {
-                                for (Marker m : stopsMarkers) {
-                                    m.remove();
-                                }
-                                stopsMarkers.clear();
-                            }
-                        }
                     }
                 }
                 mDrawerLayout.closeDrawer(mDrawerList);

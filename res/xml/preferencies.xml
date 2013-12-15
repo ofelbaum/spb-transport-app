@@ -43,18 +43,4 @@
                 android:defaultValue="@string/notfound"
                 android:selectable="true"/>
     </PreferenceCategory>
-    <PreferenceCategory
-            android:title="@string/info"
-            android:key="pref_info">
-        <Preference
-                android:key="pref_version"
-                android:selectable="true"
-                android:summary="@string/version"
-                android:title="@string/version_title"/>
-        <Preference
-                android:key="pref_copyright"
-                android:selectable="true"
-                android:summary="@string/copyright"
-                android:title="@string/copyright_title"/>
-    </PreferenceCategory>
 </PreferenceScreen>

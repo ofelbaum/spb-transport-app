@@ -34,6 +34,7 @@
         </activity>
         <activity android:name=".activity.PreferencesActivity" />
         <activity android:name=".activity.SearchActivity" />
+        <activity android:name=".activity.InfoActivity" />
         <uses-library android:name="com.google.android.maps"/>
     </application>
 </manifest>
