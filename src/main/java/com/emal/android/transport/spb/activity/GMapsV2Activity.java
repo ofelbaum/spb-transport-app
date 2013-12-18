@@ -367,7 +367,6 @@ public class GMapsV2Activity extends FragmentActivity {
     @Override
     protected void onDestroy() {
         Log.d(TAG, "onDestroy");
-        portalClient.reset();
         super.onDestroy();
     }
 
@@ -375,6 +374,7 @@ public class GMapsV2Activity extends FragmentActivity {
     protected void onStop() {
         Log.d(TAG, "onStop");
         unregisterReceiver(networkStatusReceiver);
+        portalClient.reset();
         super.onStop();
     }
 

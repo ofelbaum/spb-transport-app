@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">St-Pete Bus</string>
+    <string name="app_name">SPB Bus Hound</string>
     <string name="satellite_view">Satellite</string>
     <string name="street_view">Street</string>
     <string name="vehicle_bus">Autobus</string>
