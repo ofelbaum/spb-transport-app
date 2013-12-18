@@ -67,7 +67,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
             LatLng homePoint = new LatLng(latitude, longtitude);
 
             VehicleProps properties = v.getProperties();
-            String stateNumber = properties.getStateNumber() + " @ " + properties.getVelocity() + " km/h";
+            String stateNumber = properties.getStateNumber() + " | " + properties.getVelocity() + " km/h";
 
             Bitmap bitmap = getVehicleBitmap(route, properties);
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
