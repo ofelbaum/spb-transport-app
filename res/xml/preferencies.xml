@@ -31,16 +31,18 @@
                 android:key="map_show_traffic"
                 android:defaultValue="false"
                 />
-        <ListPreference
-                android:title="@string/map_provider"
-                android:key="map_provider_type"
-                android:enabled="false"
-                android:entries="@array/map_provider_entries"
-                android:entryValues="@array/map_provider_values"/>
         <Preference
                 android:title="@string/my_place"
                 android:key="my_place"
                 android:defaultValue="@string/notfound"
                 android:selectable="true"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/app_params"
+                        android:key="pref_app_params">
+        <ListPreference
+                android:title="@string/app_theme"
+                android:key="app_theme"
+                android:entries="@array/app_theme_entries"
+                android:entryValues="@array/app_theme_values"/>
     </PreferenceCategory>
 </PreferenceScreen>

@@ -1,5 +1,7 @@
 package com.emal.android.transport.spb.activity;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.*;
@@ -9,6 +11,7 @@ import com.emal.android.transport.spb.R;
 import android.os.Bundle;
 import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.model.ApplicationParams;
+import com.emal.android.transport.spb.model.Theme;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.task.LoadAddressTask;
 
@@ -20,17 +23,17 @@ import java.util.*;
  */
 public class SettingsFragment extends PreferenceFragment implements SharedPreferences.OnSharedPreferenceChangeListener {
     private static final String TAG = SettingsFragment.class.getName();
-    private static final String MAP_PROVIDER_TYPE = "map_provider_type";
     private static final String MAP_SYNC_TIME = "map_sync_time";
     private static final String MAP_TYPE = "map_type";
     private static final String VEHICLE_TYPES = "vehicle_types";
     private static final String MY_PLACE = "my_place";
     private static final String MAP_SHOW_TRAFFIC = "map_show_traffic";
+    private static final String APP_THEME = "app_theme";
 
     private ListPreference syncTimePref;
     private MultiSelectListPreference vehicleTypes;
     private ListPreference mapTypePref;
-    private ListPreference mapProviderType;
+    private ListPreference appTheme;
     private ApplicationParams appParams;
     private Preference myPlace;
     private CheckBoxPreference showTraffic;
@@ -82,7 +85,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         syncTimePref = (ListPreference) findPreference(MAP_SYNC_TIME);
         this.vehicleTypes = (MultiSelectListPreference) findPreference(VEHICLE_TYPES);
         mapTypePref = (ListPreference) findPreference(MAP_TYPE);
-        mapProviderType = (ListPreference) findPreference(MAP_PROVIDER_TYPE);
+        appTheme = (ListPreference) findPreference(APP_THEME);
         myPlace= findPreference(MY_PLACE);
 
         showTraffic = (CheckBoxPreference) findPreference(MAP_SHOW_TRAFFIC);
@@ -96,9 +99,9 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         mapTypePref.setSummary(prefData.getValue());
         mapTypePref.setValueIndex(prefData.getIndex());
 
-        prefData = getEntryByValue(providerType.name(), R.array.map_provider_entries, R.array.map_provider_values);
-        mapProviderType.setSummary(prefData.getValue());
-        mapProviderType.setValueIndex(prefData.getIndex());
+        prefData = getEntryByValue(appParams.getTheme().name(), R.array.app_theme_entries, R.array.app_theme_values);
+        appTheme.setSummary(prefData.getValue());
+        appTheme.setValueIndex(prefData.getIndex());
 
         Set<VehicleType> vehicleTypes = new HashSet<VehicleType>();
         if (appParams.isShowBus()) {
@@ -163,10 +166,15 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "Choose key=" + key);
-        if (MAP_PROVIDER_TYPE.equals(key))
+        if (APP_THEME.equals(key))
         {
-            String res = setSummary(sharedPreferences, key, R.array.map_provider_entries, R.array.map_provider_values);
-            appParams.setMapProviderType(MapProviderType.valueOf(res));
+            String res = setSummary(sharedPreferences, key, R.array.app_theme_entries, R.array.app_theme_values);
+            Theme theme = Theme.valueOf(res);
+            appParams.setTheme(theme);
+            appParams.saveAll();
+            Activity activity = getActivity();
+            activity.finish();
+            activity.startActivity(new Intent(activity, activity.getClass()));
         }
         if (MAP_SYNC_TIME.equals(key))
         {

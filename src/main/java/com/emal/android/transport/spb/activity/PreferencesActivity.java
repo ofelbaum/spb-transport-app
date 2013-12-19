@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import com.emal.android.transport.spb.R;
+import com.emal.android.transport.spb.model.ApplicationParams;
+import com.emal.android.transport.spb.utils.Constants;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -13,6 +15,9 @@ public class PreferencesActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ApplicationParams appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
+        setTheme(appParams.getTheme().getCode());
         getActionBar().setHomeButtonEnabled(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle(R.string.settings);

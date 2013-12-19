@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @since 1.5
  */
 
-public class Route implements Serializable{
+public class Route implements Serializable, Comparable<Route>{
     private String id;
     private VehicleType transportType;
     private String routeNumber;
@@ -116,6 +116,15 @@ public class Route implements Serializable{
         this.forDisabled = routeBuilder.forDisabled;
         this.scheduleLinkColumn = routeBuilder.scheduleLinkColumn;
         this.mapLinkColumn = routeBuilder.mapLinkColumn;
+    }
+
+    @Override
+    public int compareTo(Route another) {
+        int res = routeNumber.compareTo(another.getRouteNumber());
+        if (res == 0) {
+            res = transportType.compareTo(another.getTransportType());
+        }
+        return res;
     }
 
     public static class RouteBuilder {

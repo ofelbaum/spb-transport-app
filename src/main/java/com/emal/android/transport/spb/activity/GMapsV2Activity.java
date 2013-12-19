@@ -26,8 +26,8 @@ import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.model.MenuItemAdapter;
 import com.emal.android.transport.spb.model.MenuModel;
+import com.emal.android.transport.spb.model.Theme;
 import com.emal.android.transport.spb.portal.*;
-import com.emal.android.transport.spb.task.DrawStopsTask;
 import com.emal.android.transport.spb.task.LoadTrackRoutesTask;
 import com.emal.android.transport.spb.utils.*;
 import com.google.android.gms.R;
@@ -67,6 +67,7 @@ public class GMapsV2Activity extends FragmentActivity {
     private Menu menu;
     private ErrorSignCallback errorSignCallback;
     private BroadcastReceiver networkStatusReceiver;
+    private Theme currentTheme;
 
     public class MapUpdateTimerTask extends TimerTask {
         @Override
@@ -80,9 +81,13 @@ public class GMapsV2Activity extends FragmentActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
+
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        currentTheme = appParams.getTheme();
+        setTheme(currentTheme.getCode());
         setContentView(R.layout.main);
 
         mTitle = mDrawerTitle = getTitle();
@@ -174,7 +179,6 @@ public class GMapsV2Activity extends FragmentActivity {
             }
         };
 
-        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
         setUpMapIfNeeded();
 
         initApplication();
@@ -328,6 +332,11 @@ public class GMapsV2Activity extends FragmentActivity {
         super.onResume();
         appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
 
+        if (currentTheme != appParams.getTheme()) {
+            finish();
+            this.startActivity(new Intent(this, this.getClass()));
+        }
+
         networkStatusReceiver = new BroadcastReceiver() {
             private boolean isConnected = false;
 
@@ -373,7 +382,11 @@ public class GMapsV2Activity extends FragmentActivity {
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop");
-        unregisterReceiver(networkStatusReceiver);
+        try {
+            unregisterReceiver(networkStatusReceiver);
+        } catch (Exception e) {
+            Log.d(TAG, "Exception during unregistration, Cause: " + e.getMessage());
+        }
         portalClient.reset();
         super.onStop();
     }

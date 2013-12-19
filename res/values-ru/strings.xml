@@ -21,7 +21,7 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Выберите частоту (сек)</string>
     <string name="info">Информация</string>
-    <string name="version">версия 2.0</string>
+    <string name="version">версия 2.0.1</string>
     <string name="copyright">&#169; 2013 Алексей Емельяненко</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Установить закладку на %1$s?</string>
@@ -46,6 +46,8 @@
     <string name="clear_selection">Очистить</string>
     <string name="search_page">Поиск</string>
     <string name="feedback">Отзыв</string>
+    <string name="app_params">Общие</string>
+    <string name="app_theme">Тема</string>
     <string-array name="sync_string_array">
         <item>5 сек</item>
         <item>10 сек</item>
@@ -66,6 +68,10 @@
         <item>Трамвай</item>
         <item>Троллейбус</item>
         <item>Аквабус</item>
+    </string-array>
+    <string-array name="app_theme_entries">
+        <item>Темная</item>
+        <item>Светлая</item>
     </string-array>
 
     <string-array name="menu_items_array">

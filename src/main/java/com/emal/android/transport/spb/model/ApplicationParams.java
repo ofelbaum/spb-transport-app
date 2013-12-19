@@ -9,6 +9,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.maps.GeoPoint;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -32,6 +33,7 @@ public class ApplicationParams {
     private GeoPoint homeLocation;
     private GeoPoint lastLocation;
     private Set<String> routesToTrack;
+    private Theme theme;
 
     public ApplicationParams(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
@@ -53,7 +55,9 @@ public class ApplicationParams {
         this.satView = sharedPreferences.getBoolean(Constants.SAT_VIEW_FLAG, false);
         this.mapProviderType = MapProviderType.getByValue(sharedPreferences.getString(Constants.MAP_PROVIDER_TYPE_FLAG, MapProviderType.GMAPSV2.name()));
         this.zoomSize = sharedPreferences.getInt(Constants.ZOOM_FLAG, Constants.DEFAULT_ZOOM_LEVEL);
-        this.routesToTrack = sharedPreferences.getStringSet(Constants.ROUTES_TO_TRACK, Collections.<String>emptySet());
+        Set<String> stringSet = sharedPreferences.getStringSet(Constants.ROUTES_TO_TRACK, Collections.<String>emptySet());
+        this.routesToTrack = new ConcurrentSkipListSet<String>(stringSet);
+        this.theme = Theme.valueOf(sharedPreferences.getString(Constants.THEME_FLAG, Theme.HOLO_LIGHT.name()));
     }
 
     public boolean isShowBus() {
@@ -145,7 +149,7 @@ public class ApplicationParams {
     }
 
     public Set<String> getRoutesToTrack() {
-        Log.d(TAG, "getRoutesToTrack");
+        Log.d(TAG, "getRoutesToTrack: " + routesToTrack.getClass().getCanonicalName());
         for (String s : routesToTrack) {
             Log.d(TAG, s);
         }
@@ -170,6 +174,14 @@ public class ApplicationParams {
         return list;
     }
 
+    public Theme getTheme() {
+        return theme;
+    }
+
+    public void setTheme(Theme theme) {
+        this.theme = theme;
+    }
+
     public void saveAll() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(Constants.SYNC_TIME_FLAG, syncTime);
@@ -186,6 +198,7 @@ public class ApplicationParams {
         editor.putInt(Constants.HOME_LOC_LONG_FLAG, homeLocation.getLongitudeE6());
         editor.putInt(Constants.ZOOM_FLAG, zoomSize);
         editor.putStringSet(Constants.ROUTES_TO_TRACK, routesToTrack);
+        editor.putString(Constants.THEME_FLAG, theme.name());
 
         Log.d(TAG, "Saving app prefs: " + this);
 

@@ -21,6 +21,7 @@ import com.emal.android.transport.spb.utils.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentSkipListSet;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -34,9 +35,9 @@ public class SearchActivity extends Activity {
     private PortalClient portalClient = PortalClient.getInstance();
     public static final String SELECTED_ROUTES = "SELECTED_ROUTES";
     private ApplicationParams appParams;
-    private RoutesStorage routesStorage = new RoutesStorage();;
+    private RoutesStorage routesStorage = new RoutesStorage();
     private List<Route> findedRoutes;
-    private Set<Route> selectedRoutes;
+    private Set<Route> selectedRoutes = new ConcurrentSkipListSet<Route>();
     private LinearLayout selectedRoutesPics;
 
     @Override
@@ -44,12 +45,14 @@ public class SearchActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
+        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
+        setTheme(appParams.getTheme().getCode());
+
         setContentView(R.layout.search);
         getActionBar().setHomeButtonEnabled(true);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle(R.string.search_page);
-
-        appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
 
         searchView = (SearchView) findViewById(R.id.searchView);
         searchView.setIconified(false);
@@ -93,9 +96,8 @@ public class SearchActivity extends Activity {
         });
 
         Bundle b = getIntent().getExtras();
-        ArrayList<Route> routes = (ArrayList<Route>) b.getSerializable(SELECTED_ROUTES);
-        redrawSelection(routes);
-        selectedRoutes = new HashSet<Route>(routes);
+        selectedRoutes.addAll((ArrayList<Route>) b.getSerializable(SELECTED_ROUTES));
+        redrawSelection(selectedRoutes);
 
         initIndex();
     }

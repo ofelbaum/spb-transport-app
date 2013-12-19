@@ -25,4 +25,5 @@ public final class Constants {
     public static final int MS_IN_SEC = 1000;
     public static final int DEFAULT_SYNC_MS = 10000;
     public static final String ROUTES_TO_TRACK = "ROUTES_TO_TRACK";
+    public static final String THEME_FLAG = "THEME_FLAG";
 }

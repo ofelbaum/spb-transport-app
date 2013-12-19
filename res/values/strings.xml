@@ -21,7 +21,7 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Choose refresh period (sec)</string>
     <string name="info">Information</string>
-    <string name="version">2.0</string>
+    <string name="version">2.0.1</string>
     <string name="copyright">&#169; 2013 Alexey Emelyanenko</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Add my place at %1$s?</string>
@@ -91,6 +91,14 @@
         <item>Trolley</item>
         <item>Aquabus</item>
     </string-array>
+    <string-array name="app_theme_values">
+        <item>HOLO_BLACK</item>
+        <item>HOLO_LIGHT</item>
+    </string-array>
+    <string-array name="app_theme_entries">
+        <item>Black</item>
+        <item>Light</item>
+    </string-array>
 
     <string-array name="menu_items_array">
         <item>Search</item>
@@ -115,5 +123,7 @@
     <string name="selected_routes">Selected Routes</string>
     <string name="clear_selection">Clear</string>
     <string name="feedback">Feedback</string>
+    <string name="app_params">General</string>
+    <string name="app_theme">Theme</string>
 
 </resources>
