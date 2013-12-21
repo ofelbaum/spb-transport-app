@@ -21,7 +21,7 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Choose refresh period (sec)</string>
     <string name="info">Information</string>
-    <string name="version">2.0.1</string>
+    <string name="version">2.0.2</string>
     <string name="copyright">&#169; 2013 Alexey Emelyanenko</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Add my place at %1$s?</string>
