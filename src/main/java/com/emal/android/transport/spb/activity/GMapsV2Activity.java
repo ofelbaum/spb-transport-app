@@ -8,8 +8,6 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -45,7 +43,7 @@ import java.util.*;
 public class GMapsV2Activity extends FragmentActivity {
     private static final String TAG = GMapsV2Activity.class.getName();
 
-    private SupportMapFragment mapFragment;
+    private TouchableMapFragment mapFragment;
     private GoogleMap mMap;
     private UiSettings mUiSettings;
     private ApplicationParams appParams;
@@ -179,9 +177,7 @@ public class GMapsV2Activity extends FragmentActivity {
             }
         };
 
-        setUpMapIfNeeded();
-
-        initApplication();
+        createMapFragment();
     }
 
     private void startSync() {
@@ -230,93 +226,98 @@ public class GMapsV2Activity extends FragmentActivity {
         moveToLocation(appParams.getLastLocation());
     }
 
-    private void setUpMapIfNeeded() {
+    private void createMapFragment() {
         if (mMap == null) {
-            mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-            mMap = mapFragment.getMap();
-        }
+            mapFragment = (TouchableMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+            mapFragment.setOnMapReadyCallback(new TouchableMapFragment.onMapReady() {
+                @Override
+                public void setMap(GoogleMap map) {
+                    mMap = map;
 
-        mMap.setMyLocationEnabled(true);
+                    mMap.setMyLocationEnabled(true);
 
-        mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
-            @Override
-            public void onCameraChange(CameraPosition cameraPosition) {
-                appParams.setLastLocation(cameraPosition.target);
-                appParams.setZoomSize((int) cameraPosition.zoom);
-                if (Boolean.FALSE.equals(mMapIsTouched)) {
-                    startSync();
-                }
-            }
-        });
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(final LatLng latLng) {
-                runOnUiThread(new Runnable() {
-                    public void run() {
-                        Log.d(TAG, "Long press. Point " + latLng);
-
-                        Geocoder geo = new Geocoder(getApplicationContext());
-                        try {
-                            List<Address> myAddrs = geo.getFromLocation(latLng.latitude, latLng.longitude, 1);
-                            if (myAddrs.size() > 0) {
-                                Address myPlace = myAddrs.get(0);
-                                Log.d(TAG, "My Place selected: " + GeoConverter.convert(myPlace));
-
-                                longPressLoc = myPlace;
-
-                                String msg = getResources().getString(com.emal.android.transport.spb.R.string.addmyplace, GeoConverter.convert(myPlace));
-                                alert.setMessage(msg);
-                                alert.show();
+                    mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                        @Override
+                        public void onCameraChange(CameraPosition cameraPosition) {
+                            appParams.setLastLocation(cameraPosition.target);
+                            appParams.setZoomSize((int) cameraPosition.zoom);
+                            if (Boolean.FALSE.equals(mMapIsTouched)) {
+                                startSync();
                             }
-                        } catch (IOException e) {
-                            e.printStackTrace();
                         }
-                    }
-                });
+                    });
+                    mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                        @Override
+                        public void onMapLongClick(final LatLng latLng) {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    Log.d(TAG, "Long press. Point " + latLng);
 
-            }
-        });
-        mUiSettings = mMap.getUiSettings();
-        mUiSettings.setMyLocationButtonEnabled(true);
-        mUiSettings.setZoomControlsEnabled(true);
-        mUiSettings.setCompassEnabled(false);
-        mUiSettings.setRotateGesturesEnabled(false);
+                                    Geocoder geo = new Geocoder(getApplicationContext());
+                                    try {
+                                        List<Address> myAddrs = geo.getFromLocation(latLng.latitude, latLng.longitude, 1);
+                                        if (myAddrs.size() > 0) {
+                                            Address myPlace = myAddrs.get(0);
+                                            Log.d(TAG, "My Place selected: " + GeoConverter.convert(myPlace));
 
-//        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        vehicleSyncAdapter = new GMapVehicleSyncAdapter(this, mapFragment, errorSignCallback);
-        vehicleTracker = new VehicleTracker(vehicleSyncAdapter, portalClient, mMap);
+                                            longPressLoc = myPlace;
 
-        GeoPoint home = appParams.getHomeLocation();
-        LatLng homePoint = new LatLng(home.getLatitudeE6() / 1E6, home.getLongitudeE6() / 1E6);
-        mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
+                                            String msg = getResources().getString(com.emal.android.transport.spb.R.string.addmyplace, GeoConverter.convert(myPlace));
+                                            alert.setMessage(msg);
+                                            alert.show();
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            });
+
+                        }
+                    });
+                    mUiSettings = mMap.getUiSettings();
+                    mUiSettings.setMyLocationButtonEnabled(true);
+                    mUiSettings.setZoomControlsEnabled(true);
+                    mUiSettings.setCompassEnabled(false);
+                    mUiSettings.setRotateGesturesEnabled(false);
+
+                    vehicleSyncAdapter = new GMapVehicleSyncAdapter(GMapsV2Activity.this, mapFragment, errorSignCallback);
+                    vehicleTracker = new VehicleTracker(vehicleSyncAdapter, portalClient, mMap);
+
+                    GeoPoint home = appParams.getHomeLocation();
+                    LatLng homePoint = new LatLng(home.getLatitudeE6() / 1E6, home.getLongitudeE6() / 1E6);
+                    mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        Resources resources = getResources();
-        String yes = resources.getString(com.emal.android.transport.spb.R.string.yes);
-        String no = resources.getString(com.emal.android.transport.spb.R.string.no);
-        builder.setCancelable(false)
-                .setPositiveButton(yes, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //longPressLoc
-                        GeoPoint homeLocation = new GeoPoint((int) (longPressLoc.getLatitude() * 1E6), (int) (longPressLoc.getLongitude() * 1E6));
-                        appParams.setHomeLocation(homeLocation);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(GMapsV2Activity.this);
+                    Resources resources = getResources();
+                    String yes = resources.getString(com.emal.android.transport.spb.R.string.yes);
+                    String no = resources.getString(com.emal.android.transport.spb.R.string.no);
+                    builder.setCancelable(false)
+                            .setPositiveButton(yes, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    //longPressLoc
+                                    GeoPoint homeLocation = new GeoPoint((int) (longPressLoc.getLatitude() * 1E6), (int) (longPressLoc.getLongitude() * 1E6));
+                                    appParams.setHomeLocation(homeLocation);
 
-                        LatLng homePoint = new LatLng(longPressLoc.getLatitude(), longPressLoc.getLongitude());
-                        mMap.clear();
-                        mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
-                        dialog.cancel();
+                                    LatLng homePoint = new LatLng(longPressLoc.getLatitude(), longPressLoc.getLongitude());
+                                    mMap.clear();
+                                    mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
+                                    dialog.cancel();
 
-                    }
-                })
-                .setNegativeButton(no, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        alert = builder.create();
+                                }
+                            })
+                            .setNegativeButton(no, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                    alert = builder.create();
+                    initApplication();
+                }
+            });
+        }
     }
 
     private void moveToLocation(GeoPoint geoPoint) {

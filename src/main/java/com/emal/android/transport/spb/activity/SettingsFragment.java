@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.*;
 import android.util.Log;
-import com.emal.android.transport.spb.MapProviderType;
 import com.emal.android.transport.spb.R;
 import android.os.Bundle;
 import com.emal.android.transport.spb.VehicleType;
@@ -37,6 +36,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private ApplicationParams appParams;
     private Preference myPlace;
     private CheckBoxPreference showTraffic;
+    private Resources resources;
 
     public class PrefData {
         private int index;
@@ -79,8 +79,6 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         int syncTime = appParams.getSyncTime();
         int mapType = Boolean.TRUE.equals(appParams.isSatView()) ? 2 : 1;
-        MapProviderType providerType = appParams.getMapProviderType();
-
 
         syncTimePref = (ListPreference) findPreference(MAP_SYNC_TIME);
         this.vehicleTypes = (MultiSelectListPreference) findPreference(VEHICLE_TYPES);
@@ -117,7 +115,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             vehicleTypes.add(VehicleType.SHIP);
         }
 
-        Resources res = getResources();
+        Resources res = getResourcesSilently();
         List<String> entries = Arrays.asList(res.getStringArray(R.array.vehicle_types_entries));
         List<String> values = Arrays.asList(res.getStringArray(R.array.vehicle_types_values));
 
@@ -155,7 +153,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     }
 
     private PrefData getEntryByValue(String value, int entriesId, int valuesId) {
-        Resources res = getResources();
+        Resources res = getResourcesSilently();
         List<String> entries = Arrays.asList(res.getStringArray(entriesId));
         List<String> values = Arrays.asList(res.getStringArray(valuesId));
         int i = values.indexOf(value);
@@ -173,8 +171,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             appParams.setTheme(theme);
             appParams.saveAll();
             Activity activity = getActivity();
-            activity.finish();
-            activity.startActivity(new Intent(activity, activity.getClass()));
+            if (activity != null) {
+                activity.finish();
+                activity.startActivity(new Intent(activity, activity.getClass()));
+            }
         }
         if (MAP_SYNC_TIME.equals(key))
         {
@@ -191,7 +191,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         }
         if (VEHICLE_TYPES.equals(key)) {
             Set<String> selected = sharedPreferences.getStringSet(VEHICLE_TYPES, new HashSet<String>());
-            Resources res = getResources();
+            Resources res = getResourcesSilently();
             List<String> entries = Arrays.asList(res.getStringArray(R.array.vehicle_types_entries));
             List<String> values = Arrays.asList(res.getStringArray(R.array.vehicle_types_values));
 
@@ -228,7 +228,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private String setSummary(SharedPreferences sharedPreferences, String key, int entriesId, int valuesId) {
         Preference exercisesPref = findPreference(key);
 
-        Resources res = getResources();
+        Resources res = getResourcesSilently();
         List<String> entries = Arrays.asList(res.getStringArray(entriesId));
         List<String> values = Arrays.asList(res.getStringArray(valuesId));
 
@@ -236,6 +236,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String summary = entries.get(values.indexOf(string));
         exercisesPref.setSummary(summary);
         return string;
+    }
+
+    private Resources getResourcesSilently() {
+        return resources;
+    }
+
+    @Override
+    public void onAttach(Activity activity) {
+        resources = activity.getResources();
+        super.onAttach(activity);
     }
 
     @Override

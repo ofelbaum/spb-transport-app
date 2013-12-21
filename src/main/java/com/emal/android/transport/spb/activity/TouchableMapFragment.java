@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import com.google.android.gms.maps.GoogleMap;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -14,7 +15,7 @@ import android.widget.FrameLayout;
 public class TouchableMapFragment extends com.google.android.gms.maps.SupportMapFragment {
     public View mOriginalContentView;
     public TouchableWrapper mTouchView;
-
+    private onMapReady onMapReadyCallback;
 
     private class TouchableWrapper extends FrameLayout {
         private GMapsV2Activity activity;
@@ -38,6 +39,14 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
         }
     }
 
+    public interface onMapReady {
+        void setMap(GoogleMap map);
+    }
+
+    public void setOnMapReadyCallback(onMapReady onMapReadyCallback) {
+        this.onMapReadyCallback = onMapReadyCallback;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
         mOriginalContentView = super.onCreateView(inflater, parent, savedInstanceState);
@@ -49,5 +58,11 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
     @Override
     public View getView() {
         return mOriginalContentView;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        onMapReadyCallback.setMap(getMap());
     }
 }
