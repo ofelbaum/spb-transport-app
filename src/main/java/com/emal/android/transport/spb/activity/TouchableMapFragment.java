@@ -1,6 +1,7 @@
 package com.emal.android.transport.spb.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -63,6 +64,21 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        onMapReadyCallback.setMap(getMap());
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                GoogleMap map = getMap();
+
+                if (map != null) {
+                    onMapReadyCallback.setMap(map);
+                    handler.removeCallbacksAndMessages(null);
+                } else {
+                    handler.postDelayed(this, 500);
+                }
+            }
+        }, 500);
     }
 }

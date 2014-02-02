@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.VehicleType;
-import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.utils.Constants;
 
 import java.io.InputStream;
@@ -20,15 +19,13 @@ import java.util.Set;
 public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
     private static final String TAG = SyncVehiclePositionTask.class.getName();
 
-    private PortalClient portalClient;
     private VehicleSyncAdapter vehicleSyncAdapter;
     private String vehiclesStr;
     private boolean clearBeforeUpdate = false;
     private Set<VehicleType> vehicleTypes;
 
-    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<VehicleType> vehicleTypes, boolean clearBeforeUpdate, PortalClient portalClient) {
+    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<VehicleType> vehicleTypes, boolean clearBeforeUpdate) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;
-        this.portalClient = portalClient;
         this.clearBeforeUpdate = clearBeforeUpdate;
         this.vehicleTypes = vehicleTypes;
     }
@@ -61,7 +58,7 @@ public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
         Log.d(TAG, "Download " + vehiclesStr + " START for " + Thread.currentThread().getName());
 
         try {
-            InputStream in = portalClient.doGet(url);
+            InputStream in = vehicleSyncAdapter.getPortalClient().doGet(url);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 1;
             Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);

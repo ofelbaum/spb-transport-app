@@ -6,7 +6,6 @@ import android.util.Log;
 import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.portal.*;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.*;
 
 import java.util.*;
@@ -18,15 +17,11 @@ import java.util.*;
 public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
     private static final String TAG = DrawVehicleTask.class.getName();
     private Route route;
-    private PortalClient portalClient;
-    private GoogleMap mMap;
     private Map<String, Marker> markers;
     private VehicleSyncAdapter vehicleSyncAdapter;
 
-    public DrawVehicleTask(Route route, PortalClient portalClient, GoogleMap mMap, Map<String, Marker> markers, VehicleSyncAdapter vehicleSyncAdapter) {
+    public DrawVehicleTask(Route route, Map<String, Marker> markers, VehicleSyncAdapter vehicleSyncAdapter) {
         this.route = route;
-        this.portalClient = portalClient;
-        this.mMap = mMap;
         this.markers = markers;
         this.vehicleSyncAdapter = vehicleSyncAdapter;
     }
@@ -41,7 +36,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
         List<Vehicle> list = null;
         try {
             Log.d(TAG, "Get vehicles fro route: " + route);
-            VehicleCollection routeData = portalClient.getRouteData(route.getId());
+            VehicleCollection routeData = vehicleSyncAdapter.getPortalClient().getRouteData(route.getId());
             list = routeData.getList();
             Log.d(TAG, "Found vehicles size: " + list.size());
         } catch (Exception e) {
@@ -79,7 +74,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
 
             String vehId = v.getId();
             Log.d(TAG, "Add new marker for vehicle: " + vehId);
-            Marker newMarker = mMap.addMarker(title);
+            Marker newMarker = vehicleSyncAdapter.addMarker(title);
             Marker oldMarker = markers.get(vehId);
             if (oldMarker != null) {
                 Log.d(TAG, "Found old marker for vehicle: " + vehId);

@@ -1,12 +1,12 @@
 package com.emal.android.transport.spb;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
-import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.portal.Route;
 import com.emal.android.transport.spb.task.DrawVehicleTask;
 import com.emal.android.transport.spb.task.SyncVehiclePositionTask;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.Marker;
 
 import java.util.*;
@@ -23,16 +23,52 @@ public class VehicleTracker {
     private Set<VehicleType> vehicleTypes;
     private VehicleSyncAdapter vehicleSyncAdapter;
 
-    private PortalClient portalClient;
-    private final GoogleMap googleMap;
     private Map<String, Map<String, Marker>> markers;
+    private Handler mHandler = new Handler(Looper.getMainLooper());
+    private TimerTask timerTask;
 
-    public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter,
-                          PortalClient portalClient,
-                          GoogleMap googleMap) {
+
+    public class MapUpdateTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            //TODO
+            int syncTime = 5000;
+            Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
+            syncVehicles();
+            mHandler.postDelayed(this, syncTime);
+        }
+    }
+
+    public void startSync() {
+        Log.d(TAG, "startSync");
+//        GoogleMap map = mapFragment.getMap();
+//        if ( == null) {
+//            TimerTask waitForMapTask = new TimerTask() {
+//                @Override
+//                public void run() {
+//                    startSync();
+//                }
+//            };
+//            mHandler.removeCallbacks(waitForMapTask);
+//            mHandler.postDelayed(waitForMapTask, 50);
+//            return;
+//        }
+//        LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+        vehicleSyncAdapter.setBBox();
+        if (timerTask != null) {
+            timerTask.cancel();
+        } else {
+            timerTask = new MapUpdateTimerTask();
+        }
+        mHandler.removeCallbacks(timerTask);
+        mHandler.postDelayed(timerTask, 0);
+    }
+
+
+
+
+    public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;
-        this.portalClient = portalClient;
-        this.googleMap = googleMap;
         this.markers = new ConcurrentHashMap<String, Map<String, Marker>>();
         vehicleTypes = new HashSet<VehicleType>();
         routeTaskMap = new HashMap<Route, AsyncTask>();
@@ -64,7 +100,7 @@ public class VehicleTracker {
 
             Map<String, Marker> markers1 = markers.get(key.getId());
             if (markers1 != null) {
-                for(Marker marker : markers1.values()) {
+                for (Marker marker : markers1.values()) {
                     marker.remove();
                 }
             }
@@ -85,7 +121,7 @@ public class VehicleTracker {
         }
         if (!vehicleTypes.isEmpty() && routeTaskMap.isEmpty()) {
             Log.d(TAG, "Scheduling typed layout for types: " + vehicleTypes);
-            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate, portalClient);
+            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate);
             syncTypesTask.execute();
         }
 
@@ -102,7 +138,7 @@ public class VehicleTracker {
                 markersForRoute = new HashMap<String, Marker>();
                 markers.put(routeId, markersForRoute);
             }
-            value = new DrawVehicleTask(route, portalClient, googleMap, markersForRoute, vehicleSyncAdapter);
+            value = new DrawVehicleTask(route, markersForRoute, vehicleSyncAdapter);
             value.execute();
             routeTaskMap.put(route, value);
 
@@ -111,6 +147,11 @@ public class VehicleTracker {
     }
 
     public void stopTracking() {
+        mHandler.removeCallbacks(timerTask);
+        if (timerTask != null) {
+            timerTask.cancel();
+        }
+
         vehicleSyncAdapter.clearOverlay();
         vehicleTypes.clear();
         if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {

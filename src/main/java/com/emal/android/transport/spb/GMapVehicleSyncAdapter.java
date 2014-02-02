@@ -4,8 +4,12 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
+import android.view.Menu;
+import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.utils.ErrorSignCallback;
 import com.emal.android.transport.spb.utils.GeoConverter;
+import com.emal.android.transport.spb.utils.MenuErrorSignCallback;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 
@@ -21,10 +25,10 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private LatLngBounds latLngBounds;
     private ErrorSignCallback errorSignCallback;
 
-    public GMapVehicleSyncAdapter(Activity activity, SupportMapFragment mapFragment, ErrorSignCallback callback) {
-        this.activity = activity;
+    public GMapVehicleSyncAdapter(SupportMapFragment mapFragment, Menu menu) {
         this.mapFragment = mapFragment;
-        this.errorSignCallback = callback;
+        this.activity = mapFragment.getActivity();
+        this.errorSignCallback = new MenuErrorSignCallback(menu);
     }
 
     @Override
@@ -126,8 +130,9 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     }
 
     @Override
-    public void setBBox(LatLngBounds latLngBounds) {
-        this.latLngBounds = latLngBounds;
+    public void setBBox() {
+        //TODO
+        this.latLngBounds = mapFragment.getMap().getProjection().getVisibleRegion().latLngBounds;
     }
 
     @Override
@@ -143,5 +148,40 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
         });
 
         errorSignCallback.hide();
+    }
+
+    @Override
+    public Marker addMarker(MarkerOptions options) {
+        return mapFragment.getMap().addMarker(options);
+    }
+
+    @Override
+    public PortalClient getPortalClient() {
+        return PortalClient.getInstance();
+    }
+
+    @Override
+    public void hideError() {
+        errorSignCallback.hide();
+    }
+
+    @Override
+    public void showError() {
+        errorSignCallback.show();
+    }
+
+    @Override
+    public void setTrafficEnabled(boolean showTraffic) {
+        mapFragment.getMap().setTrafficEnabled(showTraffic);
+    }
+
+    @Override
+    public void setMapType(int i) {
+        mapFragment.getMap().setMapType(i);
+    }
+
+    @Override
+    public void moveCamera(CameraUpdate cameraUpdate) {
+        mapFragment.getMap().moveCamera(cameraUpdate);
     }
 }
