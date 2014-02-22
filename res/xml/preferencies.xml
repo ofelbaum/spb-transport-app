@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:custom="http://schemas.android.com/apk/res-auto"
                   android:layout_height="fill_parent"
                   android:layout_width="fill_parent">
     <PreferenceCategory
@@ -31,6 +32,13 @@
                 android:key="map_show_traffic"
                 android:defaultValue="false"
                 />
+        <com.emal.android.transport.spb.component.SeekBarDialogPreference
+                android:key="icon_size"
+                android:defaultValue="5"
+                android:dialogMessage="@string/icon_size_title"
+                android:max="10"
+                custom:min="1"
+                android:title="@string/icon_size"/>
         <Preference
                 android:title="@string/my_place"
                 android:key="my_place"

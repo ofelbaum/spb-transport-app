@@ -27,12 +27,11 @@ public class VehicleTracker {
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private TimerTask timerTask;
 
-
-    public class MapUpdateTimerTask extends TimerTask {
+    private class MapUpdateTimerTask extends TimerTask {
         @Override
         public void run() {
             //TODO
-            int syncTime = 5000;
+            int syncTime = vehicleSyncAdapter.getSyncTime();
             Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
             syncVehicles();
             mHandler.postDelayed(this, syncTime);
@@ -41,19 +40,6 @@ public class VehicleTracker {
 
     public void startSync() {
         Log.d(TAG, "startSync");
-//        GoogleMap map = mapFragment.getMap();
-//        if ( == null) {
-//            TimerTask waitForMapTask = new TimerTask() {
-//                @Override
-//                public void run() {
-//                    startSync();
-//                }
-//            };
-//            mHandler.removeCallbacks(waitForMapTask);
-//            mHandler.postDelayed(waitForMapTask, 50);
-//            return;
-//        }
-//        LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
         vehicleSyncAdapter.setBBox();
         if (timerTask != null) {
             timerTask.cancel();
@@ -63,9 +49,6 @@ public class VehicleTracker {
         mHandler.removeCallbacks(timerTask);
         mHandler.postDelayed(timerTask, 0);
     }
-
-
-
 
     public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;

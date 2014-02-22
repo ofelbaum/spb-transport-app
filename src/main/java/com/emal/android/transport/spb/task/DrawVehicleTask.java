@@ -62,15 +62,14 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
             LatLng homePoint = new LatLng(latitude, longtitude);
 
             VehicleProps properties = v.getProperties();
-            String stateNumber = properties.getStateNumber() + " | " + properties.getVelocity() + " km/h";
 
-            Bitmap bitmap = getVehicleBitmap(route, properties);
+            Bitmap bitmap = getVehicleBitmap(route, properties, vehicleSyncAdapter.getScaleFactor());
             BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
             MarkerOptions title = new MarkerOptions()
                     .position(homePoint)
                     .anchor(0.5f, 0.5f)
                     .icon(bitmapDescriptor)
-                    .title(stateNumber);
+                    .title(properties.getDisplayValue());
 
             String vehId = v.getId();
             Log.d(TAG, "Add new marker for vehicle: " + vehId);
@@ -92,16 +91,17 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
         vehicleSyncAdapter.afterSync(true);
     }
 
-    private static Bitmap getVehicleBitmap(Route route, VehicleProps properties) {
+    private static Bitmap getVehicleBitmap(Route route, VehicleProps properties, float scaleFactor) {
         VehicleType transportType = route.getTransportType();
 
-        int bHeigth = 80;
-        int bWidth = 80;
+        int magic = (int) (10 * scaleFactor);
+        int bHeigth = magic * 4;
+        int bWidth = magic * 4;
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = Bitmap.createBitmap(bWidth, bHeigth, conf);
 
         Paint vehiclePaint = new Paint();
-        vehiclePaint.setTextSize(30);
+        vehiclePaint.setTextSize(magic + 5);
         vehiclePaint.setColor(Color.WHITE);
         vehiclePaint.setTypeface(Typeface.DEFAULT_BOLD);
         vehiclePaint.setTextAlign(Paint.Align.CENTER);
@@ -109,7 +109,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
         vehiclePaint.setFilterBitmap(true);
 
         Paint vehicleNumberPaint = new Paint();
-        vehicleNumberPaint.setTextSize(25);
+        vehicleNumberPaint.setTextSize(magic + 5);
         vehicleNumberPaint.setColor(Color.BLACK);
         vehicleNumberPaint.setTypeface(Typeface.DEFAULT_BOLD);
         vehicleNumberPaint.setTextAlign(Paint.Align.CENTER);
@@ -126,7 +126,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
         int x = canvas.getClipBounds().centerX();
         int y = canvas.getClipBounds().centerY();
 
-        canvas.drawText(route.getRouteNumber(), 20, 20, vehicleNumberPaint);
+        canvas.drawText(route.getRouteNumber(), magic, magic, vehicleNumberPaint);
         canvas.save();
 
         int direction = properties.getDirection();
@@ -134,7 +134,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
             direction += 180;
         }
         canvas.rotate(direction, x, y);
-        canvas.drawRect(x - 15, y + 20, x + 15, y - 20, rectPaint);
+        canvas.drawRect(x - magic + magic/3.0f, y + magic, x + magic - magic/3.0f, y - magic, rectPaint);
 
         int xPos = (canvas.getWidth() / 2);
         int yPos = (int) ((canvas.getHeight() / 2) - ((vehiclePaint.descent() + vehiclePaint.ascent()) / 2)) ;

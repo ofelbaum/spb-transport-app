@@ -16,6 +16,7 @@ import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.portal.*;
 import com.emal.android.transport.spb.task.LoadTrackRoutesTask;
 import com.emal.android.transport.spb.utils.*;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.R;
 import com.google.android.gms.maps.*;
 import com.google.android.gms.maps.model.*;
@@ -48,67 +49,10 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
         appParams = new ApplicationParams(getSharedPreferences(Constants.APP_SHARED_SOURCE, 0));
         createMapFragment();
-    }
-
-    private void initApplication() {
-        if (appParams.isShowBus()) {
-            vehicleTracker.startTrack(VehicleType.BUS);
-        }
-        if (appParams.isShowShip()) {
-            vehicleTracker.startTrack(VehicleType.SHIP);
-        }
-        if (appParams.isShowTram()) {
-            vehicleTracker.startTrack(VehicleType.TRAM);
-        }
-        if (appParams.isShowTrolley()) {
-            vehicleTracker.startTrack(VehicleType.TROLLEY);
-        }
-
-
-        vehicleSyncAdapter.setTrafficEnabled(appParams.isShowTraffic());
-        vehicleSyncAdapter.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
-
-        moveToLocation(appParams.getLastLocation());
-
-        networkStatusReceiver = new BroadcastReceiver() {
-            private boolean isConnected = false;
-
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                ConnectivityManager connectivity = (ConnectivityManager) context
-                        .getSystemService(Context.CONNECTIVITY_SERVICE);
-
-
-                NetworkInfo activeNetworkInfo = connectivity.getActiveNetworkInfo();
-                if (activeNetworkInfo == null) {
-                    Log.d(TAG, "Network OFF");
-                    isConnected = false;
-                    return;
-                }
-                Log.d(TAG, "Network ON " + activeNetworkInfo.toString());
-                if (activeNetworkInfo.isConnected() && !isConnected) {
-                    Log.d(TAG, "connected");
-
-                    final Set<String> routesToTrack = appParams.getRoutesToTrack();
-                    if (!routesToTrack.isEmpty()) {
-                        Log.d(TAG, "Start routes tracking");
-                        new LoadTrackRoutesTask(routesToTrack, vehicleSyncAdapter, vehicleTracker).execute();
-                    } else {
-                        Log.d(TAG, "Start all routes tracking");
-
-                    }
-                    isConnected = true;
-                }
-            }
-        };
-        registerReceiver(networkStatusReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        EasyTracker.getInstance(this).activityStart(this);
     }
 
     private void createMapFragment() {
-        if (mapFragment != null) {
-            return;
-        }
-
         mapFragment = (TouchableMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.setOnMapReadyCallback(new TouchableMapFragment.onMapReady() {
             @Override
@@ -120,7 +64,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                     public void onCameraChange(CameraPosition cameraPosition) {
                         appParams.setLastLocation(cameraPosition.target);
                         appParams.setZoomSize((int) cameraPosition.zoom);
-                        if (Boolean.FALSE.equals(mMapIsTouched)) {
+                        if (Boolean.FALSE.equals(mMapIsTouched) && vehicleTracker != null) {
                             vehicleTracker.startSync();
                         }
                     }
@@ -159,14 +103,9 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                 mUiSettings.setCompassEnabled(false);
                 mUiSettings.setRotateGesturesEnabled(false);
 
-                //TODO menu null?
-                vehicleSyncAdapter = new GMapVehicleSyncAdapter(mapFragment, menu);
-                vehicleTracker = new VehicleTracker(vehicleSyncAdapter);
-
                 GeoPoint home = appParams.getHomeLocation();
                 LatLng homePoint = new LatLng(home.getLatitudeE6() / 1E6, home.getLongitudeE6() / 1E6);
                 mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
-
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(GMapsV2Activity.this);
                 Resources resources = getResources();
@@ -194,15 +133,15 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                             }
                         });
                 alert = builder.create();
-                initApplication();
+
+                if (vehicleTracker != null) {
+                    vehicleTracker.startSync();
+                }
             }
         });
     }
 
     private void moveToLocation(GeoPoint geoPoint) {
-        if (vehicleSyncAdapter == null) {
-            return;
-        }
         Log.d(TAG, "Move to location: " + geoPoint.toString());
         LatLng latLng = new LatLng(geoPoint.getLatitudeE6() / 1E6, geoPoint.getLongitudeE6() / 1E6);
         vehicleSyncAdapter.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, appParams.getZoomSize()));
@@ -220,17 +159,66 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
             this.startActivity(new Intent(this, this.getClass()));
         }
 
-        if (networkStatusReceiver != null) {
-            registerReceiver(networkStatusReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        vehicleSyncAdapter = new GMapVehicleSyncAdapter(mapFragment, menu);
+        vehicleSyncAdapter.setSyncTime(appParams.getSyncTime());
+        vehicleSyncAdapter.setIconSize(appParams.getIconSize());
+        vehicleSyncAdapter.setTrafficEnabled(appParams.isShowTraffic());
+        vehicleSyncAdapter.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
 
-            final Set<String> routesToTrack = appParams.getRoutesToTrack();
-            if (!routesToTrack.isEmpty()) {
-                Log.d(TAG, "Start routes tracking");
-                new LoadTrackRoutesTask(routesToTrack, vehicleSyncAdapter, vehicleTracker).execute();
-            } else {
-                Log.d(TAG, "Start all routes tracking");
+        vehicleTracker = new VehicleTracker(vehicleSyncAdapter);
 
-            }
+        moveToLocation(appParams.getLastLocation());
+        vehicleTracker.startSync();
+
+        if (appParams.isShowBus()) {
+            vehicleTracker.startTrack(VehicleType.BUS);
+        }
+        if (appParams.isShowShip()) {
+            vehicleTracker.startTrack(VehicleType.SHIP);
+        }
+        if (appParams.isShowTram()) {
+            vehicleTracker.startTrack(VehicleType.TRAM);
+        }
+        if (appParams.isShowTrolley()) {
+            vehicleTracker.startTrack(VehicleType.TROLLEY);
+        }
+
+        if (networkStatusReceiver == null) {
+            networkStatusReceiver = new BroadcastReceiver() {
+                private boolean isConnected = false;
+
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    ConnectivityManager connectivity = (ConnectivityManager) context
+                            .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+                    NetworkInfo activeNetworkInfo = connectivity.getActiveNetworkInfo();
+                    if (activeNetworkInfo == null) {
+                        Log.d(TAG, "Network OFF");
+                        isConnected = false;
+                        return;
+                    }
+                    Log.d(TAG, "Network ON " + activeNetworkInfo.toString());
+                    if (activeNetworkInfo.isConnected() && !isConnected) {
+                        Log.d(TAG, "connected");
+                        loadTrackedRoutes();
+                        isConnected = true;
+                    }
+                }
+            };
+
+        }
+        loadTrackedRoutes();
+        registerReceiver(networkStatusReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+    }
+
+    private void loadTrackedRoutes() {
+        final Set<String> routesToTrack = appParams.getRoutesToTrack();
+        if (!routesToTrack.isEmpty()) {
+            Log.d(TAG, "Start routes tracking");
+            new LoadTrackRoutesTask(routesToTrack, vehicleSyncAdapter, vehicleTracker).execute();
+        } else {
+            Log.d(TAG, "Start all routes tracking");
         }
     }
 
@@ -244,6 +232,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
         }
         portalClient.reset();
         super.onStop();
+        EasyTracker.getInstance(this).activityStop(this);
     }
 
     @Override
@@ -252,6 +241,8 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
         if (vehicleTracker != null) {
             vehicleTracker.stopTracking();
         }
+        vehicleSyncAdapter = null;
+        vehicleTracker = null;
         appParams.saveAll();
         super.onPause();
     }

@@ -34,6 +34,7 @@ public class ApplicationParams {
     private GeoPoint lastLocation;
     private Set<String> routesToTrack;
     private Theme theme;
+    private int iconSize;
 
     public ApplicationParams(SharedPreferences sharedPreferences) {
         this.sharedPreferences = sharedPreferences;
@@ -43,6 +44,7 @@ public class ApplicationParams {
         this.showShip = sharedPreferences.getBoolean(Constants.SHOW_SHIP_FLAG, true);
         this.showTraffic = sharedPreferences.getBoolean(Constants.SHOW_TRAFFIC_FLAG, false);
         this.syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
+        this.iconSize = sharedPreferences.getInt(Constants.ICON_SIZE_FLAG, Constants.DEFAULT_ICON_SIZE);
 
         Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, SPB_CENTER_LAT_DEF_VALUE);
         Integer homeLong = sharedPreferences.getInt(Constants.HOME_LOC_LONG_FLAG, SPB_CENTER_LONG_DEF_VALUE);
@@ -182,6 +184,14 @@ public class ApplicationParams {
         this.theme = theme;
     }
 
+    public int getIconSize() {
+        return iconSize;
+    }
+
+    public void setIconSize(int iconSize) {
+        this.iconSize = iconSize;
+    }
+
     public void saveAll() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putInt(Constants.SYNC_TIME_FLAG, syncTime);
@@ -197,6 +207,7 @@ public class ApplicationParams {
         editor.putInt(Constants.HOME_LOC_LAT_FLAG, homeLocation.getLatitudeE6());
         editor.putInt(Constants.HOME_LOC_LONG_FLAG, homeLocation.getLongitudeE6());
         editor.putInt(Constants.ZOOM_FLAG, zoomSize);
+        editor.putInt(Constants.ICON_SIZE_FLAG, iconSize);
         editor.putStringSet(Constants.ROUTES_TO_TRACK, routesToTrack);
         editor.putString(Constants.THEME_FLAG, theme.name());
 

@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.view.Menu;
 import com.emal.android.transport.spb.portal.PortalClient;
+import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.utils.ErrorSignCallback;
 import com.emal.android.transport.spb.utils.GeoConverter;
 import com.emal.android.transport.spb.utils.MenuErrorSignCallback;
@@ -21,9 +22,11 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private static final String TAG = GMapVehicleSyncAdapter.class.getName();
     private Activity activity;
     private SupportMapFragment mapFragment;
+    private int syncTime = Constants.DEFAULT_SYNC_MS;
     private GroundOverlay vehicleOverlay;
     private LatLngBounds latLngBounds;
     private ErrorSignCallback errorSignCallback;
+    private int iconSize = Constants.DEFAULT_ICON_SIZE;
 
     public GMapVehicleSyncAdapter(SupportMapFragment mapFragment, Menu menu) {
         this.mapFragment = mapFragment;
@@ -116,12 +119,12 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public int getScreenWidth() {
-        return mapFragment.getView().getWidth();
+        return (int) (mapFragment.getView().getWidth() / getScaleFactor());
     }
 
     @Override
     public int getScreenHeight() {
-        return mapFragment.getView().getHeight();
+        return (int) (mapFragment.getView().getHeight() / getScaleFactor());
     }
 
     @Override
@@ -183,5 +186,23 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     @Override
     public void moveCamera(CameraUpdate cameraUpdate) {
         mapFragment.getMap().moveCamera(cameraUpdate);
+    }
+
+    @Override
+    public float getScaleFactor() {
+        return iconSize / 5f + 1;
+    }
+
+    public void setIconSize(int iconSize) {
+        this.iconSize = iconSize;
+    }
+
+    @Override
+    public int getSyncTime() {
+        return syncTime;
+    }
+
+    public void setSyncTime(int syncTime) {
+        this.syncTime = syncTime;
     }
 }

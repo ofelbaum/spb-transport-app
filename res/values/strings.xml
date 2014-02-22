@@ -21,8 +21,8 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Choose refresh period (sec)</string>
     <string name="info">Information</string>
-    <string name="version">2.0.2</string>
-    <string name="copyright">&#169; 2013 Alexey Emelyanenko</string>
+    <string name="version">${app.version}</string>
+    <string name="copyright">&#169; 2014 Alexey Emelyanenko</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Add my place at %1$s?</string>
     <string name="yes">Yes</string>
@@ -34,7 +34,7 @@
     <string name="ok">OK</string>
     <string name="vehicleTypes">Transport</string>
     <string name="map_params">Map Parameters</string>
-    <string name="map_sync_time">Refrest Time</string>
+    <string name="map_sync_time">Refresh Time</string>
     <string name="map_provider">Map provider</string>
     <string name="version_title">Version</string>
     <string name="copyright_title">Copyright</string>
@@ -125,5 +125,20 @@
     <string name="feedback">Feedback</string>
     <string name="app_params">General</string>
     <string name="app_theme">Theme</string>
+    <string name="icon_size">Icon Size</string>
+    <string name="icon_size_title">Please select a value for the transport icons:</string>
 
+    <array name="icon_size_array">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </array>
 </resources>

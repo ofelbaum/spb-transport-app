@@ -21,8 +21,8 @@
     <integer name="heigth">100</integer>
     <string name="sync_picker">Выберите частоту (сек)</string>
     <string name="info">Информация</string>
-    <string name="version">версия 2.0.2</string>
-    <string name="copyright">&#169; 2013 Алексей Емельяненко</string>
+    <string name="version">${app.version}</string>
+    <string name="copyright">&#169; 2014 Алексей Емельяненко</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
     <string name="addmyplace">Установить закладку на %1$s?</string>
     <string name="yes">Да</string>
@@ -80,4 +80,8 @@
         <item>Настройки</item>
         <item>Информация</item>
     </string-array>
+
+    <string name="icon_size">Размер пиктограмм</string>
+    <string name="icon_size_title">Выберите размер пиктограмм транспорта:</string>
+
 </resources>

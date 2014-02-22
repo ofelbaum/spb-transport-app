@@ -26,4 +26,6 @@ public final class Constants {
     public static final int DEFAULT_SYNC_MS = 10000;
     public static final String ROUTES_TO_TRACK = "ROUTES_TO_TRACK";
     public static final String THEME_FLAG = "THEME_FLAG";
+    public static final String ICON_SIZE_FLAG = "ICON_SIZE_FLAG";
+    public static final int DEFAULT_ICON_SIZE = 5;
 }

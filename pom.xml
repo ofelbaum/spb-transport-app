@@ -17,6 +17,8 @@
         <keystore.alias>${maven.prop.keystore.alias}</keystore.alias>
         <google.maps.key>${maven.prop.google.maps.key}</google.maps.key>
         <google.maps.v2.key>${maven.prop.google.maps.v2.key}</google.maps.v2.key>
+        <google.analytics.tracking.id>${maven.prop.ga.tracking.id}</google.analytics.tracking.id>
+        <app.version>${maven.prop.application.version}</app.version>
 
         <platform.sdk.min.version>11</platform.sdk.min.version>
         <platform.sdk.target.version>11</platform.sdk.target.version>
@@ -28,7 +30,7 @@
         <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
-            <version>4.3_r1</version>
+            <version>4.4.2_r2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -47,6 +49,12 @@
             <groupId>com.google.android.gms</groupId>
             <artifactId>google-play-services</artifactId>
             <version>10</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>com.google.android</groupId>
+            <artifactId>analytics</artifactId>
+            <version>3.0.1</version>
             <type>jar</type>
         </dependency>
         <dependency>

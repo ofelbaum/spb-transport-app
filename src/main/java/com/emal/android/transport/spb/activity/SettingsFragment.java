@@ -13,6 +13,7 @@ import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.model.Theme;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.task.LoadAddressTask;
+import com.emal.android.transport.spb.component.SeekBarDialogPreference;
 
 import java.util.*;
 
@@ -28,6 +29,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private static final String MY_PLACE = "my_place";
     private static final String MAP_SHOW_TRAFFIC = "map_show_traffic";
     private static final String APP_THEME = "app_theme";
+    private static final String ICON_SIZE = "icon_size";
 
     private ListPreference syncTimePref;
     private MultiSelectListPreference vehicleTypes;
@@ -36,6 +38,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private ApplicationParams appParams;
     private Preference myPlace;
     private CheckBoxPreference showTraffic;
+    private SeekBarDialogPreference iconSize;
     private Resources resources;
 
     public class PrefData {
@@ -79,12 +82,14 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
 
         int syncTime = appParams.getSyncTime();
         int mapType = Boolean.TRUE.equals(appParams.isSatView()) ? 2 : 1;
+        int iconSizeValue = appParams.getIconSize();
 
         syncTimePref = (ListPreference) findPreference(MAP_SYNC_TIME);
         this.vehicleTypes = (MultiSelectListPreference) findPreference(VEHICLE_TYPES);
         mapTypePref = (ListPreference) findPreference(MAP_TYPE);
         appTheme = (ListPreference) findPreference(APP_THEME);
-        myPlace= findPreference(MY_PLACE);
+        myPlace = findPreference(MY_PLACE);
+        iconSize = (SeekBarDialogPreference) findPreference(ICON_SIZE);
 
         showTraffic = (CheckBoxPreference) findPreference(MAP_SHOW_TRAFFIC);
         showTraffic.setChecked(appParams.isShowTraffic());
@@ -100,6 +105,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         prefData = getEntryByValue(appParams.getTheme().name(), R.array.app_theme_entries, R.array.app_theme_values);
         appTheme.setSummary(prefData.getValue());
         appTheme.setValueIndex(prefData.getIndex());
+
+        prefData = getEntryByIndex(iconSizeValue, R.array.icon_size_array);
+        iconSize.setSummary(prefData.getValue());
+        iconSize.setProgress(prefData.getIndex());
 
         Set<VehicleType> vehicleTypes = new HashSet<VehicleType>();
         if (appParams.isShowBus()) {
@@ -160,12 +169,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         return new PrefData(i, value, entries.get(i));
     }
 
+    private PrefData getEntryByIndex(int index, int entriesId) {
+        Resources res = getResourcesSilently();
+        int[] entries = res.getIntArray(entriesId);
+        return new PrefData(index, String.valueOf(entries[index]), String.valueOf(entries[index]));
+    }
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Log.d(TAG, "Choose key=" + key);
-        if (APP_THEME.equals(key))
-        {
+        if (APP_THEME.equals(key)) {
             String res = setSummary(sharedPreferences, key, R.array.app_theme_entries, R.array.app_theme_values);
             Theme theme = Theme.valueOf(res);
             appParams.setTheme(theme);
@@ -176,13 +189,16 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                 activity.startActivity(new Intent(activity, activity.getClass()));
             }
         }
-        if (MAP_SYNC_TIME.equals(key))
-        {
+        if (MAP_SYNC_TIME.equals(key)) {
             String res = setSummary(sharedPreferences, key, R.array.sync_string_array, R.array.sync_string_values);
             appParams.setSyncTime(Integer.valueOf(res));
         }
-        if (MAP_TYPE.equals(key))
-        {
+        if (ICON_SIZE.equals(key)) {
+            int progress = iconSize.getProgress();
+            setSummary(sharedPreferences, key, progress);
+            appParams.setIconSize(progress);
+        }
+        if (MAP_TYPE.equals(key)) {
             String res = setSummary(sharedPreferences, key, R.array.map_types_entries, R.array.map_types_values);
             appParams.setSatView(Integer.valueOf(res) == 2);
         }
@@ -236,6 +252,13 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         String summary = entries.get(values.indexOf(string));
         exercisesPref.setSummary(summary);
         return string;
+    }
+
+    private void setSummary(SharedPreferences sharedPreferences, String key, int entriesId) {
+        Preference exercisesPref = findPreference(key);
+
+        String summary = String.valueOf(entriesId);
+        exercisesPref.setSummary(summary);
     }
 
     private Resources getResourcesSilently() {

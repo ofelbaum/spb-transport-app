@@ -72,4 +72,16 @@ public class VehicleProps {
     public void setLabel(int label) {
         this.label = label;
     }
+
+    public String getDisplayValue() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append(stateNumber).append(" | ");
+        if (!stateNumber.equals(String.valueOf(label))) {
+            buffer.append(label);
+            buffer.append(" | ");
+        }
+        buffer.append(velocity).append("km/h");
+
+        return buffer.toString();
+    }
 }
