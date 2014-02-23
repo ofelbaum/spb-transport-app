@@ -37,11 +37,13 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
     private ApplicationParams appParams;
     private VehicleTracker vehicleTracker;
     private VehicleSyncAdapter vehicleSyncAdapter;
-    private AlertDialog alert;
+    private AlertDialog addMyPlaceDialog;
+    private AlertDialog removeMyPlaceDialog;
     private Address longPressLoc;
     private PortalClient portalClient = PortalClient.getInstance();
     private boolean mMapIsTouched = false;
     private BroadcastReceiver networkStatusReceiver;
+    private Marker myPlaceMarker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,8 +88,8 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                                         longPressLoc = myPlace;
 
                                         String msg = getResources().getString(com.emal.android.transport.spb.R.string.addmyplace, GeoConverter.convert(myPlace));
-                                        alert.setMessage(msg);
-                                        alert.show();
+                                        addMyPlaceDialog.setMessage(msg);
+                                        addMyPlaceDialog.show();
                                     }
                                 } catch (IOException e) {
                                     e.printStackTrace();
@@ -97,6 +99,16 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
                     }
                 });
+                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                    @Override
+                    public boolean onMarkerClick(Marker marker) {
+                        String msg = getResources().getString(com.emal.android.transport.spb.R.string.removemyplace);
+                        removeMyPlaceDialog.setMessage(msg);
+                        removeMyPlaceDialog.show();
+
+                        return true;
+                    }
+                });
                 mUiSettings = mMap.getUiSettings();
                 mUiSettings.setMyLocationButtonEnabled(true);
                 mUiSettings.setZoomControlsEnabled(true);
@@ -104,8 +116,10 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                 mUiSettings.setRotateGesturesEnabled(false);
 
                 GeoPoint home = appParams.getHomeLocation();
-                LatLng homePoint = new LatLng(home.getLatitudeE6() / 1E6, home.getLongitudeE6() / 1E6);
-                mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
+                if (home != null) {
+                    LatLng homePoint = new LatLng(home.getLatitudeE6() / 1E6, home.getLongitudeE6() / 1E6);
+                    myPlaceMarker = mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
+                }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(GMapsV2Activity.this);
                 Resources resources = getResources();
@@ -120,10 +134,11 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                                 appParams.setHomeLocation(homeLocation);
 
                                 LatLng homePoint = new LatLng(longPressLoc.getLatitude(), longPressLoc.getLongitude());
-                                mMap.clear();
-                                mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
+                                if (myPlaceMarker != null) {
+                                    myPlaceMarker.remove();
+                                }
+                                myPlaceMarker = mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
                                 dialog.cancel();
-
                             }
                         })
                         .setNegativeButton(no, new DialogInterface.OnClickListener() {
@@ -132,7 +147,25 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                                 dialog.cancel();
                             }
                         });
-                alert = builder.create();
+                addMyPlaceDialog = builder.create();
+
+                builder = new AlertDialog.Builder(GMapsV2Activity.this);
+                builder.setCancelable(false)
+                        .setPositiveButton(yes, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                myPlaceMarker.remove();
+                                appParams.setHomeLocation(null);
+                                dialog.cancel();
+                            }
+                        })
+                        .setNegativeButton(no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+                removeMyPlaceDialog = builder.create();
 
                 if (vehicleTracker != null) {
                     vehicleTracker.startSync();
@@ -283,7 +316,10 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                 break;
             }
             case 1: {
-                moveToLocation(appParams.getHomeLocation());
+                GeoPoint homeLocation = appParams.getHomeLocation();
+                if (homeLocation != null) {
+                    moveToLocation(homeLocation);
+                }
                 break;
             }
             case 2: {

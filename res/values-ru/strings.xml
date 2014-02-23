@@ -83,5 +83,6 @@
 
     <string name="icon_size">Размер пиктограмм</string>
     <string name="icon_size_title">Выберите размер пиктограмм транспорта:</string>
+    <string name="removemyplace">Удалить закладку?</string>
 
 </resources>

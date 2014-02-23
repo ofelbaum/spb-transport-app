@@ -192,7 +192,7 @@ public class SearchActivity extends Activity {
                 }
             });
 
-            if (list == null) {
+            if (list == null && !isFinishing()) {
                 //An error occurred
                 UIHelper.getErrorDialog(listView.getContext());
                 return;

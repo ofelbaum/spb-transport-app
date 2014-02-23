@@ -46,9 +46,11 @@ public class ApplicationParams {
         this.syncTime = sharedPreferences.getInt(Constants.SYNC_TIME_FLAG, Constants.DEFAULT_SYNC_MS);
         this.iconSize = sharedPreferences.getInt(Constants.ICON_SIZE_FLAG, Constants.DEFAULT_ICON_SIZE);
 
-        Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, SPB_CENTER_LAT_DEF_VALUE);
-        Integer homeLong = sharedPreferences.getInt(Constants.HOME_LOC_LONG_FLAG, SPB_CENTER_LONG_DEF_VALUE);
-        this.homeLocation = new GeoPoint(homeLat, homeLong);
+        Integer homeLat = sharedPreferences.getInt(Constants.HOME_LOC_LAT_FLAG, -1);
+        Integer homeLong = sharedPreferences.getInt(Constants.HOME_LOC_LONG_FLAG, -1);
+        if (homeLat != -1 && homeLong != -1) {
+            this.homeLocation = new GeoPoint(homeLat, homeLong);
+        }
 
         Integer currLat = sharedPreferences.getInt(Constants.LAST_LOC_LAT_FLAG, SPB_CENTER_LAT_DEF_VALUE);
         Integer currLong = sharedPreferences.getInt(Constants.LAST_LOC_LONG_FLAG, SPB_CENTER_LONG_DEF_VALUE);
@@ -204,8 +206,13 @@ public class ApplicationParams {
         editor.putBoolean(Constants.SAT_VIEW_FLAG, Boolean.TRUE.equals(satView));
         editor.putInt(Constants.LAST_LOC_LAT_FLAG, lastLocation.getLatitudeE6());
         editor.putInt(Constants.LAST_LOC_LONG_FLAG, lastLocation.getLongitudeE6());
-        editor.putInt(Constants.HOME_LOC_LAT_FLAG, homeLocation.getLatitudeE6());
-        editor.putInt(Constants.HOME_LOC_LONG_FLAG, homeLocation.getLongitudeE6());
+        if (homeLocation != null) {
+            editor.putInt(Constants.HOME_LOC_LAT_FLAG, homeLocation.getLatitudeE6());
+            editor.putInt(Constants.HOME_LOC_LONG_FLAG, homeLocation.getLongitudeE6());
+        } else {
+            editor.remove(Constants.HOME_LOC_LAT_FLAG);
+            editor.remove(Constants.HOME_LOC_LONG_FLAG);
+        }
         editor.putInt(Constants.ZOOM_FLAG, zoomSize);
         editor.putInt(Constants.ICON_SIZE_FLAG, iconSize);
         editor.putStringSet(Constants.ROUTES_TO_TRACK, routesToTrack);

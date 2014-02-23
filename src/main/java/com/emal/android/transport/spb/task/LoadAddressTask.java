@@ -33,6 +33,9 @@ public abstract class LoadAddressTask extends AsyncTask<Object, Void, String> {
     protected String doInBackground(Object... params) {
         String myPlaceString = context.getResources().getString(R.string.notfound);
         GeoPoint geoPoint = appParams.getHomeLocation();
+        if (geoPoint == null) {
+            return "Not defined";
+        }
         Geocoder geo = new Geocoder(context);
         try {
             List<Address> myAddrs = geo.getFromLocation(geoPoint.getLatitudeE6() / 1E6, geoPoint.getLongitudeE6() / 1E6, 1);
