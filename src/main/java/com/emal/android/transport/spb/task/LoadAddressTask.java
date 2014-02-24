@@ -20,22 +20,18 @@ import java.util.List;
 public abstract class LoadAddressTask extends AsyncTask<Object, Void, String> {
     private static final String TAG = LoadAddressTask.class.getName();
     private Context context;
-    private ApplicationParams appParams;
+    private GeoPoint geoPoint;
 
     public abstract void setValue(String s);
 
-    protected LoadAddressTask(Context context, ApplicationParams appParams) {
+    protected LoadAddressTask(Context context, GeoPoint geoPoint) {
         this.context = context;
-        this.appParams = appParams;
+        this.geoPoint = geoPoint;
     }
 
     @Override
     protected String doInBackground(Object... params) {
         String myPlaceString = context.getResources().getString(R.string.notfound);
-        GeoPoint geoPoint = appParams.getHomeLocation();
-        if (geoPoint == null) {
-            return "Not defined";
-        }
         Geocoder geo = new Geocoder(context);
         try {
             List<Address> myAddrs = geo.getFromLocation(geoPoint.getLatitudeE6() / 1E6, geoPoint.getLongitudeE6() / 1E6, 1);

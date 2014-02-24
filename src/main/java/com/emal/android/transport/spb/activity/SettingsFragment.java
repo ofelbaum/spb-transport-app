@@ -1,6 +1,8 @@
 package com.emal.android.transport.spb.activity;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -14,6 +16,7 @@ import com.emal.android.transport.spb.model.Theme;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.task.LoadAddressTask;
 import com.emal.android.transport.spb.component.SeekBarDialogPreference;
+import com.google.android.maps.GeoPoint;
 
 import java.util.*;
 
@@ -40,6 +43,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
     private CheckBoxPreference showTraffic;
     private SeekBarDialogPreference iconSize;
     private Resources resources;
+    private AlertDialog removeMyPlaceDialog;
 
     public class PrefData {
         private int index;
@@ -73,8 +77,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         SharedPreferences sharedPreferences = getPreferenceManager().getSharedPreferences();
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
 
-        initParams();
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        String yes = resources.getString(com.emal.android.transport.spb.R.string.yes);
+        String no = resources.getString(com.emal.android.transport.spb.R.string.no);
+        builder.setCancelable(false)
+                .setMessage(resources.getString(R.string.removemyplace))
+                .setPositiveButton(yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        appParams.setHomeLocation(null);
+                        myPlace.setSummary(R.string.place_not_defined);
+                        dialog.cancel();
+                    }
+                })
+                .setNegativeButton(no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        removeMyPlaceDialog = builder.create();
 
+        initParams();
     }
 
     private void initParams() {
@@ -152,13 +176,28 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
             }
         });
 
-        LoadAddressTask loadAddressTask = new LoadAddressTask(getActivity().getApplicationContext(), appParams) {
+        myPlace.setEnabled(false);
+        myPlace.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
-            public void setValue(String s) {
-                myPlace.setSummary(s);
+            public boolean onPreferenceClick(Preference preference) {
+                removeMyPlaceDialog.show();
+                return true;
             }
-        };
-        loadAddressTask.execute();
+        });
+
+        GeoPoint homeLocation = appParams.getHomeLocation();
+        if (homeLocation == null) {
+            myPlace.setSummary(resources.getString(R.string.place_not_defined));
+        } else {
+            LoadAddressTask loadAddressTask = new LoadAddressTask(getActivity().getApplicationContext(), homeLocation) {
+                @Override
+                public void setValue(String s) {
+                    myPlace.setSummary(s);
+                    myPlace.setEnabled(true);
+                }
+            };
+            loadAddressTask.execute();
+        }
     }
 
     private PrefData getEntryByValue(String value, int entriesId, int valuesId) {

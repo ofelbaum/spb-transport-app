@@ -102,11 +102,11 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                 mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
-                        String msg = getResources().getString(com.emal.android.transport.spb.R.string.removemyplace);
-                        removeMyPlaceDialog.setMessage(msg);
-                        removeMyPlaceDialog.show();
-
-                        return true;
+                        if (marker.equals(myPlaceMarker)) {
+                            removeMyPlaceDialog.show();
+                            return true;
+                        }
+                        return false;
                     }
                 });
                 mUiSettings = mMap.getUiSettings();
@@ -151,6 +151,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
                 builder = new AlertDialog.Builder(GMapsV2Activity.this);
                 builder.setCancelable(false)
+                        .setMessage(getResources().getString(com.emal.android.transport.spb.R.string.removemyplace))
                         .setPositiveButton(yes, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
@@ -192,6 +193,10 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
             this.startActivity(new Intent(this, this.getClass()));
         }
 
+        GeoPoint homeLocation = appParams.getHomeLocation();
+        if (homeLocation == null && myPlaceMarker != null) {
+            myPlaceMarker.remove();
+        }
         vehicleSyncAdapter = new GMapVehicleSyncAdapter(mapFragment, menu);
         vehicleSyncAdapter.setSyncTime(appParams.getSyncTime());
         vehicleSyncAdapter.setIconSize(appParams.getIconSize());

@@ -8,12 +8,12 @@
     <string name="vehicle_tram">Tram</string>
     <string name="vehicle_ship">Aquabus</string>
     <string name="cur_location">Current</string>
-    <string name="home_location">My Place</string>
+    <string name="home_location">My Bookmark</string>
     <string name="settings">Settings</string>
     <string name="vehicle_type">Layers</string>
     <string name="map_type">Map type</string>
     <string name="refresh_period">Refresh Time</string>
-    <string name="my_place">My Place</string>
+    <string name="my_place">My Bookmark</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="choose_period">Choose</string>
@@ -24,7 +24,7 @@
     <string name="version">${app.version}</string>
     <string name="copyright">&#169; 2014 Alexey Emelyanenko</string>
     <string name="email">alexey.emelyanenko@gmail.com</string>
-    <string name="addmyplace">Add my place at %1$s?</string>
+    <string name="addmyplace">Add bookmark at %1$s?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="wait">Please wait...</string>
@@ -127,7 +127,8 @@
     <string name="app_theme">Theme</string>
     <string name="icon_size">Icon Size</string>
     <string name="icon_size_title">Please select a value for the transport icons:</string>
-    <string name="removemyplace">Удалить закладку?</string>
+    <string name="removemyplace">Remove bookmark?</string>
+    <string name="place_not_defined">Value is not set</string>
 
     <array name="icon_size_array">
         <item>0</item>
