@@ -87,6 +87,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
                     public void onClick(DialogInterface dialog, int which) {
                         appParams.setHomeLocation(null);
                         myPlace.setSummary(R.string.place_not_defined);
+                        myPlace.setEnabled(false);
                         dialog.cancel();
                     }
                 })

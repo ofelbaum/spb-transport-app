@@ -155,6 +155,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public Marker addMarker(MarkerOptions options) {
+        //TODO fix NPE
         return mapFragment.getMap().addMarker(options);
     }
 
