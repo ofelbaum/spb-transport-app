@@ -102,7 +102,7 @@
 
     <string-array name="menu_items_array">
         <item>Search</item>
-        <item>My Place</item>
+        <item>My Bookmark</item>
         <item>Settings</item>
         <item>Info</item>
     </string-array>
