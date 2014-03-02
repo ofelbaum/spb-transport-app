@@ -192,13 +192,13 @@ public class SearchActivity extends Activity {
                 }
             });
 
-            if (list == null && !isFinishing()) {
+            if (list != null) {
+                findedRoutes = routesStorage.rebuildStorage(list, appParams.getSelectedVehicleTypes());
+                queryAndShowResult(searchView.getQuery().toString());
+            } else if (!isFinishing()) {
                 //An error occurred
-                UIHelper.getErrorDialog(listView.getContext());
-                return;
+                UIHelper.getErrorDialog(SearchActivity.this);
             }
-            findedRoutes = routesStorage.rebuildStorage(list, appParams.getSelectedVehicleTypes());
-            queryAndShowResult(searchView.getQuery().toString());
         }
     }
 

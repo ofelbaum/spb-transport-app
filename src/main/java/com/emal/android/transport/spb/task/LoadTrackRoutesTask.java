@@ -3,6 +3,8 @@ package com.emal.android.transport.spb.task;
 import android.os.AsyncTask;
 import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.VehicleTracker;
+import com.emal.android.transport.spb.VehicleType;
+import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.portal.Route;
 
 import java.io.IOException;
@@ -15,14 +17,17 @@ import java.util.Collection;
 public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
     private Collection<String> routesToTrack;
     private VehicleSyncAdapter vehicleSyncAdapter;
+    private ApplicationParams appParams;
     private VehicleTracker vehicleTracker;
 
     public LoadTrackRoutesTask(Collection<String> routesToTrack,
                                VehicleSyncAdapter vehicleSyncAdapter,
-                               VehicleTracker vehicleTracker) {
+                               VehicleTracker vehicleTracker,
+                               ApplicationParams appParams) {
         this.routesToTrack = routesToTrack;
         this.vehicleSyncAdapter = vehicleSyncAdapter;
         this.vehicleTracker = vehicleTracker;
+        this.appParams = appParams;
     }
 
     @Override
@@ -37,6 +42,20 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
                 return false;
             }
         }
+
+        if (appParams.isShowBus()) {
+            vehicleTracker.startTrack(VehicleType.BUS);
+        }
+        if (appParams.isShowShip()) {
+            vehicleTracker.startTrack(VehicleType.SHIP);
+        }
+        if (appParams.isShowTram()) {
+            vehicleTracker.startTrack(VehicleType.TRAM);
+        }
+        if (appParams.isShowTrolley()) {
+            vehicleTracker.startTrack(VehicleType.TROLLEY);
+        }
+
         return true;
     }
 
@@ -48,7 +67,7 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean o) {
         if (Boolean.TRUE.equals(o)) {
-            vehicleTracker.syncVehicles();
+            vehicleTracker.startSync();
         } else {
             vehicleSyncAdapter.showError();
         }

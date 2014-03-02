@@ -31,14 +31,16 @@ public class VehicleTracker {
         @Override
         public void run() {
             //TODO
-            int syncTime = vehicleSyncAdapter.getSyncTime();
-            Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
-            syncVehicles();
-            mHandler.postDelayed(this, syncTime);
+            synchronized (VehicleTracker.this) {
+                int syncTime = vehicleSyncAdapter.getSyncTime();
+                Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
+                syncVehicles(false);
+                mHandler.postDelayed(this, syncTime);
+            }
         }
     }
 
-    public void startSync() {
+    public synchronized void startSync() {
         Log.d(TAG, "startSync");
         vehicleSyncAdapter.setBBox();
         if (timerTask != null) {
@@ -57,11 +59,11 @@ public class VehicleTracker {
         routeTaskMap = new HashMap<Route, AsyncTask>();
     }
 
-    public boolean startTrack(VehicleType vehicleType) {
+    public synchronized boolean startTrack(VehicleType vehicleType) {
         return vehicleTypes.add(vehicleType);
     }
 
-    public void startTrack(Route route) {
+    public synchronized void startTrack(Route route) {
         AsyncTask asyncTask = routeTaskMap.get(route);
         if (asyncTask == null) {
             routeTaskMap.put(route, null);
@@ -92,11 +94,7 @@ public class VehicleTracker {
         Log.d(TAG, "stopTrackAllRoutes >>");
     }
 
-    public void syncVehicles() {
-        syncVehicles(false);
-    }
-
-    public void syncVehicles(boolean clearBeforeUpdate) {
+    private synchronized void syncVehicles(boolean clearBeforeUpdate) {
         Log.d(TAG, "syncVehicles <<");
         if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
             Log.d(TAG, "Reschedule vehicleTypes");
@@ -129,17 +127,17 @@ public class VehicleTracker {
         Log.d(TAG, "syncVehicles >>");
     }
 
-    public void stopTracking() {
+    public synchronized void stopTracking() {
         mHandler.removeCallbacks(timerTask);
         if (timerTask != null) {
             timerTask.cancel();
         }
 
-        vehicleSyncAdapter.clearOverlay();
-        vehicleTypes.clear();
+        //vehicleTypes.clear();
         if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
             syncTypesTask.cancel(true);
         }
+        vehicleSyncAdapter.clearOverlay();
 
         stopTrackAllRoutes();
     }

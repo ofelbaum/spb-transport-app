@@ -7,11 +7,11 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
 import com.emal.android.transport.spb.*;
 import android.os.Bundle;
-import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.model.ApplicationParams;
 import com.emal.android.transport.spb.portal.*;
 import com.emal.android.transport.spb.task.LoadTrackRoutesTask;
@@ -44,6 +44,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
     private boolean mMapIsTouched = false;
     private BroadcastReceiver networkStatusReceiver;
     private Marker myPlaceMarker;
+    private AsyncTask<Object, Void, Boolean> initVehicleTrackerTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -167,10 +168,6 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                             }
                         });
                 removeMyPlaceDialog = builder.create();
-
-                if (vehicleTracker != null) {
-                    vehicleTracker.startSync();
-                }
             }
         });
     }
@@ -206,20 +203,6 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
         vehicleTracker = new VehicleTracker(vehicleSyncAdapter);
 
         moveToLocation(appParams.getLastLocation());
-        vehicleTracker.startSync();
-
-        if (appParams.isShowBus()) {
-            vehicleTracker.startTrack(VehicleType.BUS);
-        }
-        if (appParams.isShowShip()) {
-            vehicleTracker.startTrack(VehicleType.SHIP);
-        }
-        if (appParams.isShowTram()) {
-            vehicleTracker.startTrack(VehicleType.TRAM);
-        }
-        if (appParams.isShowTrolley()) {
-            vehicleTracker.startTrack(VehicleType.TROLLEY);
-        }
 
         if (networkStatusReceiver == null) {
             networkStatusReceiver = new BroadcastReceiver() {
@@ -252,12 +235,10 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
     private void loadTrackedRoutes() {
         final Set<String> routesToTrack = appParams.getRoutesToTrack();
-        if (!routesToTrack.isEmpty()) {
-            Log.d(TAG, "Start routes tracking");
-            new LoadTrackRoutesTask(routesToTrack, vehicleSyncAdapter, vehicleTracker).execute();
-        } else {
-            Log.d(TAG, "Start all routes tracking");
+        if (initVehicleTrackerTask != null && !AsyncTask.Status.FINISHED.equals(initVehicleTrackerTask.getStatus())) {
+            initVehicleTrackerTask.cancel(true);
         }
+        initVehicleTrackerTask = new LoadTrackRoutesTask(routesToTrack, vehicleSyncAdapter, vehicleTracker, appParams).execute();
     }
 
     @Override
@@ -276,6 +257,9 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
     @Override
     protected void onPause() {
         Log.d(TAG, "onPause");
+        if (initVehicleTrackerTask != null && !AsyncTask.Status.FINISHED.equals(initVehicleTrackerTask.getStatus())) {
+            initVehicleTrackerTask.cancel(true);
+        }
         if (vehicleTracker != null) {
             vehicleTracker.stopTracking();
         }

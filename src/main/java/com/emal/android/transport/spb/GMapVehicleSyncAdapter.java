@@ -11,6 +11,7 @@ import com.emal.android.transport.spb.utils.ErrorSignCallback;
 import com.emal.android.transport.spb.utils.GeoConverter;
 import com.emal.android.transport.spb.utils.MenuErrorSignCallback;
 import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
 
@@ -155,8 +156,8 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public Marker addMarker(MarkerOptions options) {
-        //TODO fix NPE
-        return mapFragment.getMap().addMarker(options);
+        GoogleMap map = mapFragment.getMap();
+        return map != null ? map.addMarker(options) : null;
     }
 
     @Override

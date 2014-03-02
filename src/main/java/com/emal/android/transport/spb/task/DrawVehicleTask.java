@@ -80,7 +80,9 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
                 oldMarker.remove();
                 routeMarkers.remove(oldMarker);
             }
-            markers.put(vehId, newMarker);
+            if (newMarker != null) {
+                markers.put(vehId, newMarker);
+            }
         }
 
         Log.d(TAG, "Remainig markers " + routeMarkers.size() + " for route " + route);
