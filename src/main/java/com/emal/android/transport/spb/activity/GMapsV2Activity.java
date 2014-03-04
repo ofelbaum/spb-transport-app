@@ -244,11 +244,6 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop");
-        try {
-            unregisterReceiver(networkStatusReceiver);
-        } catch (Exception e) {
-            Log.d(TAG, "Exception during unregistration, Cause: " + e.getMessage());
-        }
         portalClient.reset();
         super.onStop();
         EasyTracker.getInstance(this).activityStop(this);
@@ -262,6 +257,11 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
         }
         if (vehicleTracker != null) {
             vehicleTracker.stopTracking();
+        }
+        try {
+            unregisterReceiver(networkStatusReceiver);
+        } catch (Exception e) {
+            Log.d(TAG, "Exception during unregistration, Cause: " + e.getMessage());
         }
         vehicleSyncAdapter = null;
         vehicleTracker = null;
