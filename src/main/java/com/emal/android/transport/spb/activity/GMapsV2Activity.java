@@ -68,7 +68,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                         appParams.setLastLocation(cameraPosition.target);
                         appParams.setZoomSize((int) cameraPosition.zoom);
                         if (Boolean.FALSE.equals(mMapIsTouched) && vehicleTracker != null) {
-                            vehicleTracker.startSync();
+                            vehicleTracker.start();
                         }
                     }
                 });
@@ -115,6 +115,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                 mUiSettings.setZoomControlsEnabled(true);
                 mUiSettings.setCompassEnabled(false);
                 mUiSettings.setRotateGesturesEnabled(false);
+                mUiSettings.setTiltGesturesEnabled(false);
 
                 GeoPoint home = appParams.getHomeLocation();
                 if (home != null) {
@@ -256,7 +257,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
             initVehicleTrackerTask.cancel(true);
         }
         if (vehicleTracker != null) {
-            vehicleTracker.stopTracking();
+            vehicleTracker.stop();
         }
         try {
             unregisterReceiver(networkStatusReceiver);

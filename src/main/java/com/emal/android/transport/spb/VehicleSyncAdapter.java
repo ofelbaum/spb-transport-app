@@ -2,9 +2,12 @@ package com.emal.android.transport.spb;
 
 import android.graphics.Bitmap;
 import com.emal.android.transport.spb.portal.PortalClient;
+import com.emal.android.transport.spb.portal.Route;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.List;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -48,4 +51,8 @@ public interface VehicleSyncAdapter {
     int getSyncTime();
 
     void setSyncTime(int syncTime);
+
+    void updateMarkers(Route route, List<Marker> markers);
+
+    void removeMarkers(Route key);
 }

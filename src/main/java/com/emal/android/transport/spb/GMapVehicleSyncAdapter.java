@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.view.Menu;
 import com.emal.android.transport.spb.portal.PortalClient;
+import com.emal.android.transport.spb.portal.Route;
 import com.emal.android.transport.spb.utils.Constants;
 import com.emal.android.transport.spb.utils.ErrorSignCallback;
 import com.emal.android.transport.spb.utils.GeoConverter;
@@ -14,6 +15,10 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * User: alexey.emelyanenko@gmail.com
@@ -28,11 +33,13 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private LatLngBounds latLngBounds;
     private ErrorSignCallback errorSignCallback;
     private int iconSize = Constants.DEFAULT_ICON_SIZE;
+    private Map<Route, List<Marker>> markers;
 
     public GMapVehicleSyncAdapter(SupportMapFragment mapFragment, Menu menu) {
         this.mapFragment = mapFragment;
         this.activity = mapFragment.getActivity();
         this.errorSignCallback = new MenuErrorSignCallback(menu);
+        this.markers = new ConcurrentHashMap<Route, List<Marker>>();
     }
 
     @Override
@@ -94,8 +101,8 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
             errorSignCallback.hide();
 
             BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize=4;
-            BitmapDescriptor image= BitmapDescriptorFactory.fromBitmap(result);
+            o2.inSampleSize = 4;
+            BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(result);
 
             LatLngBounds latLngBounds = mapFragment.getMap().getProjection().getVisibleRegion().latLngBounds;
             GroundOverlay vehicleOverlayNew = mapFragment.getMap().addGroundOverlay(new GroundOverlayOptions()
@@ -206,5 +213,22 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     public void setSyncTime(int syncTime) {
         this.syncTime = syncTime;
+    }
+
+    @Override
+    public void updateMarkers(Route route, List<Marker> list) {
+        removeMarkers(route);
+        markers.put(route, list);
+    }
+
+    @Override
+    public void removeMarkers(Route route) {
+        List<Marker> list = markers.get(route);
+        if (list == null) {
+            return;
+        }
+        for (Marker marker : list) {
+            marker.remove();
+        }
     }
 }

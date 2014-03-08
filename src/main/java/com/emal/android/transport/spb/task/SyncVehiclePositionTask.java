@@ -18,21 +18,18 @@ import java.util.Set;
  */
 public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
     private static final String TAG = SyncVehiclePositionTask.class.getName();
-
     private VehicleSyncAdapter vehicleSyncAdapter;
     private String vehiclesStr;
-    private boolean clearBeforeUpdate = false;
     private Set<VehicleType> vehicleTypes;
 
-    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<VehicleType> vehicleTypes, boolean clearBeforeUpdate) {
+    public SyncVehiclePositionTask(VehicleSyncAdapter vehicleSyncAdapter, Set<VehicleType> vehicleTypes) {
         this.vehicleSyncAdapter = vehicleSyncAdapter;
-        this.clearBeforeUpdate = clearBeforeUpdate;
         this.vehicleTypes = vehicleTypes;
     }
 
     @Override
     protected void onPreExecute() {
-        vehicleSyncAdapter.beforeSync(clearBeforeUpdate);
+        vehicleSyncAdapter.beforeSync(false);
     }
 
     @Override

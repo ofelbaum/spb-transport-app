@@ -7,7 +7,6 @@ import android.util.Log;
 import com.emal.android.transport.spb.portal.Route;
 import com.emal.android.transport.spb.task.DrawVehicleTask;
 import com.emal.android.transport.spb.task.SyncVehiclePositionTask;
-import com.google.android.gms.maps.model.Marker;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,11 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VehicleTracker {
     private static final String TAG = VehicleTracker.class.getName();
     private AsyncTask syncTypesTask;
-    private Map<Route, AsyncTask> routeTaskMap;
     private Set<VehicleType> vehicleTypes;
+    private Map<Route, AsyncTask> routeTaskMap;
     private VehicleSyncAdapter vehicleSyncAdapter;
-
-    private Map<String, Map<String, Marker>> markers;
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private TimerTask timerTask;
 
@@ -34,14 +31,20 @@ public class VehicleTracker {
             synchronized (VehicleTracker.this) {
                 int syncTime = vehicleSyncAdapter.getSyncTime();
                 Log.d(TAG, "START Timer Update " + Thread.currentThread().getName() + " with time " + syncTime);
-                syncVehicles(false);
+                scheduleTasks();
                 mHandler.postDelayed(this, syncTime);
             }
         }
     }
 
-    public synchronized void startSync() {
-        Log.d(TAG, "startSync");
+    public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter) {
+        this.vehicleSyncAdapter = vehicleSyncAdapter;
+        this.vehicleTypes = Collections.synchronizedSet(new HashSet<VehicleType>());
+        this.routeTaskMap = new ConcurrentHashMap<Route, AsyncTask>();
+    }
+
+    public synchronized void start() {
+        Log.d(TAG, "start");
         vehicleSyncAdapter.setBBox();
         if (timerTask != null) {
             timerTask.cancel();
@@ -52,21 +55,14 @@ public class VehicleTracker {
         mHandler.postDelayed(timerTask, 0);
     }
 
-    public VehicleTracker(VehicleSyncAdapter vehicleSyncAdapter) {
-        this.vehicleSyncAdapter = vehicleSyncAdapter;
-        this.markers = new ConcurrentHashMap<String, Map<String, Marker>>();
-        vehicleTypes = new HashSet<VehicleType>();
-        routeTaskMap = new HashMap<Route, AsyncTask>();
-    }
-
-    public synchronized boolean startTrack(VehicleType vehicleType) {
+    public boolean add(VehicleType vehicleType) {
         return vehicleTypes.add(vehicleType);
     }
 
-    public synchronized void startTrack(Route route) {
+    public synchronized void add(Route route) {
         AsyncTask asyncTask = routeTaskMap.get(route);
         if (asyncTask == null) {
-            routeTaskMap.put(route, null);
+            routeTaskMap.put(route, new DrawVehicleTask(route, vehicleSyncAdapter));
         }
     }
 
@@ -74,7 +70,17 @@ public class VehicleTracker {
         return new ArrayList<Route>(routeTaskMap.keySet());
     }
 
-    private void stopTrackAllRoutes() {
+    public synchronized void stop() {
+        mHandler.removeCallbacks(timerTask);
+        if (timerTask != null) {
+            timerTask.cancel();
+        }
+
+        if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
+            syncTypesTask.cancel(true);
+        }
+        vehicleSyncAdapter.clearOverlay();
+
         Log.d(TAG, "stopTrackAllRoutes <<");
         for (Map.Entry<Route, AsyncTask> task : routeTaskMap.entrySet()) {
             Route key = task.getKey();
@@ -83,62 +89,32 @@ public class VehicleTracker {
                 value.cancel(true);
             }
 
-            Map<String, Marker> markers1 = markers.get(key.getId());
-            if (markers1 != null) {
-                for (Marker marker : markers1.values()) {
-                    marker.remove();
-                }
-            }
+            vehicleSyncAdapter.removeMarkers(key);
         }
         routeTaskMap.clear();
         Log.d(TAG, "stopTrackAllRoutes >>");
     }
 
-    private synchronized void syncVehicles(boolean clearBeforeUpdate) {
-        Log.d(TAG, "syncVehicles <<");
+    private synchronized void scheduleTasks() {
+        Log.d(TAG, "scheduleTasks <<");
         if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
             Log.d(TAG, "Reschedule vehicleTypes");
             syncTypesTask.cancel(true);
         }
         if (!vehicleTypes.isEmpty() && routeTaskMap.isEmpty()) {
             Log.d(TAG, "Scheduling typed layout for types: " + vehicleTypes);
-            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes, clearBeforeUpdate);
-            syncTypesTask.execute();
+            syncTypesTask = new SyncVehiclePositionTask(vehicleSyncAdapter, vehicleTypes).execute();
         }
 
         for (Route route : routeTaskMap.keySet()) {
             Log.d(TAG, "Scheduling route: " + route);
-            String routeId = route.getId();
-            AsyncTask value = routeTaskMap.get(routeId);
-            if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
-                value.cancel(true);
+            AsyncTask task = routeTaskMap.get(route);
+            if (task != null && !AsyncTask.Status.FINISHED.equals(task.getStatus())) {
+                task.cancel(true);
             }
-            Map<String, Marker> markersForRoute = markers.get(routeId);
-            if (markersForRoute == null) {
-                Log.d(TAG, "Add new map for markers for route: " + route);
-                markersForRoute = new HashMap<String, Marker>();
-                markers.put(routeId, markersForRoute);
-            }
-            value = new DrawVehicleTask(route, markersForRoute, vehicleSyncAdapter);
-            value.execute();
-            routeTaskMap.put(route, value);
-
+            task = new DrawVehicleTask(route, vehicleSyncAdapter).execute();
+            routeTaskMap.put(route, task);
         }
-        Log.d(TAG, "syncVehicles >>");
-    }
-
-    public synchronized void stopTracking() {
-        mHandler.removeCallbacks(timerTask);
-        if (timerTask != null) {
-            timerTask.cancel();
-        }
-
-        //vehicleTypes.clear();
-        if (syncTypesTask != null && !AsyncTask.Status.FINISHED.equals(syncTypesTask.getStatus())) {
-            syncTypesTask.cancel(true);
-        }
-        vehicleSyncAdapter.clearOverlay();
-
-        stopTrackAllRoutes();
+        Log.d(TAG, "scheduleTasks >>");
     }
 }

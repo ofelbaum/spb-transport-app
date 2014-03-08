@@ -17,12 +17,10 @@ import java.util.*;
 public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
     private static final String TAG = DrawVehicleTask.class.getName();
     private Route route;
-    private Map<String, Marker> markers;
     private VehicleSyncAdapter vehicleSyncAdapter;
 
-    public DrawVehicleTask(Route route, Map<String, Marker> markers, VehicleSyncAdapter vehicleSyncAdapter) {
+    public DrawVehicleTask(Route route, VehicleSyncAdapter vehicleSyncAdapter) {
         this.route = route;
-        this.markers = markers;
         this.vehicleSyncAdapter = vehicleSyncAdapter;
     }
 
@@ -52,8 +50,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
             return;
         }
         Log.d(TAG, "Found new vehicles size: " + vehicles.size());
-        Collection<Marker> routeMarkers = new ArrayList<Marker>(markers.values());
-        Log.d(TAG, "Found markers " + routeMarkers.size() + " for route " + route);
+        List<Marker> routeMarkers = new ArrayList<Marker>();
 
         for (Vehicle v : vehicles) {
             Double latitude = v.getGeometry().getLatitude();
@@ -74,22 +71,10 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
             String vehId = v.getId();
             Log.d(TAG, "Add new marker for vehicle: " + vehId);
             Marker newMarker = vehicleSyncAdapter.addMarker(title);
-            Marker oldMarker = markers.get(vehId);
-            if (oldMarker != null) {
-                Log.d(TAG, "Found old marker for vehicle: " + vehId);
-                oldMarker.remove();
-                routeMarkers.remove(oldMarker);
-            }
-            if (newMarker != null) {
-                markers.put(vehId, newMarker);
-            }
+            routeMarkers.add(newMarker);
         }
 
-        Log.d(TAG, "Remainig markers " + routeMarkers.size() + " for route " + route);
-        for (Marker routeMarker : routeMarkers) {
-            routeMarker.remove();
-        }
-
+        vehicleSyncAdapter.updateMarkers(route, routeMarkers);
         vehicleSyncAdapter.afterSync(true);
     }
 

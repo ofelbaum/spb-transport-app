@@ -36,7 +36,7 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
             String[] decode = Route.decode(s);
             try {
                 Route route = vehicleSyncAdapter.getPortalClient().findRoute(decode[0], decode[1]);
-                vehicleTracker.startTrack(route);
+                vehicleTracker.add(route);
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
@@ -44,16 +44,16 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
         }
 
         if (appParams.isShowBus()) {
-            vehicleTracker.startTrack(VehicleType.BUS);
+            vehicleTracker.add(VehicleType.BUS);
         }
         if (appParams.isShowShip()) {
-            vehicleTracker.startTrack(VehicleType.SHIP);
+            vehicleTracker.add(VehicleType.SHIP);
         }
         if (appParams.isShowTram()) {
-            vehicleTracker.startTrack(VehicleType.TRAM);
+            vehicleTracker.add(VehicleType.TRAM);
         }
         if (appParams.isShowTrolley()) {
-            vehicleTracker.startTrack(VehicleType.TROLLEY);
+            vehicleTracker.add(VehicleType.TROLLEY);
         }
 
         return true;
@@ -61,13 +61,13 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
 
     @Override
     protected void onPreExecute() {
-        vehicleTracker.stopTracking();
+        vehicleTracker.stop();
     }
 
     @Override
     protected void onPostExecute(Boolean o) {
         if (Boolean.TRUE.equals(o)) {
-            vehicleTracker.startSync();
+            vehicleTracker.start();
         } else {
             vehicleSyncAdapter.showError();
         }
