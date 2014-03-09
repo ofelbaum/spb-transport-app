@@ -5,6 +5,7 @@ import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.VehicleTracker;
 import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.model.ApplicationParams;
+import com.emal.android.transport.spb.portal.PortalClientException;
 import com.emal.android.transport.spb.portal.Route;
 
 import java.io.IOException;
@@ -40,6 +41,8 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
+            } catch (PortalClientException e) {
+                e.printStackTrace();
             }
         }
 

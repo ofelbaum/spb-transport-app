@@ -180,14 +180,14 @@ public class PortalClient {
         return allRoutes;
     }
 
-    public Route findRoute(String id, String number) throws IOException {
+    public Route findRoute(String id, String number) throws IOException, PortalClientException {
         List<Route> routes = internalFindRoutes(number, VehicleType.values());
         for (Route route : routes) {
             if (id.equals(route.getId())) {
                 return route;
             }
         }
-        return null;
+        throw new PortalClientException("Route id=" + id + ", number=" + number + " not found");
     }
 
     private List<Route> internalFindRoutes(String s, VehicleType... types) throws IOException {
