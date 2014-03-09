@@ -104,16 +104,19 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
             o2.inSampleSize = 4;
             BitmapDescriptor image = BitmapDescriptorFactory.fromBitmap(result);
 
-            LatLngBounds latLngBounds = mapFragment.getMap().getProjection().getVisibleRegion().latLngBounds;
-            GroundOverlay vehicleOverlayNew = mapFragment.getMap().addGroundOverlay(new GroundOverlayOptions()
-                    .image(image)
-                    .zIndex(Float.MAX_VALUE)
-                    .positionFromBounds(latLngBounds));
-
-            if (vehicleOverlay != null) {
-                vehicleOverlay.remove();
+            GoogleMap map = mapFragment.getMap();
+            if (map != null) {
+                LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+                GroundOverlay vehicleOverlayNew = map.addGroundOverlay(new GroundOverlayOptions()
+                        .image(image)
+                        .zIndex(Float.MAX_VALUE)
+                        .positionFromBounds(latLngBounds));
+                if (vehicleOverlay != null) {
+                    vehicleOverlay.remove();
+                }
+                vehicleOverlay = vehicleOverlayNew;
             }
-            vehicleOverlay = vehicleOverlayNew;
+
             result.recycle();
         } else {
             new Handler().postAtTime(new Runnable() {
