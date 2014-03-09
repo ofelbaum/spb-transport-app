@@ -183,16 +183,6 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     }
 
     @Override
-    public void setTrafficEnabled(boolean showTraffic) {
-        mapFragment.getMap().setTrafficEnabled(showTraffic);
-    }
-
-    @Override
-    public void setMapType(int i) {
-        mapFragment.getMap().setMapType(i);
-    }
-
-    @Override
     public void moveCamera(CameraUpdate cameraUpdate) {
         mapFragment.getMap().moveCamera(cameraUpdate);
     }

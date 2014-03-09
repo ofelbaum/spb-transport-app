@@ -61,6 +61,8 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
             @Override
             public void setMap(final GoogleMap mMap) {
                 mMap.setMyLocationEnabled(true);
+                mMap.setTrafficEnabled(appParams.isShowTraffic());
+                mMap.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
 
                 mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                     @Override
@@ -169,14 +171,15 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                             }
                         });
                 removeMyPlaceDialog = builder.create();
+
+                moveToLocation(appParams.getLastLocation());
             }
         });
     }
 
     private void moveToLocation(GeoPoint geoPoint) {
         Log.d(TAG, "Move to location: " + geoPoint.toString());
-        LatLng latLng = new LatLng(geoPoint.getLatitudeE6() / 1E6, geoPoint.getLongitudeE6() / 1E6);
-        vehicleSyncAdapter.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, appParams.getZoomSize()));
+        vehicleSyncAdapter.moveCamera(GeoConverter.toCameraUpdate(geoPoint, appParams.getZoomSize()));
         appParams.setLastLocation(geoPoint);
     }
 
@@ -198,12 +201,8 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
         vehicleSyncAdapter = new GMapVehicleSyncAdapter(mapFragment, menu);
         vehicleSyncAdapter.setSyncTime(appParams.getSyncTime());
         vehicleSyncAdapter.setIconSize(appParams.getIconSize());
-        vehicleSyncAdapter.setTrafficEnabled(appParams.isShowTraffic());
-        vehicleSyncAdapter.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
 
         vehicleTracker = new VehicleTracker(vehicleSyncAdapter);
-
-        moveToLocation(appParams.getLastLocation());
 
         if (networkStatusReceiver == null) {
             networkStatusReceiver = new BroadcastReceiver() {

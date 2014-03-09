@@ -1,7 +1,7 @@
 package com.emal.android.transport.spb.task;
 
 import android.os.AsyncTask;
-import com.emal.android.transport.spb.portal.PortalClient;
+import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.portal.Stop;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
@@ -16,12 +16,12 @@ import java.util.List;
  * @since: 1.5
  */
 public class DrawStopsTask extends AsyncTask<Object, Void, List<Stop>>{
-    private PortalClient portalClient;
+    private VehicleSyncAdapter vehicleSyncAdapter;
     private GoogleMap mMap;
     private List<Marker> stopList;
 
-    public DrawStopsTask(PortalClient portalClient, GoogleMap mMap, List<Marker> stopList) {
-        this.portalClient = portalClient;
+    public DrawStopsTask(VehicleSyncAdapter vehicleSyncAdapter, GoogleMap mMap, List<Marker> stopList) {
+        this.vehicleSyncAdapter = vehicleSyncAdapter;
         this.mMap = mMap;
         this.stopList = stopList;
     }
@@ -30,7 +30,7 @@ public class DrawStopsTask extends AsyncTask<Object, Void, List<Stop>>{
     protected List<Stop> doInBackground(Object... params) {
         List<Stop> stopsList = null;
         try {
-            stopsList = portalClient.getStopsList();
+            stopsList = vehicleSyncAdapter.getPortalClient().getStopsList();
         } catch (IOException e) {
             e.printStackTrace();
         }

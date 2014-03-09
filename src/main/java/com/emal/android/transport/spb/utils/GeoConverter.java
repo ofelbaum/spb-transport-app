@@ -1,9 +1,13 @@
 package com.emal.android.transport.spb.utils;
 
 import android.location.Address;
+import android.util.Log;
 import android.util.Pair;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapView;
 
 /**
@@ -27,6 +31,7 @@ public class GeoConverter {
 
     /**
      * Get BBOX parameter from map view
+     *
      * @param mapView
      * @return
      */
@@ -76,11 +81,11 @@ public class GeoConverter {
         double originShift = 2 * Math.PI * 6378137 / 2.0;
         double lon = (mx / originShift) * 180.0;
         double lat = (my / originShift) * 180.0;
-        lat = 180 / Math.PI * (2 * Math.atan( Math.exp( lat * Math.PI / 180.0)) - Math.PI / 2.0);
+        lat = 180 / Math.PI * (2 * Math.atan(Math.exp(lat * Math.PI / 180.0)) - Math.PI / 2.0);
         return new Double[]{lat, lon};
     }
 
-    public static double distance(double lat1, double lon1, double lat2, double lon2){
+    public static double distance(double lat1, double lon1, double lat2, double lon2) {
         double lat1r = lat1 * Math.PI / 180;
         double lon1r = lon1 * Math.PI / 180;
         double lat2r = lat2 * Math.PI / 180;
@@ -90,7 +95,12 @@ public class GeoConverter {
 
         double up = Math.sqrt(Math.pow(Math.cos(lat2r) * Math.sin(lonDelta), 2) + Math.pow(Math.cos(lat1r) * Math.sin(lat2r) - Math.sin(lat1r) * Math.cos(lat2r) * Math.cos(lonDelta), 2));
         double down = Math.sin(lat1r) * Math.sin(lat2r) + Math.cos(lat1r) * Math.cos(lat2r) * Math.cos(lonDelta);
-        double res = Math.atan(up /down) * 6367444.6571225;
+        double res = Math.atan(up / down) * 6367444.6571225;
         return res;
+    }
+
+    public static CameraUpdate toCameraUpdate(GeoPoint geoPoint, float zoom) {
+        LatLng latLng = new LatLng(geoPoint.getLatitudeE6() / 1E6, geoPoint.getLongitudeE6() / 1E6);
+        return CameraUpdateFactory.newLatLngZoom(latLng, zoom);
     }
 }

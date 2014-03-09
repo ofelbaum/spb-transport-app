@@ -38,10 +38,6 @@ public interface VehicleSyncAdapter {
 
     void showError();
 
-    void setTrafficEnabled(boolean showTraffic);
-
-    void setMapType(int i);
-
     void moveCamera(CameraUpdate cameraUpdate);
 
     float getScaleFactor();
