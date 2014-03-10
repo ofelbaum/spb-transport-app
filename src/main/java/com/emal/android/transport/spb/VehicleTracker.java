@@ -43,8 +43,8 @@ public class VehicleTracker {
         this.routeTaskMap = new ConcurrentHashMap<Route, AsyncTask>();
     }
 
-    public synchronized void start() {
-        Log.d(TAG, "start");
+    public synchronized void restart() {
+        Log.d(TAG, "restart");
         vehicleSyncAdapter.setBBox();
         if (timerTask != null) {
             timerTask.cancel();
@@ -53,6 +53,12 @@ public class VehicleTracker {
         }
         mHandler.removeCallbacks(timerTask);
         mHandler.postDelayed(timerTask, 0);
+    }
+
+    public synchronized void start() {
+        Log.d(TAG, "start");
+        vehicleSyncAdapter.getPortalClient().reset();
+        restart();
     }
 
     public boolean add(VehicleType vehicleType) {

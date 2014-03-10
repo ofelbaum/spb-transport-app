@@ -42,9 +42,18 @@ public class PortalClient {
     private static String GET_STOPS_LIST_QUERY = "http://transport.orgp.spb.ru/Portal/transport/stops/list";
     private static String GET_ROUTE_QUERY = "http://transport.orgp.spb.ru/Portal/transport/route/%s";
     private static String GET_ROUTE_INFO_QUERY = "http://transport.orgp.spb.ru/Portal/transport/mapx/innerRouteVehicle?ROUTE={1}&SCOPE={2}&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetFeature&SRS=EPSG%3A900913&LAYERS=&WHEELCHAIRONLY=false&_OLSALT=0.6481046043336391&BBOX={3}";
+//    http://transport.orgp.spb.ru/Portal/transport/route/1504/stops/return
+
     //    private static String GET_ROUTE_INFO_QUERY2 = "http://transport.orgp.spb.ru/Portal/transport/map/poi?ROUTE={1}&REQUEST=GetFeature&_=1385406049565";
 //    http://transport.orgp.spb.ru/Portal/transport/route/1504/stops/direct
-//    http://transport.orgp.spb.ru/Portal/transport/route/1504/stops/return
+    // Set the timeout in milliseconds until a connection is established.
+    // The default value is zero, that means the timeout is not used.
+    private static final int timeoutConnection = 5000;
+
+    // Set the default socket timeout (SO_TIMEOUT)
+    // in milliseconds which is the timeout for waiting for data.
+    private static final int timeoutSocket = 5000;
+
     private List<Route> allRoutes;
 
     private static final String BBOX = "3236938.2945543,8256172.549016,3492103.4398571,8480968.3457368";
@@ -71,11 +80,9 @@ public class PortalClient {
             params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE, new ConnPerRouteBean(3));
             params.setParameter(CoreConnectionPNames.TCP_NODELAY, true);
             params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
-            int timeoutConnection = 5000;
-            HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
-            int timeoutSocket = 5000;
-            HttpConnectionParams.setSoTimeout(params, timeoutSocket);
 
+            HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(params, timeoutSocket);
             HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
 
             ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
@@ -93,6 +100,9 @@ public class PortalClient {
 
     private HttpClient getScopeBasedHttpClient() {
         BasicHttpParams params = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
+        HttpConnectionParams.setSoTimeout(params, timeoutSocket);
+
         SchemeRegistry schemeRegistry = new SchemeRegistry();
         schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
         ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
@@ -105,12 +115,13 @@ public class PortalClient {
         HttpResponse httpResponse;
         String content;
 
-        Log.d(TAG, "Get client: " + scopeBasedHttpClient + "scope:" + scope);
-
         if (scopeBasedHttpClient == null) {
             Log.d(TAG, "Creating http client for route: " + route);
 
             BasicHttpParams params = new BasicHttpParams();
+            HttpConnectionParams.setConnectionTimeout(params, timeoutConnection);
+            HttpConnectionParams.setSoTimeout(params, timeoutSocket);
+
             SchemeRegistry schemeRegistry = new SchemeRegistry();
             schemeRegistry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
             ClientConnectionManager cm = new ThreadSafeClientConnManager(params, schemeRegistry);
@@ -134,6 +145,8 @@ public class PortalClient {
                 throw new IllegalStateException("SCOPE is not defined");
             }
         }
+
+        Log.d(TAG, "Get client: " + scopeBasedHttpClient + "scope:" + scope);
 
         String format = GET_ROUTE_INFO_QUERY.replace("{1}", route).replace("{2}", scope).replace("{3}", BBOX);
         HttpGet httpGet = new HttpGet(format);
@@ -278,9 +291,13 @@ public class PortalClient {
         return new UrlEncodedFormEntity(formparams, "UTF-8");
     }
 
-    public void reset() {
+    public void destroy() {
         Log.d(TAG, "Reset portal client");
         allRoutes = null;
+        reset();
+    }
+
+    public void reset() {
         scopeBasedHttpClient = null;
         defaultHttpClient = null;
     }

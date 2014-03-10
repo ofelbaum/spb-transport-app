@@ -70,7 +70,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                         appParams.setLastLocation(cameraPosition.target);
                         appParams.setZoomSize((int) cameraPosition.zoom);
                         if (Boolean.FALSE.equals(mMapIsTouched) && vehicleTracker != null) {
-                            vehicleTracker.start();
+                            vehicleTracker.restart();
                         }
                     }
                 });
@@ -222,8 +222,8 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                     Log.d(TAG, "Network ON " + activeNetworkInfo.toString());
                     if (activeNetworkInfo.isConnected() && !isConnected) {
                         Log.d(TAG, "connected");
-                        loadTrackedRoutes();
                         isConnected = true;
+                        vehicleTracker.start();
                     }
                 }
             };
@@ -244,7 +244,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
     @Override
     protected void onStop() {
         Log.d(TAG, "onStop");
-        portalClient.reset();
+        portalClient.destroy();
         super.onStop();
         EasyTracker.getInstance(this).activityStop(this);
     }
