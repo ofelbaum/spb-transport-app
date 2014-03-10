@@ -29,7 +29,8 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private Activity activity;
     private SupportMapFragment mapFragment;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
-    private GroundOverlay vehicleOverlay;
+//    private GroundOverlay vehicleOverlay;
+    private Marker typedMarker;
     private LatLngBounds latLngBounds;
     private ErrorSignCallback errorSignCallback;
     private int iconSize = Constants.DEFAULT_ICON_SIZE;
@@ -60,8 +61,8 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
         }
 
         if (clearBeforeUpdate) {
-            if (vehicleOverlay != null) {
-                vehicleOverlay.remove();
+            if (typedMarker != null) {
+                typedMarker.remove();
             }
         }
     }
@@ -106,15 +107,23 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
             GoogleMap map = mapFragment.getMap();
             if (map != null) {
-                LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
-                GroundOverlay vehicleOverlayNew = map.addGroundOverlay(new GroundOverlayOptions()
-                        .image(image)
-                        .zIndex(Float.MAX_VALUE)
-                        .positionFromBounds(latLngBounds));
-                if (vehicleOverlay != null) {
-                    vehicleOverlay.remove();
+//                LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+//                GroundOverlay vehicleOverlayNew = map.addGroundOverlay(new GroundOverlayOptions()
+//                        .image(image)
+//                        .zIndex(Float.MAX_VALUE)
+//                        .positionFromBounds(latLngBounds));
+//                if (vehicleOverlay != null) {
+//                    vehicleOverlay.remove();
+//                }
+//                vehicleOverlay = vehicleOverlayNew;
+                //TODO
+                if (typedMarker != null) {
+                    typedMarker.remove();
                 }
-                vehicleOverlay = vehicleOverlayNew;
+                MarkerOptions options = new MarkerOptions();
+                options.icon(image).anchor(0.5f, 0.5f)
+                        .position(map.getCameraPosition().target);
+                typedMarker = map.addMarker(options);
             }
 
             result.recycle();
@@ -129,13 +138,23 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     }
 
     @Override
-    public int getScreenWidth() {
+    public int getScaledWidth() {
         return (int) (mapFragment.getView().getWidth() / getScaleFactor());
     }
 
     @Override
-    public int getScreenHeight() {
+    public int getScaledHeight() {
         return (int) (mapFragment.getView().getHeight() / getScaleFactor());
+    }
+
+    @Override
+    public int getScreenHeight() {
+        return mapFragment.getView().getHeight();
+    }
+
+    @Override
+    public int getScreenWidth() {
+        return mapFragment.getView().getWidth();
     }
 
     @Override
@@ -145,14 +164,16 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public void setBBox() {
-        //TODO
-        this.latLngBounds = mapFragment.getMap().getProjection().getVisibleRegion().latLngBounds;
+        GoogleMap map = mapFragment.getMap();
+        if (map != null) {
+            this.latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
+        }
     }
 
     @Override
     public void clearOverlay() {
-        if (vehicleOverlay != null) {
-            vehicleOverlay.remove();
+        if (typedMarker != null) {
+            typedMarker.remove();
         }
         activity.runOnUiThread(new Runnable() {
             @Override

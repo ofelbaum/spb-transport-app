@@ -42,6 +42,7 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
 
     public interface onMapReady {
         void setMap(GoogleMap map);
+        void updateMap(GoogleMap map);
     }
 
     public void setOnMapReadyCallback(onMapReady onMapReadyCallback) {
@@ -74,6 +75,27 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
 
                 if (map != null) {
                     onMapReadyCallback.setMap(map);
+                    handler.removeCallbacksAndMessages(null);
+                } else {
+                    handler.postDelayed(this, 500);
+                }
+            }
+        }, 500);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                GoogleMap map = getMap();
+
+                if (map != null) {
+                    onMapReadyCallback.updateMap(map);
                     handler.removeCallbacksAndMessages(null);
                 } else {
                     handler.postDelayed(this, 500);

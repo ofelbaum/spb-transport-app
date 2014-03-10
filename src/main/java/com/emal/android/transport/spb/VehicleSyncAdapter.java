@@ -20,9 +20,9 @@ public interface VehicleSyncAdapter {
 
     void afterSync(boolean result);
 
-    int getScreenWidth();
+    int getScaledWidth();
 
-    int getScreenHeight();
+    int getScaledHeight();
 
     String getBBox();
 
@@ -51,4 +51,8 @@ public interface VehicleSyncAdapter {
     void updateMarkers(Route route, List<Marker> markers);
 
     void removeMarkers(Route key);
+
+    int getScreenHeight();
+
+    int getScreenWidth();
 }

@@ -47,8 +47,8 @@ public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
         vehiclesStr = vs.toString();
         Object[] paramss = new Object[]{vehiclesStr,
                 bbox,
-                vehicleSyncAdapter.getScreenWidth(),
-                vehicleSyncAdapter.getScreenHeight()};
+                vehicleSyncAdapter.getScaledWidth(),
+                vehicleSyncAdapter.getScaledHeight()};
         String url = Constants.URL_TEMPLATE + String.format(Constants.URL_PARAMS, paramss);
 
         long start = System.currentTimeMillis();
@@ -59,6 +59,7 @@ public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 1;
             Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
+            bitmap = Bitmap.createScaledBitmap(bitmap, vehicleSyncAdapter.getScreenWidth(), vehicleSyncAdapter.getScreenHeight(), true);
             in.close();
             return bitmap;
         } catch (Exception e) {

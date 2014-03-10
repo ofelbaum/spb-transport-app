@@ -61,9 +61,6 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
             @Override
             public void setMap(final GoogleMap mMap) {
                 mMap.setMyLocationEnabled(true);
-                mMap.setTrafficEnabled(appParams.isShowTraffic());
-                mMap.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
-
                 mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                     @Override
                     public void onCameraChange(CameraPosition cameraPosition) {
@@ -173,6 +170,12 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                 removeMyPlaceDialog = builder.create();
 
                 moveToLocation(appParams.getLastLocation());
+            }
+
+            @Override
+            public void updateMap(GoogleMap map) {
+                map.setTrafficEnabled(appParams.isShowTraffic());
+                map.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
             }
         });
     }
