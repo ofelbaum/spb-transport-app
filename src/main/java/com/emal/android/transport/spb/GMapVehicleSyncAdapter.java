@@ -128,6 +128,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
             result.recycle();
         } else {
+            //TODO not shown
             new Handler().postAtTime(new Runnable() {
                 @Override
                 public void run() {

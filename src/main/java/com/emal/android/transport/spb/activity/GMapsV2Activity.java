@@ -57,6 +57,18 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
     private void createMapFragment() {
         mapFragment = (TouchableMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.setZoomSupport(new TouchableMapFragment.ZoomSupport() {
+            @Override
+            public void before() {
+                vehicleSyncAdapter.clearOverlay();
+            }
+
+            @Override
+            public void after() {
+                vehicleTracker.restart();
+
+            }
+        });
         mapFragment.setOnMapReadyCallback(new TouchableMapFragment.onMapReady() {
             @Override
             public void setMap(final GoogleMap mMap) {
@@ -168,14 +180,13 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                             }
                         });
                 removeMyPlaceDialog = builder.create();
-
-                moveToLocation(appParams.getLastLocation());
             }
 
             @Override
             public void updateMap(GoogleMap map) {
                 map.setTrafficEnabled(appParams.isShowTraffic());
                 map.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
+                moveToLocation(appParams.getLastLocation());
             }
         });
     }

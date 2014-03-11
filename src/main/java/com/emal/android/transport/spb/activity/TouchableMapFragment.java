@@ -2,10 +2,7 @@ package com.emal.android.transport.spb.activity;
 
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.FrameLayout;
 import com.google.android.gms.maps.GoogleMap;
 
@@ -17,6 +14,8 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
     public View mOriginalContentView;
     public TouchableWrapper mTouchView;
     private onMapReady onMapReadyCallback;
+    private ZoomSupport zoomSupport;
+    private GestureDetector gestureDetector;
 
     private class TouchableWrapper extends FrameLayout {
         private GMapsV2Activity activity;
@@ -36,6 +35,24 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
                     activity.setTouched(false);
                     break;
             }
+
+            int maskedAction = event.getActionMasked();
+            System.out.println("maskedAction - " + maskedAction);
+            switch (maskedAction) {
+//                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_POINTER_DOWN: {
+                    // We have a new pointer. Lets add it to the list of pointers
+                    zoomSupport.before();
+                    break;
+                }
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_POINTER_UP:
+                case MotionEvent.ACTION_CANCEL: {
+                    zoomSupport.after();
+                    break;
+                }
+            }
+            gestureDetector.onTouchEvent(event);
             return super.dispatchTouchEvent(event);
         }
     }
@@ -45,8 +62,24 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
         void updateMap(GoogleMap map);
     }
 
+    public interface ZoomSupport {
+        void before();
+        void after();
+    }
+
     public void setOnMapReadyCallback(onMapReady onMapReadyCallback) {
         this.onMapReadyCallback = onMapReadyCallback;
+    }
+
+    public void setZoomSupport(final ZoomSupport zoomSupport) {
+        this.zoomSupport = zoomSupport;
+        this.gestureDetector = new GestureDetector(getActivity(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTapEvent(MotionEvent e) {
+                zoomSupport.before();
+                return super.onDoubleTapEvent(e);
+            }
+        });
     }
 
     @Override
