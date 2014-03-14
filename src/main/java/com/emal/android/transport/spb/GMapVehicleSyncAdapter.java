@@ -128,13 +128,21 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
             result.recycle();
         } else {
-            //TODO not shown
-            new Handler().postAtTime(new Runnable() {
-                @Override
-                public void run() {
-                    errorSignCallback.show();
-                }
-            }, 1000);
+            //TODO fix it, because not shown
+            errorSignCallback.show();
+//            activity.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    errorSignCallback.show();
+//                }
+//            });
+
+//            new Handler().postAtTime(new Runnable() {
+//                @Override
+//                public void run() {
+//                    errorSignCallback.show();
+//                }
+//            }, 1000);
         }
     }
 
@@ -209,7 +217,10 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
     @Override
     public void moveCamera(CameraUpdate cameraUpdate) {
-        mapFragment.getMap().moveCamera(cameraUpdate);
+        GoogleMap map = mapFragment.getMap();
+        if (map != null) {
+            map.moveCamera(cameraUpdate);
+        }
     }
 
     @Override

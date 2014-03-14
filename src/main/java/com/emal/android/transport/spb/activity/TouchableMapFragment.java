@@ -43,12 +43,14 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
                 case MotionEvent.ACTION_POINTER_DOWN: {
                     // We have a new pointer. Lets add it to the list of pointers
                     zoomSupport.before();
+                    activity.setTouched(true);
                     break;
                 }
                 case MotionEvent.ACTION_UP:
                 case MotionEvent.ACTION_POINTER_UP:
                 case MotionEvent.ACTION_CANCEL: {
-                    zoomSupport.after();
+//                    zoomSupport.after();
+                    activity.setTouched(false);
                     break;
                 }
             }

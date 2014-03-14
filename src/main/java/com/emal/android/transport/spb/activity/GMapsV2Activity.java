@@ -192,6 +192,11 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
     }
 
     private void moveToLocation(GeoPoint geoPoint) {
+        //TODO improve me
+        if (vehicleSyncAdapter == null) {
+            Log.e(TAG, "Move to location fails");
+            return;
+        }
         Log.d(TAG, "Move to location: " + geoPoint.toString());
         vehicleSyncAdapter.moveCamera(GeoConverter.toCameraUpdate(geoPoint, appParams.getZoomSize()));
         appParams.setLastLocation(geoPoint);
