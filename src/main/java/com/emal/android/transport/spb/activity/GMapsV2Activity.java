@@ -10,6 +10,8 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import com.emal.android.transport.spb.*;
 import android.os.Bundle;
 import com.emal.android.transport.spb.model.ApplicationParams;
@@ -33,7 +35,6 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
     private static final String TAG = GMapsV2Activity.class.getName();
 
     private TouchableMapFragment mapFragment;
-    private UiSettings mUiSettings;
     private ApplicationParams appParams;
     private VehicleTracker vehicleTracker;
     private VehicleSyncAdapter vehicleSyncAdapter;
@@ -57,22 +58,63 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
     private void createMapFragment() {
         mapFragment = (TouchableMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.setZoomSupport(new TouchableMapFragment.ZoomSupport() {
+        final TouchableMapFragment.ZoomSupport zoomSupport = new TouchableMapFragment.ZoomSupport() {
             @Override
             public void before() {
-                vehicleSyncAdapter.clearOverlay();
+                vehicleTracker.pause();
             }
 
             @Override
             public void after() {
                 vehicleTracker.restart();
-
             }
-        });
+        };
+        mapFragment.setZoomSupport(zoomSupport);
         mapFragment.setOnMapReadyCallback(new TouchableMapFragment.onMapReady() {
             @Override
             public void setMap(final GoogleMap mMap) {
                 mMap.setMyLocationEnabled(true);
+
+                //TODO refactor zoomin/out buttons
+                final View zoomIn = findViewById(R.id.zoomin);
+                zoomIn.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (event.getAction() == MotionEvent.ACTION_UP) {
+                            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                            mMapIsTouched = false;
+                            zoomIn.setBackgroundResource(R.drawable.zoom_in_button);
+                            return true;
+                        }
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            zoomSupport.before();
+                            mMapIsTouched = true;
+                            zoomIn.setBackgroundResource(R.drawable.zoom_in_button_pressed);
+                            return true;
+                        }
+                        return true;
+                    }
+                });
+                final View zoomOut = findViewById(R.id.zoomout);
+                zoomOut.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        if (event.getAction() == MotionEvent.ACTION_UP) {
+                            mMap.animateCamera(CameraUpdateFactory.zoomOut());
+                            mMapIsTouched = false;
+                            zoomOut.setBackgroundResource(R.drawable.zoom_out_button);
+                            return true;
+                        }
+                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                            zoomSupport.before();
+                            mMapIsTouched = true;
+                            zoomOut.setBackgroundResource(R.drawable.zoom_out_button_pressed);
+                            return true;
+                        }
+                        return true;
+                    }
+                });
+
                 mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                     @Override
                     public void onCameraChange(CameraPosition cameraPosition) {
@@ -121,12 +163,6 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                         return false;
                     }
                 });
-                mUiSettings = mMap.getUiSettings();
-                mUiSettings.setMyLocationButtonEnabled(true);
-                mUiSettings.setZoomControlsEnabled(true);
-                mUiSettings.setCompassEnabled(false);
-                mUiSettings.setRotateGesturesEnabled(false);
-                mUiSettings.setTiltGesturesEnabled(false);
 
                 GeoPoint home = appParams.getHomeLocation();
                 if (home != null) {

@@ -39,9 +39,7 @@ public class TouchableMapFragment extends com.google.android.gms.maps.SupportMap
             int maskedAction = event.getActionMasked();
             System.out.println("maskedAction - " + maskedAction);
             switch (maskedAction) {
-//                case MotionEvent.ACTION_DOWN:
                 case MotionEvent.ACTION_POINTER_DOWN: {
-                    // We have a new pointer. Lets add it to the list of pointers
                     zoomSupport.before();
                     activity.setTouched(true);
                     break;

@@ -76,7 +76,8 @@ public class VehicleTracker {
         return new ArrayList<Route>(routeTaskMap.keySet());
     }
 
-    public synchronized void stop() {
+    public synchronized void pause() {
+        Log.d(TAG, "pause tracking <<");
         mHandler.removeCallbacks(timerTask);
         if (timerTask != null) {
             timerTask.cancel();
@@ -97,8 +98,14 @@ public class VehicleTracker {
 
             vehicleSyncAdapter.removeMarkers(key);
         }
+        Log.d(TAG, "pause tracking >>");
+    }
+
+    public synchronized void stop() {
+        Log.d(TAG, "stop tracking <<");
+        pause();
         routeTaskMap.clear();
-        Log.d(TAG, "stopTrackAllRoutes >>");
+        Log.d(TAG, "stop tracking >>");
     }
 
     private synchronized void scheduleTasks() {
