@@ -95,8 +95,6 @@ public class VehicleTracker {
             if (value != null && !AsyncTask.Status.FINISHED.equals(value.getStatus())) {
                 value.cancel(true);
             }
-
-            vehicleSyncAdapter.removeMarkers(key);
         }
         Log.d(TAG, "pause tracking >>");
     }
@@ -104,6 +102,10 @@ public class VehicleTracker {
     public synchronized void stop() {
         Log.d(TAG, "stop tracking <<");
         pause();
+        for (Map.Entry<Route, AsyncTask> task : routeTaskMap.entrySet()) {
+            Route key = task.getKey();
+            vehicleSyncAdapter.removeMarkers(key);
+        }
         routeTaskMap.clear();
         Log.d(TAG, "stop tracking >>");
     }
