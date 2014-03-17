@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.view.Menu;
+import com.emal.android.transport.spb.activity.AbstractDrawerActivity;
 import com.emal.android.transport.spb.portal.PortalClient;
 import com.emal.android.transport.spb.portal.Route;
 import com.emal.android.transport.spb.utils.Constants;
@@ -39,7 +40,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     public GMapVehicleSyncAdapter(SupportMapFragment mapFragment, Menu menu) {
         this.mapFragment = mapFragment;
         this.activity = mapFragment.getActivity();
-        this.errorSignCallback = new MenuErrorSignCallback(menu);
+        this.errorSignCallback = new MenuErrorSignCallback((AbstractDrawerActivity) activity);
         this.markers = new ConcurrentHashMap<Route, List<Marker>>();
     }
 
@@ -128,21 +129,12 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
             result.recycle();
         } else {
-            //TODO fix it, because not shown
-            errorSignCallback.show();
-//            activity.runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    errorSignCallback.show();
-//                }
-//            });
-
-//            new Handler().postAtTime(new Runnable() {
-//                @Override
-//                public void run() {
-//                    errorSignCallback.show();
-//                }
-//            }, 1000);
+            new Handler().postAtTime(new Runnable() {
+                @Override
+                public void run() {
+                    errorSignCallback.show();
+                }
+            }, 1000);
         }
     }
 

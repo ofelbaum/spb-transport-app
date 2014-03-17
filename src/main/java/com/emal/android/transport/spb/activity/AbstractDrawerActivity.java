@@ -134,4 +134,8 @@ public abstract class AbstractDrawerActivity extends FragmentActivity {
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
+
+    public Menu getMenu() {
+        return menu;
+    }
 }

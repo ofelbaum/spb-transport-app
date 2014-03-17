@@ -1,6 +1,7 @@
 package com.emal.android.transport.spb.utils;
 
 import android.view.Menu;
+import com.emal.android.transport.spb.activity.AbstractDrawerActivity;
 
 /**
  * @author alexey.emelyanenko@gmail.com
@@ -8,14 +9,15 @@ import android.view.Menu;
  */
 public class MenuErrorSignCallback implements ErrorSignCallback {
 
-    private Menu menu;
+    private AbstractDrawerActivity activity;
 
-    public MenuErrorSignCallback(Menu menu) {
-        this.menu = menu;
+    public MenuErrorSignCallback(AbstractDrawerActivity menu) {
+        this.activity = menu;
     }
 
     @Override
     public void show() {
+        Menu menu = activity.getMenu();
         if (menu == null) {
             return;
         }
@@ -24,6 +26,7 @@ public class MenuErrorSignCallback implements ErrorSignCallback {
 
     @Override
     public void hide() {
+        Menu menu = activity.getMenu();
         if (menu == null) {
             return;
         }
@@ -33,6 +36,7 @@ public class MenuErrorSignCallback implements ErrorSignCallback {
 
     @Override
     public boolean isShowed() {
+        Menu menu = activity.getMenu();
         return menu != null && menu.getItem(0).isVisible();
     }
 }
