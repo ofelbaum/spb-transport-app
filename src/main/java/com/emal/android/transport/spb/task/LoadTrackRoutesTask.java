@@ -69,9 +69,7 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
 
     @Override
     protected void onPostExecute(Boolean o) {
-        if (Boolean.TRUE.equals(o)) {
-            vehicleTracker.start();
-        } else {
+        if (Boolean.FALSE.equals(o)) {
             vehicleSyncAdapter.showError();
         }
     }

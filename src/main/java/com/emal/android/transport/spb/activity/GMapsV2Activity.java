@@ -72,8 +72,8 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
         mapFragment.setZoomSupport(zoomSupport);
         mapFragment.setOnMapReadyCallback(new TouchableMapFragment.onMapReady() {
             @Override
-            public void setMap(final GoogleMap mMap) {
-                mMap.setMyLocationEnabled(true);
+            public void setMap(final GoogleMap map) {
+                map.setMyLocationEnabled(true);
 
                 //TODO refactor zoomin/out buttons
                 final View zoomIn = findViewById(R.id.zoomin);
@@ -81,7 +81,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_UP) {
-                            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+                            map.animateCamera(CameraUpdateFactory.zoomIn());
                             mMapIsTouched = false;
                             zoomIn.setBackgroundResource(R.drawable.zoom_in_button);
                             return true;
@@ -100,7 +100,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_UP) {
-                            mMap.animateCamera(CameraUpdateFactory.zoomOut());
+                            map.animateCamera(CameraUpdateFactory.zoomOut());
                             mMapIsTouched = false;
                             zoomOut.setBackgroundResource(R.drawable.zoom_out_button);
                             return true;
@@ -115,7 +115,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                     }
                 });
 
-                mMap.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
+                map.setOnCameraChangeListener(new GoogleMap.OnCameraChangeListener() {
                     @Override
                     public void onCameraChange(CameraPosition cameraPosition) {
                         appParams.setLastLocation(cameraPosition.target);
@@ -125,7 +125,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                         }
                     }
                 });
-                mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                     @Override
                     public void onMapLongClick(final LatLng latLng) {
                         runOnUiThread(new Runnable() {
@@ -153,7 +153,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
                     }
                 });
-                mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                     @Override
                     public boolean onMarkerClick(Marker marker) {
                         if (marker.equals(myPlaceMarker)) {
@@ -167,7 +167,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                 GeoPoint home = appParams.getHomeLocation();
                 if (home != null) {
                     LatLng homePoint = new LatLng(home.getLatitudeE6() / 1E6, home.getLongitudeE6() / 1E6);
-                    myPlaceMarker = mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
+                    myPlaceMarker = map.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
                 }
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(GMapsV2Activity.this);
@@ -186,7 +186,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                                 if (myPlaceMarker != null) {
                                     myPlaceMarker.remove();
                                 }
-                                myPlaceMarker = mMap.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
+                                myPlaceMarker = map.addMarker(new MarkerOptions().position(homePoint).title(getResources().getString(R.string.my_place)));
                                 dialog.cancel();
                             }
                         })
@@ -222,19 +222,14 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
             public void updateMap(GoogleMap map) {
                 map.setTrafficEnabled(appParams.isShowTraffic());
                 map.setMapType(Boolean.TRUE.equals(appParams.isSatView()) ? GoogleMap.MAP_TYPE_SATELLITE : GoogleMap.MAP_TYPE_NORMAL);
-                moveToLocation(appParams.getLastLocation());
+                moveToLocation(map, appParams.getLastLocation());
             }
         });
     }
 
-    private void moveToLocation(GeoPoint geoPoint) {
-        //TODO improve me
-        if (vehicleSyncAdapter == null) {
-            Log.e(TAG, "Move to location fails");
-            return;
-        }
+    private void moveToLocation(GoogleMap map, GeoPoint geoPoint) {
         Log.d(TAG, "Move to location: " + geoPoint.toString());
-        vehicleSyncAdapter.moveCamera(GeoConverter.toCameraUpdate(geoPoint, appParams.getZoomSize()));
+        map.animateCamera(GeoConverter.toCameraUpdate(geoPoint, appParams.getZoomSize()));
         appParams.setLastLocation(geoPoint);
     }
 
@@ -261,7 +256,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
         if (networkStatusReceiver == null) {
             networkStatusReceiver = new BroadcastReceiver() {
-                private boolean isConnected = false;
+                private boolean isConnected = true;
 
                 @Override
                 public void onReceive(Context context, Intent intent) {
@@ -362,7 +357,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
             case 1: {
                 GeoPoint homeLocation = appParams.getHomeLocation();
                 if (homeLocation != null) {
-                    moveToLocation(homeLocation);
+                    moveToLocation(mapFragment.getMap(), homeLocation);
                 }
                 break;
             }
