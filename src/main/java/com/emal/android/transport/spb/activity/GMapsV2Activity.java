@@ -229,7 +229,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
 
     private void moveToLocation(GoogleMap map, GeoPoint geoPoint) {
         Log.d(TAG, "Move to location: " + geoPoint.toString());
-        map.animateCamera(GeoConverter.toCameraUpdate(geoPoint, appParams.getZoomSize()));
+        map.moveCamera(GeoConverter.toCameraUpdate(geoPoint, appParams.getZoomSize()));
         appParams.setLastLocation(geoPoint);
     }
 
@@ -267,6 +267,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
                     if (activeNetworkInfo == null) {
                         Log.d(TAG, "Network OFF");
                         isConnected = false;
+                        vehicleTracker.stop();
                         return;
                     }
                     Log.d(TAG, "Network ON " + activeNetworkInfo.toString());

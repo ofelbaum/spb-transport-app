@@ -1,6 +1,7 @@
 package com.emal.android.transport.spb.task;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.VehicleTracker;
 import com.emal.android.transport.spb.VehicleType;
@@ -16,6 +17,7 @@ import java.util.Collection;
  * @since: 1.5
  */
 public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
+    private static final String TAG = LoadTrackRoutesTask.class.getSimpleName();
     private Collection<String> routesToTrack;
     private VehicleSyncAdapter vehicleSyncAdapter;
     private ApplicationParams appParams;
@@ -33,16 +35,28 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Object... params) {
+
+        // This is temporary workaround
+        if (routesToTrack.isEmpty()) {
+            try {
+                vehicleSyncAdapter.getPortalClient().findRoute("1", "1");
+            } catch (Exception e) {
+                //nothing to do
+            }
+        }
+
         for (String s : routesToTrack) {
             String[] decode = Route.decode(s);
             try {
                 Route route = vehicleSyncAdapter.getPortalClient().findRoute(decode[0], decode[1]);
+                Log.d(TAG, "Get route info: " + route.getRouteNumber());
                 vehicleTracker.add(route);
             } catch (IOException e) {
                 e.printStackTrace();
                 return false;
             } catch (PortalClientException e) {
                 e.printStackTrace();
+                return false;
             }
         }
 
@@ -65,12 +79,16 @@ public class LoadTrackRoutesTask extends AsyncTask<Object, Void, Boolean> {
     @Override
     protected void onPreExecute() {
         vehicleTracker.stop();
+        vehicleSyncAdapter.beforeSync(false);
     }
 
     @Override
     protected void onPostExecute(Boolean o) {
-        if (Boolean.FALSE.equals(o)) {
-            vehicleSyncAdapter.showError();
+        //TODO fix false state. Reload tracks?
+        vehicleSyncAdapter.afterSync(o);
+
+        if (Boolean.TRUE.equals(o)) {
+            vehicleTracker.restart();
         }
     }
 }
