@@ -34,27 +34,26 @@ public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Object... params) {
-        String bbox = vehicleSyncAdapter.getBBox();
-        StringBuffer vs = new StringBuffer();
-        Iterator<VehicleType> iterator = vehicleTypes.iterator();
-        while (iterator.hasNext()) {
-            VehicleType next = iterator.next();
-            vs.append(next.getCode());
-            if (iterator.hasNext()) {
-                vs.append(",");
-            }
-        }
-        vehiclesStr = vs.toString();
-        Object[] paramss = new Object[]{vehiclesStr,
-                bbox,
-                vehicleSyncAdapter.getScaledWidth(),
-                vehicleSyncAdapter.getScaledHeight()};
-        String url = Constants.URL_TEMPLATE + String.format(Constants.URL_PARAMS, paramss);
-
         long start = System.currentTimeMillis();
         Log.d(TAG, "Download " + vehiclesStr + " START for " + Thread.currentThread().getName());
 
         try {
+            String bbox = vehicleSyncAdapter.getBBox();
+            StringBuffer vs = new StringBuffer();
+            Iterator<VehicleType> iterator = vehicleTypes.iterator();
+            while (iterator.hasNext()) {
+                VehicleType next = iterator.next();
+                vs.append(next.getCode());
+                if (iterator.hasNext()) {
+                    vs.append(",");
+                }
+            }
+            vehiclesStr = vs.toString();
+            Object[] paramss = new Object[]{vehiclesStr,
+                    bbox,
+                    vehicleSyncAdapter.getScaledWidth(),
+                    vehicleSyncAdapter.getScaledHeight()};
+            String url = Constants.URL_TEMPLATE + String.format(Constants.URL_PARAMS, paramss);
             InputStream in = vehicleSyncAdapter.getPortalClient().doGet(url);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 1;
