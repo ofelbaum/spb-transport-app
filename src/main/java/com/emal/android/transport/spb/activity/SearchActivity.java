@@ -39,7 +39,6 @@ public class SearchActivity extends Activity {
     private List<Route> findedRoutes;
     private Set<Route> selectedRoutes = new ConcurrentSkipListSet<Route>();
     private LinearLayout selectedRoutesPics;
-    private ImageButton clearFilter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,16 +58,6 @@ public class SearchActivity extends Activity {
         searchView.setIconified(false);
         listView = (ListView) findViewById(R.id.searchResultView);
         selectedRoutesPics = (LinearLayout) findViewById(R.id.selectedRoutesList);
-        clearFilter = (ImageButton) findViewById(R.id.clearFilter);
-        clearFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectedRoutesPics.removeAllViews();
-                selectedRoutesPics.refreshDrawableState();
-                appParams.getRoutesToTrack().clear();
-                clearFilter.setVisibility(View.INVISIBLE);
-            }
-        });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -102,7 +91,6 @@ public class SearchActivity extends Activity {
                     routesToTrack.add(encode);
                     selectedRoutes.add(route);
                     drawSelection(route);
-                    clearFilter.setVisibility(View.VISIBLE);
                 }
             }
         });
@@ -148,14 +136,10 @@ public class SearchActivity extends Activity {
                 selectedRoutesPics.removeView(imageView);
                 selectedRoutesPics.refreshDrawableState();
                 Boolean res = appParams.getRoutesToTrack().remove(Route.encode(next));
-                if (selectedRoutesPics.getChildCount() == 0) {
-                    clearFilter.setVisibility(View.INVISIBLE);
-                }
                 Log.d(TAG, res.toString());
             }
         });
         selectedRoutesPics.addView(imageView);
-        clearFilter.setVisibility(View.VISIBLE);
     }
 
     private void initIndex() {
@@ -245,9 +229,17 @@ public class SearchActivity extends Activity {
 
         canvas.drawRect(0, 0, bHeigth, bWidth, rectPaint);
         canvas.save();
+//        if (type.isUpsideDown()) {
+//            int x = canvas.getClipBounds().centerX();
+//            int y = canvas.getClipBounds().centerY();
+//            canvas.rotate(180, x, y);
+//
+//            yPos += 2; //TODO fix
+//        } else {
+//        }
+
+//        yPos++; //TODO fix
         canvas.drawText(route.getRouteNumber(), xPos, yPos, textPaint);
-        Bitmap bm = Bitmap.createScaledBitmap(BitmapFactory.decodeResource(getResources(), android.R.drawable.ic_delete), 25, 25, true);
-        canvas.drawBitmap(bm, 38, -3, rectPaint);
         canvas.restore();
 
         return bitmap;
