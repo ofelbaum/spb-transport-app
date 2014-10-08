@@ -30,37 +30,37 @@
         <dependency>
             <groupId>android</groupId>
             <artifactId>android</artifactId>
-            <version>4.4.2_r2</version>
+            <version>4.4.2_r4</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.android.maps</groupId>
             <artifactId>maps</artifactId>
-            <version>17_r3</version>
+            <version>19_r7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.android.gms</groupId>
             <artifactId>google-play-services</artifactId>
-            <version>10</version>
+            <version>19.0.0</version>
             <type>apklib</type>
         </dependency>
         <dependency>
             <groupId>com.google.android.gms</groupId>
             <artifactId>google-play-services</artifactId>
-            <version>10</version>
+            <version>19.0.0</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.google.android</groupId>
             <artifactId>analytics</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.2</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>android.support</groupId>
             <artifactId>compatibility-v13</artifactId>
-            <version>18</version>
+            <version>20.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.codehaus.jackson</groupId>

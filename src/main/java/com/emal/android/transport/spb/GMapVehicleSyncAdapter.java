@@ -118,6 +118,7 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 //                }
 //                vehicleOverlay = vehicleOverlayNew;
                 //TODO
+                map.clear();
                 if (typedMarker != null) {
                     typedMarker.remove();
                 }

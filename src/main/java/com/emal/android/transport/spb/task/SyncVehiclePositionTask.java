@@ -57,9 +57,10 @@ public class SyncVehiclePositionTask extends AsyncTask<Object, Void, Bitmap> {
             InputStream in = vehicleSyncAdapter.getPortalClient().doGet(url);
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 1;
-            Bitmap bitmap = BitmapFactory.decodeStream(in, null, options);
-            bitmap = Bitmap.createScaledBitmap(bitmap, vehicleSyncAdapter.getScreenWidth(), vehicleSyncAdapter.getScreenHeight(), true);
+            Bitmap bitmap1 = BitmapFactory.decodeStream(in, null, options);
+            Bitmap bitmap = Bitmap.createScaledBitmap(bitmap1, vehicleSyncAdapter.getScreenWidth(), vehicleSyncAdapter.getScreenHeight(), true);
             in.close();
+            bitmap1.recycle();
             return bitmap;
         } catch (Exception e) {
             String message = e.getMessage();
