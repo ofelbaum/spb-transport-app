@@ -1,11 +1,11 @@
 package com.emal.android.transport.spb.task;
 
-import android.graphics.*;
 import android.os.AsyncTask;
 import android.util.Log;
 import com.emal.android.transport.spb.VehicleSyncAdapter;
 import com.emal.android.transport.spb.VehicleType;
 import com.emal.android.transport.spb.portal.*;
+import com.emal.android.transport.spb.utils.DrawHelper;
 import com.google.android.gms.maps.model.*;
 
 import java.util.*;
@@ -50,7 +50,7 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
             return;
         }
         Log.d(TAG, "Found new vehicles size: " + vehicles.size());
-        List<Marker> routeMarkers = new ArrayList<Marker>();
+        List<Marker[]> routeMarkers = new ArrayList<Marker[]>();
 
         for (Vehicle v : vehicles) {
             Double latitude = v.getGeometry().getLatitude();
@@ -60,74 +60,35 @@ public class DrawVehicleTask extends AsyncTask<Object, Void, List<Vehicle>> {
 
             VehicleProps properties = v.getProperties();
 
-            Bitmap bitmap = getVehicleBitmap(route, properties, vehicleSyncAdapter.getScaleFactor());
-            BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-            MarkerOptions title = new MarkerOptions()
+            VehicleType transportType = route.getTransportType();
+            int direction = properties.getDirection();
+            if (transportType.isUpsideDown()) {
+                direction += 180;
+            }
+
+            BitmapDescriptor vehicleTypeBitmap = DrawHelper.getVechicleTypeBitmapDescriptor(route.getTransportType(), vehicleSyncAdapter.getScaleFactor());
+            MarkerOptions vehicleMarker = new MarkerOptions()
                     .position(homePoint)
                     .anchor(0.5f, 0.5f)
-                    .icon(bitmapDescriptor)
+                    .icon(vehicleTypeBitmap)
+                    .rotation(direction)
+                    .infoWindowAnchor((float) Math.sin(Math.toRadians(direction)) * (-0.5f) + 0.5f, (float) Math.cos(Math.toRadians(direction)) * (-0.5f) + 0.5f)
                     .title(properties.getDisplayValue());
+
+            BitmapDescriptor vehicleNumber = DrawHelper.getVechicleNumberBitmapDescriptor(route.getRouteNumber(), vehicleSyncAdapter.getScaleFactor());
+            MarkerOptions numberMarker = new MarkerOptions()
+                    .position(homePoint)
+                    .anchor(0.5f, 0.5f)
+                    .icon(vehicleNumber);
 
             String vehId = v.getId();
             Log.d(TAG, "Add new marker for vehicle: " + vehId);
-            Marker newMarker = vehicleSyncAdapter.addMarker(title);
-            routeMarkers.add(newMarker);
+            Marker vechicleTypeM = vehicleSyncAdapter.addMarker(vehicleMarker);
+            Marker vehicleTypeM = vehicleSyncAdapter.addMarker(numberMarker);
+            routeMarkers.add(new Marker[]{vechicleTypeM, vehicleTypeM});
         }
 
         vehicleSyncAdapter.updateMarkers(route, routeMarkers);
         vehicleSyncAdapter.afterSync(true);
-    }
-
-    private static Bitmap getVehicleBitmap(Route route, VehicleProps properties, float scaleFactor) {
-        VehicleType transportType = route.getTransportType();
-
-        int magic = (int) (10 * scaleFactor);
-        int bHeigth = magic * 4;
-        int bWidth = magic * 4;
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = Bitmap.createBitmap(bWidth, bHeigth, conf);
-
-        Paint vehiclePaint = new Paint();
-        vehiclePaint.setTextSize(magic + 5);
-        vehiclePaint.setColor(Color.WHITE);
-        vehiclePaint.setTypeface(Typeface.DEFAULT_BOLD);
-        vehiclePaint.setTextAlign(Paint.Align.CENTER);
-        vehiclePaint.setAntiAlias(true);
-        vehiclePaint.setFilterBitmap(true);
-
-        Paint vehicleNumberPaint = new Paint();
-        vehicleNumberPaint.setTextSize(magic + 5);
-        vehicleNumberPaint.setColor(Color.BLACK);
-        vehicleNumberPaint.setTypeface(Typeface.DEFAULT_BOLD);
-        vehicleNumberPaint.setTextAlign(Paint.Align.CENTER);
-        vehicleNumberPaint.setAntiAlias(true);
-        vehicleNumberPaint.setFilterBitmap(true);
-
-        Paint rectPaint = new Paint();
-        rectPaint.setColor(transportType.getColor());
-        rectPaint.setStyle(Paint.Style.FILL);
-        rectPaint.setFilterBitmap(true);
-        rectPaint.setAntiAlias(true);
-
-        Canvas canvas = new Canvas(bitmap);
-        int x = canvas.getClipBounds().centerX();
-        int y = canvas.getClipBounds().centerY();
-
-        canvas.drawText(route.getRouteNumber(), magic, magic, vehicleNumberPaint);
-        canvas.save();
-
-        int direction = properties.getDirection();
-        if (transportType.isUpsideDown()) {
-            direction += 180;
-        }
-        canvas.rotate(direction, x, y);
-        canvas.drawRect(x - magic + magic/3.0f, y + magic, x + magic - magic/3.0f, y - magic, rectPaint);
-
-        int xPos = (canvas.getWidth() / 2);
-        int yPos = (int) ((canvas.getHeight() / 2) - ((vehiclePaint.descent() + vehiclePaint.ascent()) / 2)) ;
-
-        canvas.drawText(transportType.getLetter(), xPos, yPos, vehiclePaint);
-        canvas.restore();
-        return bitmap;
     }
 }

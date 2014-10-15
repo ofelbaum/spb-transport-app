@@ -48,7 +48,7 @@ public interface VehicleSyncAdapter {
 
     void setSyncTime(int syncTime);
 
-    void updateMarkers(Route route, List<Marker> markers);
+    void updateMarkers(Route route, List<Marker[]> markers);
 
     void removeMarkers(Route key);
 

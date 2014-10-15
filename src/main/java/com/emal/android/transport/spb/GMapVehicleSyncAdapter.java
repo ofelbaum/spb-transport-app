@@ -30,18 +30,17 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     private Activity activity;
     private SupportMapFragment mapFragment;
     private int syncTime = Constants.DEFAULT_SYNC_MS;
-//    private GroundOverlay vehicleOverlay;
     private Marker typedMarker;
     private LatLngBounds latLngBounds;
     private ErrorSignCallback errorSignCallback;
     private int iconSize = Constants.DEFAULT_ICON_SIZE;
-    private Map<Route, List<Marker>> markers;
+    private Map<Route, List<Marker[]>> markers;
 
     public GMapVehicleSyncAdapter(SupportMapFragment mapFragment, Menu menu) {
         this.mapFragment = mapFragment;
         this.activity = mapFragment.getActivity();
         this.errorSignCallback = new MenuErrorSignCallback((AbstractDrawerActivity) activity);
-        this.markers = new ConcurrentHashMap<Route, List<Marker>>();
+        this.markers = new ConcurrentHashMap<Route, List<Marker[]>>();
     }
 
     @Override
@@ -108,16 +107,6 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
 
             GoogleMap map = mapFragment.getMap();
             if (map != null) {
-//                LatLngBounds latLngBounds = map.getProjection().getVisibleRegion().latLngBounds;
-//                GroundOverlay vehicleOverlayNew = map.addGroundOverlay(new GroundOverlayOptions()
-//                        .image(image)
-//                        .zIndex(Float.MAX_VALUE)
-//                        .positionFromBounds(latLngBounds));
-//                if (vehicleOverlay != null) {
-//                    vehicleOverlay.remove();
-//                }
-//                vehicleOverlay = vehicleOverlayNew;
-                //TODO
                 map.clear();
                 if (typedMarker != null) {
                     typedMarker.remove();
@@ -235,19 +224,21 @@ public class GMapVehicleSyncAdapter implements VehicleSyncAdapter {
     }
 
     @Override
-    public void updateMarkers(Route route, List<Marker> list) {
+    public void updateMarkers(Route route, List<Marker[]> list) {
         removeMarkers(route);
         markers.put(route, list);
     }
 
     @Override
     public void removeMarkers(Route route) {
-        List<Marker> list = markers.get(route);
+        List<Marker[]> list = markers.get(route);
         if (list == null) {
             return;
         }
-        for (Marker marker : list) {
-            marker.remove();
+        for (Marker[] marker : list) {
+            for (Marker m: marker) {
+                m.remove();
+            }
         }
     }
 }

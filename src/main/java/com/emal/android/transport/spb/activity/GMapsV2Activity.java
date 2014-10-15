@@ -248,6 +248,7 @@ public class GMapsV2Activity extends AbstractDrawerActivity {
         if (homeLocation == null && myPlaceMarker != null) {
             myPlaceMarker.remove();
         }
+        DrawHelper.evictCaches();
         vehicleSyncAdapter = new GMapVehicleSyncAdapter(mapFragment, menu);
         vehicleSyncAdapter.setSyncTime(appParams.getSyncTime());
         vehicleSyncAdapter.setIconSize(appParams.getIconSize());
