@@ -36,6 +36,7 @@
         <activity android:name=".activity.PreferencesActivity" />
         <activity android:name=".activity.SearchActivity" />
         <activity android:name=".activity.InfoActivity" />
+        <activity android:name=".activity.DonateActivity" />
         <uses-library android:name="com.google.android.maps"/>
     </application>
 </manifest>

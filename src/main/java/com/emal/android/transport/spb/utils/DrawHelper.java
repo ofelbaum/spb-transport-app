@@ -6,36 +6,41 @@ import com.emal.android.transport.spb.VehicleType;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * User: alexey.emelyanenko@gmail.com
  * Date: 10/15/14 11:16 PM
  */
 public class DrawHelper {
-    private static LruCache<VehicleType, BitmapDescriptor> cacheTypes = new LruCache<VehicleType, BitmapDescriptor>((int)(Runtime.getRuntime().maxMemory() / 1024 / 16));
+    private static Map<String, BitmapDescriptor> cacheTypes = new ConcurrentHashMap<String, BitmapDescriptor>(4);
     private static LruCache<String, BitmapDescriptor> cacheNumbers = new LruCache<String, BitmapDescriptor>((int)(Runtime.getRuntime().maxMemory() / 1024 / 16));
 
     public static void evictCaches() {
-        cacheTypes.evictAll();
+        cacheTypes.clear();
         cacheNumbers.evictAll();
     }
 
     public static BitmapDescriptor getVechicleTypeBitmapDescriptor(VehicleType transportType, float scaleFactor) {
-        BitmapDescriptor bitmapDescriptor = cacheTypes.get(transportType);
+        String key = transportType.name() + "_" + String.valueOf(scaleFactor);
+        BitmapDescriptor bitmapDescriptor = cacheTypes.get(key);
         if (bitmapDescriptor == null) {
             Bitmap bitmap = getVehicleBitmap(transportType, scaleFactor);
             bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-            cacheTypes.put(transportType, bitmapDescriptor);
+            cacheTypes.put(key, bitmapDescriptor);
 
         }
         return bitmapDescriptor;
     }
 
     public static BitmapDescriptor getVechicleNumberBitmapDescriptor(String routeNumber, float scaleFactor) {
-        BitmapDescriptor bitmapDescriptor = cacheNumbers.get(routeNumber);
+        String key = routeNumber + "_" + String.valueOf(scaleFactor);
+        BitmapDescriptor bitmapDescriptor = cacheNumbers.get(key);
         if (bitmapDescriptor == null) {
             Bitmap bitmap = getVehicleNumberBitmap(routeNumber, scaleFactor);
             bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(bitmap);
-            cacheNumbers.put(routeNumber, bitmapDescriptor);
+            cacheNumbers.put(key, bitmapDescriptor);
 
         }
         return bitmapDescriptor;

@@ -15,6 +15,10 @@
                 android:selectable="true"
                 android:title="@string/feedback"/>
         <Preference
+                android:key="pref_donate"
+                android:selectable="true"
+                android:title="@string/donate"/>
+        <Preference
                 android:key="pref_copyright"
                 android:selectable="true"
                 android:summary="@string/copyright"

@@ -46,6 +46,7 @@
     <string name="clear_selection">Очистить</string>
     <string name="search_page">Поиск</string>
     <string name="feedback">Отзыв</string>
+    <string name="donate">Поддержать</string>
     <string name="app_params">Общие</string>
     <string name="app_theme">Тема</string>
     <string-array name="sync_string_array">
